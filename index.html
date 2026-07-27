@@ -12,6 +12,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    <!-- GSAP for advanced animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script>
+    <style>
+        /* Aircraft Cursor */
+        .aircraft-cursor {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: screen;
+            filter: drop-shadow(0 0 4px rgba(255, 87, 51, 0.6));
+        }
+    </style>
 </head>
 <body class="main-content">
     <header class="container header active" id="home">
@@ -27,14 +41,52 @@
                     Hi, I'm <span>Avni Bhardwaj.</span><br>
                     A <span class="auto-type"></span>   
                 </h1>
+                <!-- Floating A380 Decoration in Hero -->
+                <div class="hero-aircraft-decoration" data-parallax="0.3">
+                    <svg viewBox="0 0 200 100" width="120" height="60">
+                        <!-- A380 Silhouette (Side View) -->
+                        <g opacity="0.15">
+                            <!-- Fuselage -->
+                            <ellipse cx="100" cy="50" rx="70" ry="15" fill="#ff5733"/>
+                            <!-- Cockpit -->
+                            <circle cx="45" cy="48" r="8" fill="#ff5733"/>
+                            <!-- Main deck windows -->
+                            <circle cx="70" cy="42" r="3" fill="#ff5733"/>
+                            <circle cx="80" cy="42" r="3" fill="#ff5733"/>
+                            <circle cx="90" cy="42" r="3" fill="#ff5733"/>
+                            <circle cx="100" cy="42" r="3" fill="#ff5733"/>
+                            <circle cx="110" cy="42" r="3" fill="#ff5733"/>
+                            <!-- Lower deck windows -->
+                            <circle cx="75" cy="55" r="2.5" fill="#ff5733"/>
+                            <circle cx="85" cy="55" r="2.5" fill="#ff5733"/>
+                            <circle cx="95" cy="55" r="2.5" fill="#ff5733"/>
+                            <circle cx="105" cy="55" r="2.5" fill="#ff5733"/>
+                            <!-- Main wings -->
+                            <ellipse cx="100" cy="50" rx="90" ry="12" fill="none" stroke="#ff5733" stroke-width="2"/>
+                            <!-- Horizontal stabilizer (tail) -->
+                            <ellipse cx="155" cy="52" rx="30" ry="8" fill="none" stroke="#ff5733" stroke-width="1.5"/>
+                            <!-- Vertical stabilizer (tail fin) -->
+                            <line x1="160" y1="50" x2="160" y2="30" stroke="#ff5733" stroke-width="2"/>
+                            <!-- Landing gear (simplified) -->
+                            <line x1="75" y1="65" x2="75" y2="85" stroke="#ff5733" stroke-width="1.5"/>
+                            <line x1="125" y1="65" x2="125" y2="85" stroke="#ff5733" stroke-width="1.5"/>
+                            <!-- Engine markers -->
+                            <circle cx="70" cy="70" r="4" fill="none" stroke="#ff5733" stroke-width="1.5"/>
+                            <circle cx="85" cy="72" r="3" fill="none" stroke="#ff5733" stroke-width="1.5"/>
+                            <circle cx="115" cy="72" r="3" fill="none" stroke="#ff5733" stroke-width="1.5"/>
+                            <circle cx="130" cy="70" r="4" fill="none" stroke="#ff5733" stroke-width="1.5"/>
+                        </g>
+                    </svg>
+                </div>
                 <script>
                     var typed = new Typed(".auto-type", {
                         strings: ["<span style='color: #ff5733;'>Web Developer</span>", 
                                   "<span style='color: #3366ff;'>Programmer</span>", 
                                   "<span style='color: #ff33cc;'>Designer</span>", 
                                   "<span style='color: #fffc33;'>Problem Solver</span>", 
-                                  "<span style='color: #ff5733;'>Data Analyst</span>",
-                                  "<span style='color: #ff5733;'>Calligraphist</span>"],
+                                  "<span style='color: #10b981;'>AI/ML Enthusiast</span>",
+                                  "<span style='color: #8b5cf6;'>Data Insights</span>",
+                                  "<span style='color: #f59e0b;'>Avgeek</span>"],
                         typeSpeed: 70,
                         backSpeed: 70,
                         loop: true,
@@ -42,8 +94,7 @@
                     });
                 </script>
                 <p>
-                    I'm a Developer, I love to create beautiful and functional websites.
-                    I'm passionate about staying at the forefront of technology and learning new tools and techniques to enhance my craft. I thrive on challenges and enjoy tackling complex problems with creativity 
+                    I craft beautiful, functional web experiences with precision and purpose. I stay at the forefront of technology, learn new tools quickly, and treat every challenge as a chance to sharpen my craft. What I don't know today becomes the mastery I earn tomorrow.
                 </p>
                 <div class="btn-con">
                     <a href="./Avni Resume.docx" class="main-btn">
@@ -63,9 +114,7 @@
                 <div class="left-about">
                     <h4>Information About me</h4>
                     <p>
-                        I am Avni Bhardwaj, currently pursuing a Bachelor's degree in Computer Engineering at Narsee Monjee Institute of Management and Studies in Indore,Madhya Pradesh.<br>
-                        C++, Java, Mobile App development and Python, coupled with hands-on experience in web development using technologies like JavaScript, NodeJS, and React is what my expertise resides in.
-                        Beyond academics, I am an avid learner, always exploring new technologies and keeping abreast of industry trends.
+                        I am Avni Bhardwaj, a Computer Engineering student at NMIMS Indore and an intern with Airbus Flight Physics Capabilities. I build elegant interfaces, data-driven tools, and AI-powered products using C++, Java, Python, JavaScript, Node.js, and React. I am passionate about turning strong design thinking into polished technical work and I thrive in fast-paced, collaborative environments where every project levels up my skills.
                     </p>
                     <div class="btn-con">
                         <a href="./Avni Resume.docx" class="main-btn">
@@ -152,9 +201,45 @@
                     <div class="progress-bar">
                         <p class="prog-title">Python</p>
                         <div class="progress-con">
+                            <p class="prog-text">90%</p>
+                            <div class="progress">
+                                <span class="python" style="width: 90%"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <p class="prog-title">FastAPI</p>
+                        <div class="progress-con">
                             <p class="prog-text">85%</p>
                             <div class="progress">
-                                <span class="python"></span>
+                                <span class="fastapi" style="width: 85%; background: linear-gradient(to right, #10b981, #14b8a6);"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <p class="prog-title">Docker & DevOps</p>
+                        <div class="progress-con">
+                            <p class="prog-text">80%</p>
+                            <div class="progress">
+                                <span class="docker" style="width: 80%; background: linear-gradient(to right, #2496ed, #0db7ed);"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <p class="prog-title">AI/ML (PyTorch, RAG, LLM)</p>
+                        <div class="progress-con">
+                            <p class="prog-text">80%</p>
+                            <div class="progress">
+                                <span class="aiml" style="width: 80%; background: linear-gradient(to right, #ff5733, #f59e0b);"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <p class="prog-title">PySide6 & Qt</p>
+                        <div class="progress-con">
+                            <p class="prog-text">75%</p>
+                            <div class="progress">
+                                <span class="pyside" style="width: 75%; background: linear-gradient(to right, #8b5cf6, #a78bfa);"></span>
                             </div>
                         </div>
                     </div>
@@ -168,10 +253,9 @@
                     </div>
                     <p class="tl-duration">July 2023 - July 2024</p>
                     <h5>GDSC LEAD<span> - Google Developer Student Clubs</span></h5>
-                    <p>
-                        As the GDSC Lead, I am playing a pivotal role in fostering a vibrant community of like-minded students passionate about
-technology and innovation and making the students technically sound.
-                    </p>
+                   <p>
+                       As the GDSC Lead, I build a high-energy campus community, lead technical workshops, and mentor students on AI, cloud, and modern web development. I help turn ideas into polished outcomes and create opportunities for peer learning across the chapter.
+                   </p>
                 </div>
                 <div class="timeline-item">
                     <div class="tl-icon">
@@ -180,9 +264,7 @@ technology and innovation and making the students technically sound.
                     <p class="tl-duration">November 2024</p>
                     <h5>Chaitanya: The Leadership Event - National Finalist<span><br>Atharv Ranbhoomi’24 - IIM INDORE</span></h5>
                     <p>
-                        Securing a national-level finalist position at such a prestigious competition is an achievement .As part of Team INNOV8, I had
-                        the privilege of participating in Chaitanya | The Leadership Competition at IIM Indore. Out of 977 registrations, we
-                        made it to the top 20.
+                        National finalist at IIM Indore’s Chaitanya leadership challenge. Team INNOV8 was selected from 977 registrations and advanced to the top 20 with a strategic product pitch and growth plan.
                     </p>
                 </div>
                 <div class="timeline-item">
@@ -191,7 +273,8 @@ technology and innovation and making the students technically sound.
                     </div>
                     <p class="tl-duration">August 2023</p>
                     <h5>Organizing Committee<span> - WittyHacks 4.0.</span></h5>
-                    <p>Worked as an Organizer with WittyHacks 4.0 ,held at NMIMS Indore from 5-6-7 April 2024.Overseeed the smooth operation of the hackathon and directed the execution of event logistics, including venue selection, setup, and technical infrastructure arrangements.
+                    <p>
+                        Managed event logistics, mentor coordination, and technical infrastructure for WittyHacks 4.0 at NMIMS Indore, helping ensure a seamless experience for participants and judges.
                     </p>
                 </div>
                 <div class="timeline-item">
@@ -200,10 +283,8 @@ technology and innovation and making the students technically sound.
                     </div>
                     <p class="tl-duration">August 2023</p>
                     <h5>Techinnovation 6th Rank Winner<span> - IIT KANPUR</span></h5>
-                    <p>As a Frontend Developer I designed web application used for detecting murders, accidents , crimes using live CCTV feed and alerting nearby police stations.
-                        Were in the top 5 teams to reach the Grand Finale at Pillai College of Engineeering ,out of 25,000 applicants
-                        My team, NMTechnophiles developed a chemically-operated,cost-efficient hardware model to autonomously collect data from the depths of the ocean.
-                        Worked on AutoCAD/tinkercad prototype development, gas evolution calculations, pressure analysis, battery specifications, and material study.
+                    <p>Built the frontend for a CCTV analytics platform that detects incidents, flags risks, and triggers alerts.
+                        Our team reached the grand finale and placed in the top 5 out of 25,000 applicants.
                     </p>
                 </div>
                 <div class="timeline-item">
@@ -212,8 +293,9 @@ technology and innovation and making the students technically sound.
                     </div>
                     <p class="tl-duration">May 2023</p>
                     <h5>Techinnovation 6th Rank Winner<span> - IIT KANPUR</span></h5>
-                    <p>My team, NMTechnophiles developed a chemically-operated,cost-efficient hardware model to autonomously collect data from the depths of the ocean.
-                        Worked on AutoCAD/tinkercad prototype development, gas evolution calculations, pressure analysis, battery specifications, and material study.                    </p>
+                    <p>
+                        Designed an autonomous environmental monitoring prototype that combined low-cost hardware with data capture and analytics. I contributed to schematic modeling, pressure calculations, and material optimization for deployable systems.
+                    </p>
                 </div>
                 <div class="timeline-item">
                     <div class="tl-icon">
@@ -221,7 +303,8 @@ technology and innovation and making the students technically sound.
                     </div>
                     <p class="tl-duration">Feb 2023</p>
                     <h5>Execute Hacakthon<span> - Technxex-Turing Club</span></h5>
-                    <p> Were in the Top 10 in Execute Hackathon. We focused on leveraging TensorFlow, OpenCV for an AI based fashion concept in Malls and virtual shopping.
+                    <p>
+                        Achieved a Top 10 finish in Execute Hackathon by building an AI fashion concept that used TensorFlow and OpenCV to personalize mall shopping and virtual try-on experiences.
                     </p>
                 </div>
                 <div class="timeline-item">
@@ -231,7 +314,7 @@ technology and innovation and making the students technically sound.
                     <p class="tl-duration">September 2022</p>
                     <h5>Winner<span> -GDSC Oracle Challenge 2023</span></h5>
                     <p>
-                        Won 1st place in GDSC oracle challenge along with my 4 team members. Solved mind busting and puzzling challenges 
+                        First place in the GDSC Oracle Challenge with a team of four, solving demanding engineering puzzles and delivering polished solutions under pressure.
                     </p>
                 </div>
             </div>
@@ -241,15 +324,54 @@ technology and innovation and making the students technically sound.
                 <h2>My <span>Projects</span><span class="bg-text">My Work</span></h2>
             </div><br>
             <p class="port-text">
-                Here is some of my work that I've done in various programming languages.
+                A curated selection of the products and experiments I've built across web, mobile, and AI-driven workflows.
             </p>
+
+            <!-- Featured Projects Section -->
+            <div class="featured-projects">
+                <h3 class="featured-title">✨ Featured Projects</h3>
+                <div class="featured-grid">
+                    <!-- AirSimuPy -->
+                    <div class="featured-card">
+                        <div class="featured-badge">Airbus</div>
+                        <h4>AirSimuPy</h4>
+                        <p class="tech-stack-small">Python • PySide6 • NetworkX • NumPy • Qt Graphics View</p>
+                        <p class="featured-description">
+                            A proprietary block diagram simulation platform architected from scratch. Replaces a crash-prone recursive prototype with a scalable Hybrid Compiled Architecture using topological sorting and push-based execution. Enables flight physics teams to create, execute, and share custom simulation workflows using hardware-accelerated rendering.
+                        </p>
+                        <div class="featured-stats">
+                            <span>📊 Unbounded circuit depth</span>
+                            <span>⚡ 60 FPS rendering</span>
+                            <span>🔄 Push-model execution</span>
+                        </div>
+                        <a href="https://github.com/AvniBhardwaj1" class="featured-link">Explore →</a>
+                    </div>
+
+                    <!-- FP-BOT -->
+                    <div class="featured-card">
+                        <div class="featured-badge">Airbus</div>
+                        <h4>FP-BOT</h4>
+                        <p class="tech-stack-small">FastAPI • LlamaIndex • Qdrant • vLLM • BGE Embeddings</p>
+                        <p class="featured-description">
+                            An AI-powered Flight Physics knowledge assistant. Enables engineers to discover, learn, and troubleshoot 30+ internal engineering tools through natural language. Uses RAG (Retrieval-Augmented Generation) to retrieve information from user manuals, technical documentation, FAQs, and training resources.
+                        </p>
+                        <div class="featured-stats">
+                            <span>🤖 LLM-powered</span>
+                            <span>📚 30+ tool coverage</span>
+                            <span>🎯 Natural language queries</span>
+                        </div>
+                        <a href="https://github.com/AvniBhardwaj1" class="featured-link">Explore →</a>
+                    </div>
+                </div>
+            </div>
+
             <div class="portfolios">
                 <div class="portfolio-item">
                     <div class="image">
                         <img src="./Chat_Application_img.png" alt="">
                     </div>
                     <div class="hover-items">
-                        <h3>Chat Mobile Application using Java-Android Studio</h3>
+                        <h3>Java Android Chat App</h3>
                         <div class="icons">
                             <a href="https://github.com/AvniBhardwaj1/Chat-Application-using-JAVA-Android-Studio-" class="icon">
                                 <i class="fab fa-github"></i>
@@ -265,7 +387,7 @@ technology and innovation and making the students technically sound.
                         <img src="./kavach.png" alt="">
                     </div>
                     <div class="hover-items">
-                        <h3>Advanced CCTV Analytics - KAVACH 2023</h3>
+                        <h3>Advanced CCTV Analytics (KAVACH 2023)</h3>
                         <div class="icons">
                             <a href="https://github.com/AvniBhardwaj1/NM_VisionaryTitans" class="icon">
                                 <i class="fab fa-github"></i>
@@ -284,7 +406,7 @@ technology and innovation and making the students technically sound.
                         <img src="./1.png" alt="">
                     </div>
                     <div class="hover-items">
-                        <h3>Driving Licence Validation</h3>
+                        <h3>Driving License Validator</h3>
                         <div class="icons">
                             <a href="https://github.com/AvniBhardwaj1/Driving-License-Validation/tree/main" class="icon">
                                 <i class="fab fa-github"></i>
@@ -297,7 +419,7 @@ technology and innovation and making the students technically sound.
                         <img src="./phonebook.png" alt="">
                     </div>
                     <div class="hover-items">
-                        <h3>PhoneBook DSA Project</h3>
+                        <h3>PhoneBook Data Structure Project</h3>
                         <div class="icons">
                             <a href="https://github.com/AvniBhardwaj1/PhoneBook-CPP-DSA-Project" class="icon">
                                 <i class="fab fa-github"></i>
@@ -310,7 +432,7 @@ technology and innovation and making the students technically sound.
                         <img src="./spotify.png" alt="">
                     </div>
                     <div class="hover-items">
-                        <h3>Spotify Clone</h3>
+                        <h3>Spotify UI Clone</h3>
                         <div class="icons">
                             <a href="https://github.com/AvniBhardwaj1/Spotify-clone-using-html-and-css" class="icon">
                                 <i class="fab fa-github"></i>
@@ -323,7 +445,7 @@ technology and innovation and making the students technically sound.
                         <img src="./compiler.png" alt="">
                     </div>
                     <div class="hover-items">
-                        <h3>Web Code Compiler</h3>
+                        <h3>Web-based Code Compiler</h3>
                         <div class="icons">
                             <a href="https://github.com/AvniBhardwaj1/Avni-Bhardwaj_Code_Compiler.github.io-" class="icon">
                                 <i class="fab fa-github"></i>
@@ -339,7 +461,7 @@ technology and innovation and making the students technically sound.
                         <img src="./kanpur.jpeg" alt="">
                     </div>
                     <div class="hover-items">
-                        <h3>Techinnovation IIT Kanpur</h3>
+                        <h3>Techinnovation IIT Kanpur Project</h3>
                         <div class="icons">
                             <a href="https://github.com/AvniBhardwaj1/TechInnovationIITK" class="icon">
                                 <i class="fab fa-github"></i>
@@ -352,7 +474,7 @@ technology and innovation and making the students technically sound.
                         <img src="./image.png" alt="">
                     </div>
                     <div class="hover-items">
-                        <h3>Research Paper</h3>
+                        <h3>Aerogel Research Paper</h3>
                         <div class="icons">
                             <a href="./AVNI BHARDWAJ AEROGEL RESEARCH PAPER.pdf" class="icon">
                                 <i class="fab fa-github"></i>
@@ -367,7 +489,7 @@ technology and innovation and making the students technically sound.
                 <h2>My <span>Certificates</span><span class="bg-text">Achievements</span></h2>
             </div>
             <p class="port-text">
-                Here are some Notable Achievements/certificates I've earned.
+                Here are a few of the certificates, awards, and recognitions that reflect my growth as a developer and leader.
             </p>
             <div class="portfolios">
                 <div class="portfolio-item">
@@ -636,10 +758,9 @@ technology and innovation and making the students technically sound.
                 </div>
                 <div class="contact-content-con">
                     <div class="left-contact">
-                        <h4>Contact me here</h4>
+                        <h4>Let's connect</h4>
                         <p>
-                            Feel free to get in touch with me using any of the following methods. 
-                            Whether you have inquiries, collaboration opportunities, or just want to say hello, I'm always open to connecting!<br><br>
+                            Interested in a collaboration, internship, or product-focused project? I’m always open to new ideas and new teams. Reach out and let’s build something meaningful.
                         </p>
                         <div class="contact-info">
                             <div class="contact-item">
@@ -723,6 +844,146 @@ technology and innovation and making the students technically sound.
                 </div>
             </div>
         </section>
+
+        <!-- Airbus Experience Section -->
+        <section class="container airbus-experience" id="airbus-internship">
+            <div class="airbus-hero">
+                <h2 class="section-title">✈️ Airbus Experience</h2>
+                <p class="section-subtitle">Flight Physics Capabilities Intern | Jan 2026 – July 2026</p>
+            </div>
+
+            <!-- Flight Path Container -->
+            <div class="flight-container">
+                <!-- Parallax Clouds -->
+                <div class="clouds-layer clouds-1"></div>
+                <div class="clouds-layer clouds-2"></div>
+                <div class="clouds-layer clouds-3"></div>
+
+                <!-- SVG Canvas for Flight Path -->
+                <svg class="flight-path-svg" viewBox="0 0 1400 600" preserveAspectRatio="xMidYMid meet">
+                    <!-- Dashed flight path -->
+                    <path
+                        id="flightPath"
+                        d="M 50,300 Q 350,150 700,200 T 1350,300"
+                        fill="none"
+                        stroke="rgba(255, 255, 255, 0.3)"
+                        stroke-width="2"
+                        stroke-dasharray="8,4"
+                        class="path-line"
+                    />
+                    <!-- A380 Plane (SVG Group) -->
+                    <g id="airplane" class="airplane-group">
+                        <!-- Fuselage -->
+                        <ellipse cx="0" cy="0" rx="45" ry="12" fill="#ff5733" opacity="0.9"/>
+                        <!-- Wings -->
+                        <rect x="-85" y="-8" width="170" height="16" fill="#ff5733" opacity="0.85"/>
+                        <!-- Tail Wings -->
+                        <rect x="-35" y="-6" width="70" height="12" fill="#ff5733" opacity="0.8"/>
+                        <!-- Cockpit -->
+                        <circle cx="-30" cy="0" r="6" fill="#fff" opacity="0.7"/>
+                        <!-- Engine markers -->
+                        <circle cx="-50" cy="8" r="4" fill="#333"/>
+                        <circle cx="-50" cy="-8" r="4" fill="#333"/>
+                        <circle cx="50" cy="8" r="4" fill="#333"/>
+                        <circle cx="50" cy="-8" r="4" fill="#333"/>
+                        <!-- Vapor trail -->
+                        <line x1="-45" y1="0" x2="-200" y2="0" stroke="rgba(255, 255, 255, 0.4)" stroke-width="3" stroke-linecap="round"/>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Content Waypoints -->
+            <div class="flight-waypoints">
+                <!-- Waypoint 1: The Role -->
+                <div class="waypoint waypoint-1">
+                    <div class="waypoint-marker">01</div>
+                    <div class="waypoint-content">
+                        <h3>The Role</h3>
+                        <p><strong>Software Engineer Intern</strong> — Flight Physics Capabilities Team</p>
+                        <p class="detail">Bengaluru, India | 15 weeks of intensive software architecture, testing, and infrastructure development within a safety-critical aerospace environment.</p>
+                    </div>
+                </div>
+
+                <!-- Waypoint 2: What I Built -->
+                <div class="waypoint waypoint-2">
+                    <div class="waypoint-marker">02</div>
+                    <div class="waypoint-content">
+                        <h3>What I Built</h3>
+                        <div class="project-mini">
+                            <h4>🎮 AirSimuPy</h4>
+                            <p>A proprietary block diagram simulation engine architected from scratch using a Hybrid Compiled Architecture. Replaced a crash-prone recursive prototype with a scalable, topologically-sorted push-execution model using NetworkX, NumPy, and PySide6 Qt Graphics View.</p>
+                        </div>
+                        <div class="project-mini">
+                            <h4>🤖 FP-BOT</h4>
+                            <p>An AI-powered Flight Physics knowledge assistant powered by FastAPI, LlamaIndex, Qdrant, and vLLM. Enables engineers to discover and troubleshoot 30+ internal tools through natural language.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Waypoint 3: The Stack -->
+                <div class="waypoint waypoint-3">
+                    <div class="waypoint-marker">03</div>
+                    <div class="waypoint-content">
+                        <h3>Tech Stack</h3>
+                        <div class="tech-grid">
+                            <span class="tech-badge">Python</span>
+                            <span class="tech-badge">PySide6</span>
+                            <span class="tech-badge">FastAPI</span>
+                            <span class="tech-badge">NetworkX</span>
+                            <span class="tech-badge">NumPy</span>
+                            <span class="tech-badge">LlamaIndex</span>
+                            <span class="tech-badge">Qdrant</span>
+                            <span class="tech-badge">vLLM</span>
+                            <span class="tech-badge">Docker</span>
+                            <span class="tech-badge">Git/Jenkins</span>
+                            <span class="tech-badge">Conda</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Waypoint 4: Impact -->
+                <div class="waypoint waypoint-4">
+                    <div class="waypoint-marker">04</div>
+                    <div class="waypoint-content">
+                        <h3>Scale & Impact</h3>
+                        <p>Within Airbus's Flight Physics Capabilities team, I contributed to tooling that directly supports multiple commercial aircraft programs in active service.</p>
+                        <ul class="impact-list">
+                            <li>✈️ Architected a production-grade proof-of-concept that eliminates expensive commercial licensing dependencies</li>
+                            <li>✈️ Reduced testing cycle time from 20 minutes (manual) to under 60 seconds (automated)</li>
+                            <li>✈️ Resolved critical edge-case crashes through forensic debugging and rigorous scenario testing</li>
+                            <li>✈️ Integrated AI/ML into the Flight Physics workflow for the first time</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Waypoint 5: What I Learned -->
+                <div class="waypoint waypoint-5">
+                    <div class="waypoint-marker">05</div>
+                    <div class="waypoint-content">
+                        <h3>What I Learned</h3>
+                        <p><strong>Systems Architecture at Scale:</strong> Transitioning a crash-prone prototype into production-grade infrastructure.</p>
+                        <p><strong>Safety-Critical Engineering:</strong> Working where correctness is a baseline requirement from which no deviation is acceptable.</p>
+                        <p><strong>Enterprise Deployment:</strong> Navigating legacy compiler constraints and write-restricted server partitions on secure compute clusters.</p>
+                        <p><strong>Collaborative Problem Solving:</strong> Auditing code, conducting rigorous reviews, and communicating findings to cross-functional teams.</p>
+                    </div>
+                </div>
+
+                <!-- Waypoint 6: The Avgeek -->
+                <div class="waypoint waypoint-6">
+                    <div class="waypoint-marker">🛫</div>
+                    <div class="waypoint-content">
+                        <h3>Why Aviation?</h3>
+                        <p>I've been an avgeek since childhood—fascinated by the A380's elegance and precision engineering. My internship at Airbus was the realization of a dream: working on software and simulation tools that directly contribute to the safety of aircraft carrying millions of passengers.</p>
+                        <p class="personal-note">💙 Every time I board an A320, A350, or A380, I know that engineers like me contributed to the systems keeping it flying safely.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Landing -->
+            <div class="airbus-landing">
+                <p>Back to the ground.</p>
+            </div>
+        </section>
     </main>
 
     <div class="controls">
@@ -735,8 +996,11 @@ technology and innovation and making the students technically sound.
         <div class="control" data-id="portfolio">
             <i class="fas fa-briefcase"></i>
         </div>
+        <div class="control" data-id="airbus-internship">
+            <i class="fas fa-plane"></i>
+        </div>
         <div class="control" data-id="certificates">
-            <i class="fas fa-certificate"></i> <!-- Icon for certificates -->
+            <i class="fas fa-certificate"></i>
         </div>
         <div class="control" data-id="contact">
             <i class="fas fa-envelope-open"></i>
@@ -746,5 +1010,6 @@ technology and innovation and making the students technically sound.
         <i class="fas fa-adjust"></i>
     </div>
     <script src="app.js"></script>
+    <script src="enhanced-animations.js"></script>
 </body>
 </html>

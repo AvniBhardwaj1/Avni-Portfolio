@@ -1,0 +1,484 @@
+<!-- Airbus Experience Section with A380 Scroll Animation -->
+<section class="container airbus-experience" id="airbus-internship">
+    <div class="airbus-hero">
+        <h2 class="section-title">Airbus Experience</h2>
+        <p class="section-subtitle">Flight Physics Capabilities Intern | Jan 2026 – July 2026</p>
+    </div>
+
+    <!-- Flight Path Container -->
+    <div class="flight-container">
+        <!-- Parallax Clouds -->
+        <div class="clouds-layer clouds-1"></div>
+        <div class="clouds-layer clouds-2"></div>
+        <div class="clouds-layer clouds-3"></div>
+
+        <!-- SVG Canvas for Flight Path -->
+        <svg class="flight-path-svg" viewBox="0 0 1400 600" preserveAspectRatio="xMidYMid meet">
+            <!-- Dashed flight path -->
+            <path
+                id="flightPath"
+                d="M 50,300 Q 350,150 700,200 T 1350,300"
+                fill="none"
+                stroke="rgba(255, 255, 255, 0.3)"
+                stroke-width="2"
+                stroke-dasharray="8,4"
+                class="path-line"
+            />
+            <!-- A380 Plane (SVG Group) -->
+            <g id="airplane" class="airplane-group">
+                <!-- Fuselage -->
+                <ellipse cx="0" cy="0" rx="45" ry="12" fill="#ff5733" opacity="0.9"/>
+                <!-- Wings -->
+                <rect x="-85" y="-8" width="170" height="16" fill="#ff5733" opacity="0.85"/>
+                <!-- Tail Wings -->
+                <rect x="-35" y="-6" width="70" height="12" fill="#ff5733" opacity="0.8"/>
+                <!-- Cockpit -->
+                <circle cx="-30" cy="0" r="6" fill="#fff" opacity="0.7"/>
+                <!-- Engine markers -->
+                <circle cx="-50" cy="8" r="4" fill="#333"/>
+                <circle cx="-50" cy="-8" r="4" fill="#333"/>
+                <circle cx="50" cy="8" r="4" fill="#333"/>
+                <circle cx="50" cy="-8" r="4" fill="#333"/>
+                <!-- Vapor trail effect (will be styled via CSS) -->
+                <line x1="-45" y1="0" x2="-200" y2="0" stroke="rgba(255, 255, 255, 0.4)" stroke-width="3" stroke-linecap="round"/>
+            </g>
+        </svg>
+    </div>
+
+    <!-- Content Waypoints (positioned via scroll) -->
+    <div class="flight-waypoints">
+        <!-- Waypoint 1: The Role -->
+        <div class="waypoint waypoint-1">
+            <div class="waypoint-marker">01</div>
+            <div class="waypoint-content">
+                <h3>The Role</h3>
+                <p><strong>Software Engineer Intern</strong> — Flight Physics Capabilities Team</p>
+                <p class="detail">Bengaluru, India | 15 weeks of intensive software architecture, testing, and infrastructure development within a safety-critical aerospace environment.</p>
+            </div>
+        </div>
+
+        <!-- Waypoint 2: What I Built -->
+        <div class="waypoint waypoint-2">
+            <div class="waypoint-marker">02</div>
+            <div class="waypoint-content">
+                <h3>What I Built</h3>
+                <div class="project-mini">
+                    <h4>🎮 AirSimuPy</h4>
+                    <p>A proprietary block diagram simulation engine architected from scratch using a Hybrid Compiled Architecture. Replaced a crash-prone recursive prototype with a scalable, topologically-sorted push-execution model using NetworkX, NumPy, and PySide6 Qt Graphics View for hardware-accelerated rendering.</p>
+                </div>
+                <div class="project-mini">
+                    <h4>🤖 FP-BOT</h4>
+                    <p>An AI-powered Flight Physics knowledge assistant powered by FastAPI, LlamaIndex, Qdrant, and vLLM. Enables engineers to discover and troubleshoot 30+ internal tools through natural language queries against technical documentation.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Waypoint 3: The Stack -->
+        <div class="waypoint waypoint-3">
+            <div class="waypoint-marker">03</div>
+            <div class="waypoint-content">
+                <h3>Tech Stack</h3>
+                <div class="tech-grid">
+                    <span class="tech-badge">Python 3.10/3.12</span>
+                    <span class="tech-badge">PySide6</span>
+                    <span class="tech-badge">FastAPI</span>
+                    <span class="tech-badge">NetworkX</span>
+                    <span class="tech-badge">NumPy</span>
+                    <span class="tech-badge">LlamaIndex</span>
+                    <span class="tech-badge">Qdrant</span>
+                    <span class="tech-badge">vLLM</span>
+                    <span class="tech-badge">Docker</span>
+                    <span class="tech-badge">GSAP</span>
+                    <span class="tech-badge">Git/Jenkins</span>
+                    <span class="tech-badge">Conda</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Waypoint 4: Impact & Scale -->
+        <div class="waypoint waypoint-4">
+            <div class="waypoint-marker">04</div>
+            <div class="waypoint-content">
+                <h3>Scale & Impact</h3>
+                <p>Within Airbus's Flight Physics Capabilities team, I contributed to tooling that directly supports the design, validation, and certification workflows of multiple commercial aircraft programs in active service.</p>
+                <ul class="impact-list">
+                    <li>✈️ Architected a production-grade proof-of-concept that eliminates expensive commercial licensing dependencies</li>
+                    <li>✈️ Reduced testing cycle time from 20 minutes (manual) to under 60 seconds (automated)</li>
+                    <li>✈️ Resolved critical edge-case crashes through forensic debugging and rigorous scenario testing</li>
+                    <li>✈️ Integrated AI/ML into the Flight Physics workflow for the first time</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Waypoint 5: What I Learned -->
+        <div class="waypoint waypoint-5">
+            <div class="waypoint-marker">05</div>
+            <div class="waypoint-content">
+                <h3>What I Learned</h3>
+                <p><strong>Systems Architecture at Scale:</strong> Designing and defending architectural decisions with real operational consequences. Transitioning a crash-prone prototype into production-grade infrastructure.</p>
+                <p><strong>Safety-Critical Engineering:</strong> Working in an environment where correctness is a baseline requirement from which no deviation is acceptable. Every line of code matters.</p>
+                <p><strong>Enterprise Deployment:</strong> Navigating legacy compiler constraints, write-restricted server partitions, and network-isolated compute clusters. Building offline binary packages and mastering Conda environment isolation.</p>
+                <p><strong>Collaborative Problem Solving:</strong> Auditing external contractor commits, conducting rigorous code reviews, and communicating technical findings to cross-functional teams in a fast-paced environment.</p>
+            </div>
+        </div>
+
+        <!-- Waypoint 6: The Avgeek in Me -->
+        <div class="waypoint waypoint-6">
+            <div class="waypoint-marker">🛫</div>
+            <div class="waypoint-content">
+                <h3>Why Aviation?</h3>
+                <p>I've been an avgeek since childhood—fascinated by the A380's four massive Rolls-Royce Trent 900 engines, the A350's elegant composite fuselage, and the precision engineering that goes into every modern airliner.</p>
+                <p>My internship at Airbus was the realization of a dream: working on the software and simulation tools that directly contribute to the safety and performance of aircraft that carry millions of passengers annually. Getting to see the Bengaluru facility, learning how Indian engineers drive innovation at a global scale, and understanding the rigor that aerospace demands have been transformative.</p>
+                <p class="personal-note">💙 Every time I board an A320, A350, or A380, I now know that engineers like me contributed to the systems that keep it flying smoothly.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Landing -->
+    <div class="airbus-landing">
+        <p>Back to the ground.</p>
+    </div>
+</section>
+
+<style>
+/* ============================================
+   Airbus Experience Section
+   ============================================ */
+
+.airbus-experience {
+    position: relative;
+    background: linear-gradient(135deg, #0a1929 0%, #1a3a52 50%, #0f2940 100%);
+    min-height: 300vh;
+    padding: 4rem 2rem;
+    overflow: hidden;
+}
+
+/* Blueprint grid background overlay */
+.airbus-experience::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0.05) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0.05) 76%, transparent 77%, transparent);
+    background-size: 80px 80px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.airbus-experience > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Hero section */
+.airbus-hero {
+    text-align: center;
+    margin-bottom: 4rem;
+    color: #fff;
+}
+
+.section-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #ff5733, #ff9100);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.section-subtitle {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+
+/* Flight container */
+.flight-container {
+    position: sticky;
+    top: 20%;
+    height: 70vh;
+    margin: 4rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, rgba(100, 150, 200, 0.1) 0%, transparent 70%);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+/* Cloud layers */
+.clouds-layer {
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    background-repeat: repeat-x;
+    opacity: 0.3;
+}
+
+.clouds-1 {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200"><path d="M100,80 Q120,60 150,70 Q170,50 200,70 Q220,60 250,80" stroke="white" stroke-width="15" fill="none"/><path d="M400,100 Q420,80 450,90 Q470,70 500,90 Q520,80 550,100" stroke="white" stroke-width="15" fill="none"/></svg>');
+    background-size: auto 60%;
+    background-position: 0 30%;
+    animation: float 60s linear infinite;
+}
+
+.clouds-2 {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200"><path d="M200,120 Q230,100 270,120" stroke="white" stroke-width="12" fill="none"/></svg>');
+    background-size: auto 40%;
+    background-position: 0 50%;
+    animation: float 80s linear infinite reverse;
+}
+
+.clouds-3 {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200"><path d="M150,150 Q180,130 220,150" stroke="white" stroke-width="10" fill="none"/></svg>');
+    background-size: auto 30%;
+    background-position: 0 70%;
+    animation: float 100s linear infinite;
+    opacity: 0.2;
+}
+
+@keyframes float {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* SVG Flight Path */
+.flight-path-svg {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 20px rgba(255, 87, 51, 0.3));
+}
+
+.path-line {
+    stroke-dashoffset: 800;
+    animation: drawPath 3s ease-out forwards;
+}
+
+@keyframes drawPath {
+    from { stroke-dashoffset: 800; }
+    to { stroke-dashoffset: 0; }
+}
+
+/* Airplane styling */
+.airplane-group {
+    filter: drop-shadow(0 0 10px rgba(255, 87, 51, 0.6));
+    transform-origin: center;
+}
+
+/* Waypoints */
+.flight-waypoints {
+    position: relative;
+    z-index: 2;
+    margin-top: 8rem;
+}
+
+.waypoint {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 2rem;
+    margin-bottom: 6rem;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out forwards;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid #ff5733;
+    border-radius: 0.5rem;
+    backdrop-filter: blur(10px);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.waypoint-marker {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ff5733;
+    text-align: center;
+    line-height: 80px;
+}
+
+.waypoint-content {
+    color: #fff;
+}
+
+.waypoint-content h3 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+    color: #ff9100;
+}
+
+.waypoint-content p {
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 1rem;
+}
+
+.detail {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Project mini cards */
+.project-mini {
+    background: rgba(255, 87, 51, 0.08);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #ff5733;
+}
+
+.project-mini h4 {
+    color: #ff9100;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.project-mini p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+}
+
+/* Tech grid */
+.tech-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.tech-badge {
+    display: inline-block;
+    background: rgba(255, 87, 51, 0.15);
+    color: #ff9100;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.85rem;
+    border: 1px solid rgba(255, 87, 51, 0.3);
+    font-weight: 500;
+}
+
+/* Impact list */
+.impact-list {
+    list-style: none;
+    padding: 0;
+}
+
+.impact-list li {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.impact-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    width: 6px;
+    height: 6px;
+    background: #ff5733;
+    border-radius: 50%;
+}
+
+/* Personal note */
+.personal-note {
+    font-style: italic;
+    color: rgba(255, 200, 124, 0.9) !important;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 87, 51, 0.05);
+    border-left: 3px solid #ff9100;
+    border-radius: 0.25rem;
+}
+
+/* Landing */
+.airbus-landing {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.5rem;
+    font-weight: 300;
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .flight-container {
+        height: 50vh;
+        top: 10%;
+    }
+
+    .waypoint {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 4rem;
+    }
+
+    .waypoint-marker {
+        font-size: 1.5rem;
+        text-align: left;
+    }
+
+    .waypoint-content h3 {
+        font-size: 1.3rem;
+    }
+
+    .tech-grid {
+        gap: 0.5rem;
+    }
+
+    .tech-badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .flight-path-svg {
+        transform: scale(0.8);
+    }
+}
+
+@media (max-width: 480px) {
+    .airbus-experience {
+        min-height: 200vh;
+        padding: 2rem 1rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .section-subtitle {
+        font-size: 1rem;
+    }
+
+    .waypoint-content h3 {
+        font-size: 1.1rem;
+    }
+
+    .waypoint-content p {
+        font-size: 0.9rem;
+    }
+}
+</style>
