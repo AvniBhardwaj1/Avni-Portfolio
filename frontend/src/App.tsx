@@ -18,6 +18,7 @@ import { Marquee } from "@/components/Marquee";
 import { Experience } from "@/components/Experience";
 import { Timeline } from "@/components/Timeline";
 import { Skills } from "@/components/Skills";
+import { Certificates } from "@/components/Certificates";
 import { Contact } from "@/components/Contact";
 import { ChatWidget } from "@/components/ChatWidget";
 
@@ -69,6 +70,7 @@ function Site() {
         <Experience />
         <Timeline />
         <Skills />
+        <Certificates />
         <Contact />
       </main>
       <ChatWidget />

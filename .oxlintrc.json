@@ -1,0 +1,6 @@
+{
+  "ignorePatterns": [
+    "frontend/public/mediapipe/**",
+    "frontend/public/models/**"
+  ]
+}

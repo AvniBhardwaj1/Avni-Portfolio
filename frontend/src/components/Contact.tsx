@@ -48,7 +48,7 @@ export const Contact = () => (
     data-testid="contact-section"
     className="relative z-10 px-6 pb-10 pt-32 md:px-16 lg:px-24"
   >
-    <Chapter no="04" title="Contact" id="contact" />
+    <Chapter no="05" title="Contact" id="contact" />
 
     <p
       className="mb-6 font-mono text-xs uppercase tracking-[0.35em] text-accent"

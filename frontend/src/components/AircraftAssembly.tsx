@@ -201,10 +201,11 @@ export const AircraftAssembly = ({ dark }: { dark: boolean }) => {
       tl.to(model.fly.rotation, { z: 0.6, y: -Math.PI * 0.12, duration: 0.14, ease: "power2.in" }, 0.85);
       tl.to(model.fly.position, { x: -20, y: 5, duration: 0.14, ease: "power2.in" }, 0.85);
       tl.to([cardLRef.current, cardRRef.current], { opacity: 0, duration: 0.07 }, 0.87);
+      tl.call(playWhoosh, [], 0.85);
       ScrollTrigger.refresh();
     }, sectionRef);
     return () => ctx.revert();
-  }, [model]);
+  }, [model, reduced]);
 
   return (
     <div ref={sectionRef} className="relative h-screen overflow-hidden" data-testid="aircraft-assembly">

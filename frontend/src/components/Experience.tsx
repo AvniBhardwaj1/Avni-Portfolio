@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Award } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Chapter } from "@/components/Chapter";
@@ -42,24 +42,24 @@ const PROJECTS: Project[] = [
     index: "02",
     period: "AUTONOMOUS SYSTEM",
     title: "Autonomous AI Research Agent",
-    org: "Independent Build — Pydantic AI × Gemini",
+    org: "Briefing-Bot — Gemini × GitHub Actions",
     points: [
-      "Engineered a zero-maintenance, autonomous LLM agent using Pydantic AI and Gemini that scans, ranks, and synthesizes high-signal daily research digests — shipped on schedule via GitHub Actions.",
+      "Zero-maintenance daily AI/tech digest: a GitHub Actions cron pulls a strict source allowlist, Gemini synthesizes headlines and a verified Fact of the Day under prompt-injection defenses, and Gmail SMTP ships a formatted HTML email.",
     ],
-    stack: ["Pydantic AI", "Gemini", "LLM Agents", "GitHub Actions"],
-    href: "https://github.com/avnibhardwaj1",
+    stack: ["Python", "Gemini", "GitHub Actions", "Gmail SMTP"],
+    href: "https://github.com/AvniBhardwaj1/Briefing-Bot-Automation",
   },
   {
     id: "fin-advisor",
     index: "03",
     period: "AI PRODUCT",
     title: "Personalized AI Financial Advisor",
-    org: "Independent Build — Agentic RAG × Llama-3",
+    org: "Agentic RAG — Local Llama-3 × LangChain",
     points: [
-      "Built an Agentic RAG system using LangChain ReAct, fine-tuning Llama-3 (8B) via Unsloth and PyTorch to deliver personalized, conversational financial guidance.",
+      "Fine-tuned, quantized Llama-3 (GGUF) served locally via Ollama, wired into a LangChain ReAct agent that calls live tools — yfinance prices and CSV client lookups — inside a Streamlit app. Reasoning stays with the LLM; facts stay with tools.",
     ],
-    stack: ["LangChain", "ReAct Agents", "Llama-3 8B", "Unsloth", "PyTorch"],
-    href: "https://github.com/avnibhardwaj1",
+    stack: ["LangChain", "ReAct", "Llama-3", "Ollama", "Streamlit"],
+    href: "https://github.com/AvniBhardwaj1/personal-finance-assistant",
   },
   {
     id: "mapmynotes",
@@ -68,10 +68,10 @@ const PROJECTS: Project[] = [
     title: "MapMyNotes",
     org: "Study Companion — Streamlit × Google Gemini",
     points: [
-      "Built an NLP-powered study companion that converts raw text into structured, navigable mind maps using Streamlit and Google Gemini.",
+      "Turns PDFs, slides, or raw text into interactive D3.js mind maps with hover explanations, auto-generated flashcards, and quizzes — Gemini handles hierarchy extraction end to end.",
     ],
-    stack: ["Streamlit", "Gemini", "NLP", "Python"],
-    href: "https://github.com/avnibhardwaj1/MapMyNotes",
+    stack: ["Streamlit", "Gemini", "D3.js", "PyMuPDF"],
+    href: "https://github.com/AvniBhardwaj1/MapMyNotes",
   },
   {
     id: "bone-age",
@@ -83,7 +83,7 @@ const PROJECTS: Project[] = [
       "Architected an ensemble deep learning framework integrating DenseNet201 and SE-ResNet50 for pediatric bone-age assessment in medical diagnostics.",
     ],
     stack: ["PyTorch", "DenseNet201", "SE-ResNet50", "Medical AI"],
-    href: "https://github.com/avnibhardwaj1",
+    href: "https://github.com/AvniBhardwaj1",
   },
   {
     id: "iot-actuator",
@@ -95,11 +95,57 @@ const PROJECTS: Project[] = [
       "Implemented practical hardware integration for remote actuator control using Arduino Uno and ESP8266 with real-time signal handling.",
     ],
     stack: ["Arduino Uno", "ESP8266", "IoT", "C++"],
-    href: "https://github.com/avnibhardwaj1",
+    href: "https://github.com/AvniBhardwaj1",
+  },
+  {
+    id: "jobhunt",
+    index: "07",
+    period: "AUTOMATION",
+    title: "Job Hunt Automation",
+    org: "jobhunt — ATS APIs × LLM Screening",
+    points: [
+      "A personal job-search agent that reads public ATS APIs (Greenhouse, Lever, Ashby), deterministically prefilters ~99% of postings, LLM-scores the rest against a resume, drafts application kits, and emails a daily digest.",
+    ],
+    stack: ["Python", "Claude / Gemini / Groq", "GitHub Actions", "pytest"],
+    href: "https://github.com/AvniBhardwaj1/Job_search_automation",
+  },
+  {
+    id: "weather-mcp",
+    index: "08",
+    period: "SERVICE DESIGN",
+    title: "Weather MCP Server",
+    org: "OpenWeatherMap Wrapper — Minimal Common Platform",
+    points: [
+      "A small MCP-style service that normalizes OpenWeatherMap into a stable JSON contract — current conditions and daily forecasts — with TTL/Redis caching, uniform error responses, Jest tests, and a demo browser UI.",
+    ],
+    stack: ["Node.js", "REST", "Redis", "Jest"],
+    href: "https://github.com/AvniBhardwaj1/weather-mcp-server",
+  },
+  {
+    id: "fake-news",
+    index: "09",
+    period: "ML RESEARCH",
+    title: "Fake News Detection",
+    org: "NLP — TF-IDF × Cosine Similarity",
+    points: [
+      "Classifies articles as real or fake using TF-IDF vectorization and threshold-based cosine-similarity clustering — 89% accuracy with balanced precision/recall — shipped with EDA and a Streamlit prediction app.",
+    ],
+    stack: ["NLP", "TF-IDF", "scikit-learn", "Streamlit"],
+    href: "https://github.com/AvniBhardwaj1/MLPROJECT",
+  },
+  {
+    id: "typing-game",
+    index: "10",
+    period: "WEB GAME",
+    title: "Speed Typing Game",
+    org: "Browser Build — Vanilla JS",
+    points: [
+      "An interactive typing trainer that tracks words-per-minute and accuracy in real time with instant visual feedback.",
+    ],
+    stack: ["JavaScript", "HTML", "CSS"],
+    href: "https://github.com/AvniBhardwaj1/speed-typing-game",
   },
 ];
-
-const CERTS = ["CERT_01", "CERT_02", "CERT_03", "CERT_04", "CERT_05"];
 
 const INDEX_COLORS = ["text-accent", "text-accent2", "text-accent3"];
 
@@ -197,8 +243,8 @@ export const Experience = () => {
       >
         {(
           [
-            { id: "industry", label: "Industry Experience" },
-            { id: "projects", label: "Projects & Certificates" },
+          { id: "industry", label: "Industry Experience" },
+            { id: "projects", label: "Projects" },
           ] as const
         ).map((t) => (
           <button
@@ -233,30 +279,6 @@ export const Experience = () => {
               <div key={p.id} data-parallax-card>
                 <Card project={p} i={i} />
               </div>
-            ))}
-          </div>
-          <p className="mb-6 mt-24 font-mono text-xs uppercase tracking-[0.3em] text-accent" data-testid="certificates-label">
-            Certificates & Achievements
-          </p>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-            {CERTS.map((id) => (
-              <a
-                key={id}
-                href="https://www.linkedin.com/in/avni-bhardwaj10/details/certifications/"
-                target="_blank"
-                rel="noreferrer"
-                data-magnetic
-                data-testid={`cert-card-${id.toLowerCase()}`}
-                className="group flex flex-col items-start gap-3 rounded-2xl border border-dashed border-foreground/20 p-6 transition-colors hover:border-accent/60"
-              >
-                <Award className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-accent" />
-                <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                  {id}
-                </span>
-                <span className="text-sm leading-relaxed text-muted-foreground">
-                  Certificate slot — credential link drops in here
-                </span>
-              </a>
             ))}
           </div>
         </div>

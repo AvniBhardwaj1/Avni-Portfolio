@@ -49,6 +49,11 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 - Light theme color variety: added --accent-2 (violet) and --accent-3 (amber); violet/rose mesh blobs; gradient CONNECT. headline; skill group titles and project card indices cycle through cyan/violet/amber.
 - Résumé download: generated Avni_Bhardwaj_Resume.pdf (reportlab, scripts/make_resume.py) in /public; Résumé buttons in navbar and contact section.
 
+## v7 (2026-08-14)
+- Projects grid expanded to 9 real repo-linked cards with user-provided READMEs: Briefing-Bot-Automation (research agent), personal-finance-assistant (local Llama-3 GGUF + Ollama + ReAct tools), MapMyNotes, Job_search_automation (jobhunt), weather-mcp-server, MLPROJECT (fake news NLP), Pediatric Bone Age, IoT Actuator, speed-typing-game.
+- Certificates moved to dedicated section: scroll-snap carousel of round "vinyl disc" cards (spin on hover, arrows, photos drop into /public/certificates/cert-0X.jpg when user provides folder). Chapter renumbered: Contact is now 05.
+- Clone prompt updated with all new repos.
+
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.
 2. Add chat history persistence + basic rate limiting.

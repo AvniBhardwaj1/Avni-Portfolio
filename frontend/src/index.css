@@ -225,6 +225,32 @@
     animation: none;
 }
 
+.cert-track {
+    scrollbar-width: none;
+}
+
+.cert-track::-webkit-scrollbar {
+    display: none;
+}
+
+.cert-disc:hover .cert-disc,
+.group:hover .cert-disc {
+    animation: disc-spin 7s linear infinite;
+}
+
+.reduced-motion .cert-disc {
+    animation: none !important;
+}
+
+@keyframes disc-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .reduced-motion .typing-dot {
     animation: none;
     opacity: 1;
