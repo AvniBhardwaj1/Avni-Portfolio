@@ -1,0 +1,90 @@
+{
+  "theme": "dark",
+  "typography": {
+    "headings": "Outfit",
+    "body": "Satoshi",
+    "accents": "JetBrains Mono",
+    "instructions": "Use Outfit for all Headings (H1, H2, H3), tracking-tight. Use JetBrains Mono for code blocks, labels, tags, and small technical text. Use Satoshi for standard body text. Add standard font imports in index.css. Never use Inter for headings."
+  },
+  "colors": {
+    "background": "#050505",
+    "surface": "#0A0A0A",
+    "border": "rgba(255, 255, 255, 0.1)",
+    "primary": "#00E5FF",
+    "text_primary": "#FFFFFF",
+    "text_secondary": "rgba(255, 255, 255, 0.7)",
+    "text_muted": "rgba(255, 255, 255, 0.4)",
+    "instructions": "Ensure strict dark mode. The UI should rely heavily on pure black or deepest grey. The primary accent (#00E5FF) should only be used for hover states, active indicators, and glowing text. Never use full-screen gradients. Tint all greys slightly with blue for a tech feel."
+  },
+  "visual_enhancers": {
+    "surfaces": "Use Retro-Futurism / Technical look. Backgrounds are solid black or very dark grey. Use 1px border-white/10 to define containers. No soft drop shadows; instead, use sharp glowing borders on hover or 'inner glow'.",
+    "glassmorphism": "For floating widgets (chat, gesture indicator, sticky nav), use 'backdrop-blur-xl bg-black/60 border border-white/10'.",
+    "motion": "Use framer-motion for micro-interactions (hover lift, chat open/close). Use GSAP ScrollTrigger for revealing sections and project cards on scroll."
+  },
+  "layouts": {
+    "hero": "Full height (min-h-screen). Left-aligned text. Massive Name (Outfit, text-6xl+). Monospace subheadings. Gesture scroll indicator prominent.",
+    "projects_experience": "Bento Grid or strict horizontal list. Wide gaps (gap-8). Cards should have tech stack pills (JetBrains Mono, text-xs).",
+    "skills": "Grouped into 3 distinct clean columns or clusters (Data/Cloud, AI/ML, Backend). Minimalist layout with technical icons.",
+    "footer": "Generous spacing (py-32). Massive contact text (text-5xl+)."
+  },
+  "components": {
+    "MediaPipeIndicator": "Floating fixed element. Glassmorphic. Button to 'Enable Camera' to activate gesture scroll. Shows camera status. Must include data-testid.",
+    "Background3D": "Fixed z-[-1] full screen. `pointer-events-none`. Use react-three-fiber to render a slowly rotating, wireframe geometry (e.g., Icosahedron) or minimal particle grid.",
+    "ChatWidget": "Fixed bottom-right. Trigger button opens a glassmorphic chat panel. Include message history area, input field with a send icon. Use framer-motion for the opening animation.",
+    "TechnicalCard": "Custom card using raw HTML/Tailwind. 1px border, dark background. On hover: border-primary/50 and slight -translate-y-1."
+  },
+  "libraries": {
+    "3d": "three, @react-three/fiber, @react-three/drei",
+    "motion": "framer-motion, gsap, @gsap/react",
+    "icons": "lucide-react",
+    "ai_vision": "@mediapipe/tasks-vision"
+  },
+  "media": {
+    "image_urls": [
+      {
+        "url": "https://images.unsplash.com/photo-1644088379091-d574269d422f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1NzZ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGRhdGElMjB2aXN1YWxpemF0aW9ufGVufDB8fHx8MTc4NjY4MDI5MHww&ixlib=rb-4.1.0&q=85",
+        "category": "Project Thumbnail",
+        "description": "Abstract data visualization for AI/Data pipeline projects"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1727434032773-af3cd98375ba?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1NzZ8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMGRhdGElMjB2aXN1YWxpemF0aW9ufGVufDB8fHx8MTc4NjY4MDI5MHww&ixlib=rb-4.1.0&q=85",
+        "category": "Project Thumbnail",
+        "description": "Close up of a computer circuit board for AirSimuPy or Hardware projects"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1667984390538-3dea7a3fe33d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwxfHxjbG91ZCUyMGNvbXB1dGluZyUyMGFyY2hpdGVjdHVyZXxlbnwwfHx8fDE3ODY2ODAyOTB8MA&ixlib=rb-4.1.0&q=85",
+        "category": "Project Thumbnail",
+        "description": "3D render of cloud computing concept for AWS/GCP related experiences"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1674027444485-cec3da58eef4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA3MDR8MHwxfHNlYXJjaHwxfHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlJTIwbmV1cmFsJTIwbmV0d29ya3xlbnwwfHx8fDE3ODY2ODAyOTB8MA&ixlib=rb-4.1.0&q=85",
+        "category": "Project Thumbnail",
+        "description": "Abstract sphere with dots and lines for Deep Learning Research project"
+      }
+    ]
+  },
+  "instructions_to_main_agent": [
+    "INSTALL REQUIRED DEPENDENCIES: yarn add framer-motion gsap @gsap/react three @react-three/fiber @react-three/drei @mediapipe/tasks-vision @mediapipe/camera_utils lucide-react",
+    "Update tailwind.config.js to include Outfit, Satoshi, and JetBrains Mono fonts if imported, or use system equivalents with sans/mono setup.",
+    "Implement the 3D Background as a fixed overlay behind all content with pointer-events-none.",
+    "The Hero section must include an interactive element for MediaPipe. Allow the user to enable their camera, stream the feed minimally (or hide it), and use hand tracking to scroll the window. This requires setting up MediaPipe GestureRecognizer or FaceLandmarker.",
+    "The Floating AI Chatbot must be positioned bottom right. Include a toggle button. The chat window should have input, a mocked AI response, and a typing indicator.",
+    "For projects, use standard HTML/Tailwind instead of restrictive Shadcn components. Implement grid-cols-1 md:grid-cols-2 layouts with technical styling.",
+    "Never use transparent backgrounds over the 3D canvas if text readability is compromised. Always use a backdrop-blur or solid dark tint.",
+    "Ensure ALL interactive elements and major sections have data-testid attributes."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
+    "Prioritize depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) for sticky navs or widgets.",
+    "Avoid generic centered layouts; use left-aligned, asymmetrical grids.",
+    "Use 2-3x more spacing (p-8, p-12, gap-8) than typical designs.",
+    "Never use AI emoji characters.",
+    "DO NOT apply transition: all globally. Be specific (e.g. transition-colors).",
+    "All interactive elements MUST include data-testid attribute for automated testing."
+  ],
+  "GENERAL UI UX DESIGN GUIDELINES": [
+    "All interactive and key informational elements MUST include a data-testid attribute to facilitate robust automated testing.",
+    "Dark mode is default; ensure text meets minimum contrast ratio of 4.5:1.",
+    "Avoid raw transparent backgrounds for containers that overlay varied content. Use backdrop-blur and a semi-transparent dark fill."
+  ]
+}
