@@ -86,7 +86,19 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 - Turntable audio: procedural vinyl crackle (Web Audio — brown noise + random pops through bandpass, lib/sounds.ts startCrackle/stopCrackle) plays while a certificate spins on the platter, fades out on close.
 - NOTE: the Google Cloud Study Jams certificate appeared as an inline image in chat but was NOT among the uploaded files — needs a file upload to add.
 
+## v14 (2026-08-14)
+- Multi-gesture camera controls (useGestureScroll.ts rewrite): open-hand up/down = scroll (unchanged feel, paused while pinching), pinch (thumb+index tip, hand-scale-normalized ratio < 0.32, 200ms dwell) = click on links/buttons only (a, button, [data-gesture-click]) via elementFromPoint + closest. Mirrored virtual cursor follows index fingertip. gesture_click analytics event.
+- GestureCursor.tsx: fixed overlay ring (rAF direct DOM writes, no re-renders) that follows the hand, grows/accent-tints over clickables, fills as a charge meter while pinching.
+- GestureGuideModal.tsx: pre-camera cheat-sheet popup (hand up/down = scroll, pinch = click, privacy note "processed on device only"), Start Camera / backdrop / X close. Hero "Enable Camera" now opens the guide instead of enabling directly. Mini gesture legend added under the live camera preview panel in App.tsx.
+- index.css: .gesture-hover accent outline applied to hovered clickables while gesture mode is live.
+- Portrait.tsx → cinematic slideshow: AnimatePresence crossfade (1.1s) + Ken-Burns slow zoom/pan per slide, 5.2s interval, alternating pan direction, dot indicators + click-to-jump when >1 photo. PHOTOS array in file — single photo (/portrait.webp) renders as graceful Ken-Burns fallback until user uploads more photos.
+- Fixed regression from parallel same-file edits: STATUS_TEXT/useState clobber in Hero.tsx reapplied sequentially.
+
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.
 2. Add chat history persistence + basic rate limiting.
 3. Reduced-motion accessibility mode.
+4. User to upload 3-5 more photos → slideshow activates (drop in /public, append to PHOTOS in Portrait.tsx).
+5. GA4 Measurement ID (G-XXXXXXX) still needed from user → REACT_APP_GA_ID in frontend/.env.
+6. Chat Quality Meter (thumbs up/down on clone answers → satisfaction score on /stats). P1.
+7. Terminal Mini-Game (Wordle-style tech terms / typing race). P2.

@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowDown, CameraOff, Hand, Loader2, ScanFace } from "lucide-react";
 import type { useGestureScroll } from "@/hooks/useGestureScroll";
 import { Portrait } from "@/components/Portrait";
 import { SocialLinks } from "@/components/SocialLinks";
+import { GestureGuideModal } from "@/components/GestureGuideModal";
 
 const NAME_LINES = ["AVNI", "BHARDWAJ"];
 
@@ -15,15 +17,16 @@ const lineReveal = {
 };
 
 const STATUS_TEXT: Record<string, string> = {
-  idle: "Gesture scroll ready — camera stays off until you opt in",
+  idle: "Gesture control ready — camera stays off until you opt in",
   loading: "Loading hand-tracking model",
-  active: "Gesture scroll live — move index finger up / down",
+  active: "Gesture control live — hand scrolls, pinch clicks",
   denied: "Camera access denied — enable it in your browser",
   error: "Camera unavailable here — classic scroll works fine",
 };
 
 export const Hero = ({ gesture }: { gesture: ReturnType<typeof useGestureScroll> }) => {
   const { status, enable } = gesture;
+  const [guideOpen, setGuideOpen] = useState(false);
   return (
     <section
       id="hero"
@@ -114,10 +117,10 @@ export const Hero = ({ gesture }: { gesture: ReturnType<typeof useGestureScroll>
                 <button
                   data-testid="enable-camera-button"
                   data-magnetic
-                  onClick={enable}
+                  onClick={() => setGuideOpen(true)}
                   className="mt-1 font-mono text-xs text-accent underline decoration-accent/40 underline-offset-4 transition-colors hover:text-foreground"
                 >
-                  Enable Camera for Gesture Scroll
+                  Enable Camera for Gesture Control
                 </button>
               )}
             </div>
@@ -143,6 +146,15 @@ export const Hero = ({ gesture }: { gesture: ReturnType<typeof useGestureScroll>
           </span>
         </motion.div>
       )}
+
+      <GestureGuideModal
+        open={guideOpen}
+        onClose={() => setGuideOpen(false)}
+        onStart={() => {
+          setGuideOpen(false);
+          enable();
+        }}
+      />
     </section>
   );
 };

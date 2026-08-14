@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { X } from "lucide-react";
+import { Hand, Pointer, X } from "lucide-react";
 import { MotionConfig } from "framer-motion";
 import { ThemeProvider } from "@/theme/ThemeContext";
 import { MotionProvider, useMotion } from "@/theme/MotionContext";
@@ -24,6 +24,7 @@ import { Contact } from "@/components/Contact";
 import { ChatWidget } from "@/components/ChatWidget";
 import { Terminal } from "@/components/Terminal";
 import { Dock } from "@/components/Dock";
+import { GestureCursor } from "@/components/GestureCursor";
 import StatsPage from "@/pages/StatsPage";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -83,6 +84,7 @@ function Site() {
       <Terminal open={terminalOpen} onClose={() => setTerminalOpen(false)} />
       <Dock onOpenTerminal={() => setTerminalOpen(true)} />
       <Cursor />
+      {gesture.status === "active" && <GestureCursor cursorRef={gesture.cursorRef} />}
 
       <div
         data-testid="gesture-preview-panel"
@@ -103,11 +105,22 @@ function Site() {
             <button
               data-testid="gesture-disable-button"
               onClick={gesture.disable}
-              aria-label="Disable gesture scrolling"
+              aria-label="Disable gesture control"
               className="text-muted-foreground transition-colors hover:text-foreground"
             >
               <X className="h-3.5 w-3.5" />
             </button>
+          </div>
+          <div
+            data-testid="gesture-mini-legend"
+            className="mt-1 flex items-center gap-3 border-t border-foreground/10 px-1 pt-2 pb-1"
+          >
+            <span className="flex items-center gap-1 font-mono text-[8px] uppercase tracking-[0.15em] text-muted-foreground">
+              <Hand className="h-3 w-3 text-accent" /> up/down · scroll
+            </span>
+            <span className="flex items-center gap-1 font-mono text-[8px] uppercase tracking-[0.15em] text-muted-foreground">
+              <Pointer className="h-3 w-3 text-accent" /> pinch · click
+            </span>
           </div>
         </div>
       </div>
