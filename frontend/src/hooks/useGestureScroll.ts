@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type Lenis from "lenis";
+import { track } from "@/lib/analytics";
 
 export type GestureStatus = "idle" | "loading" | "active" | "denied" | "error";
 
@@ -58,6 +59,7 @@ export function useGestureScroll(lenisRef: { current: Lenis | null }) {
         await videoRef.current.play();
       }
       setStatus("active");
+      track("gesture_optin");
 
       const loop = () => {
         const video = videoRef.current;

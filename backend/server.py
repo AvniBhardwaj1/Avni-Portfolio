@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Header, HTTPException
 from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -137,6 +137,54 @@ async def chat_history(sessionId: str = "default"):
             {"id": str(i), "role": d["role"], "content": d["content"]}
             for i, d in enumerate(docs)
         ]
+    }
+
+class AnalyticsEvent(BaseModel):
+    sessionId: str
+    type: str
+    data: dict = {}
+    ts: str = ""
+
+@api_router.post("/analytics/event")
+async def track_event(ev: AnalyticsEvent):
+    await db.analytics_events.insert_one({
+        "sessionId": ev.sessionId,
+        "type": ev.type,
+        "data": ev.data,
+        "ts": ev.ts or datetime.now(timezone.utc).isoformat(),
+    })
+    return {"ok": True}
+
+@api_router.get("/analytics/stats")
+async def analytics_stats(x_stats_token: str = Header(default="")):
+    if x_stats_token != os.environ.get("STATS_TOKEN"):
+        raise HTTPException(status_code=401, detail="unauthorized")
+    events = await db.analytics_events.find({}, {"_id": 0}).to_list(20000)
+    visitors = len({e["sessionId"] for e in events if e["type"] == "page_view"})
+    page_views = sum(1 for e in events if e["type"] == "page_view")
+    resume_downloads = sum(1 for e in events if e["type"] == "resume_download")
+    gesture_optins = sum(1 for e in events if e["type"] == "gesture_optin")
+    chat_messages = sum(1 for e in events if e["type"] == "chat_message")
+    card_clicks = {}
+    for e in events:
+        if e["type"] == "card_click":
+            title = e["data"].get("title", e["data"].get("id", "?"))
+            card_clicks[title] = card_clicks.get(title, 0) + 1
+    dwell: dict = {}
+    for e in events:
+        if e["type"] == "section_view":
+            sec = e["data"].get("section", "?")
+            dwell.setdefault(sec, []).append(e["data"].get("dwellMs", 0))
+    dwell_avg = {k: round(sum(v) / len(v) / 1000, 1) for k, v in dwell.items() if v}
+    return {
+        "visitors": visitors,
+        "pageViews": page_views,
+        "resumeDownloads": resume_downloads,
+        "gestureOptins": gesture_optins,
+        "chatMessages": chat_messages,
+        "cardClicks": sorted(card_clicks.items(), key=lambda kv: kv[1], reverse=True),
+        "dwellAvgSec": dwell_avg,
+        "totalEvents": len(events),
     }
 
 # Include the router in the main app

@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Chapter } from "@/components/Chapter";
 import { AircraftAssembly } from "@/components/AircraftAssembly";
 import { useTheme } from "@/theme/ThemeContext";
+import { track } from "@/lib/analytics";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -158,7 +159,10 @@ const Card = ({ project, i }: { project: Project; i: number }) => {
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.7, delay: i * 0.06, ease: "easeOut" }}
       data-testid={`project-card-${project.id}`}
-      onClick={() => clickable && window.open(project.href, "_blank", "noreferrer")}
+      onClick={() => {
+        track("card_click", { id: project.id, title: project.title });
+        if (clickable) window.open(project.href, "_blank", "noreferrer");
+      }}
       data-magnetic={clickable ? "" : undefined}
       className={`group flex h-full flex-col gap-6 rounded-2xl border border-foreground/10 bg-background/70 p-8 backdrop-blur-sm transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-accent/60 ${
         clickable ? "cursor-pointer" : ""

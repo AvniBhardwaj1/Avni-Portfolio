@@ -12,6 +12,7 @@ import {
   Phone,
 } from "lucide-react";
 import { Chapter } from "@/components/Chapter";
+import { track } from "@/lib/analytics";
 
 const LINES = ["LET'S", "CONNECT."];
 
@@ -155,6 +156,7 @@ export const Contact = () => (
       <a
         href="/Avni_Bhardwaj_Resume.pdf"
         download
+        onClick={() => track("resume_download")}
         data-testid="contact-resume-button"
         data-magnetic
         className="flex items-center gap-3 rounded-full border border-foreground/15 px-6 py-3 font-mono text-xs uppercase tracking-[0.15em] transition-colors hover:border-accent hover:text-accent"

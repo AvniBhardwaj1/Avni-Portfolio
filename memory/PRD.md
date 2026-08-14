@@ -54,6 +54,12 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 - Certificates moved to dedicated section: scroll-snap carousel of round "vinyl disc" cards (spin on hover, arrows, photos drop into /public/certificates/cert-0X.jpg when user provides folder). Chapter renumbered: Contact is now 05.
 - Clone prompt updated with all new repos.
 
+## v8 (2026-08-14)
+- Analytics: lib/analytics.ts (sendBeacon) tracks page_view, section dwell (IntersectionObserver, 0.35 threshold), card_click, resume_download, gesture_optin, chat_message → POST /api/analytics/event → db.analytics_events. GET /api/analytics/stats gated by x-stats-token (env STATS_TOKEN=avni-stats-7f3d2a, TEST credential).
+- Private dashboard at /stats: passcode gate, stat cards (visitors, page views, résumé downloads, gesture opt-ins, clone messages), project click ranking bars, avg dwell per section, refresh. Verified with curl (401 without token) + UI unlock.
+- Google Analytics: gtag loader wired in initGA(), activates when REACT_APP_GA_ID is set in frontend/.env (currently empty — user must supply GA4 Measurement ID).
+- Certificate photos still pending user's folder (discs show placeholders; drop cert-01.jpg..cert-05.jpg into frontend/public/certificates/).
+
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.
 2. Add chat history persistence + basic rate limiting.

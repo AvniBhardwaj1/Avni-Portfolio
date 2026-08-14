@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/theme/ThemeContext";
 import { MotionProvider, useMotion } from "@/theme/MotionContext";
 import { setLenis } from "@/lib/scroll";
 import { initAudioOnGesture } from "@/lib/sounds";
+import { initAnalytics } from "@/lib/analytics";
 import { useGestureScroll } from "@/hooks/useGestureScroll";
 import { Scene3D } from "@/components/Scene3D";
 import { Cursor } from "@/components/Cursor";
@@ -21,6 +22,7 @@ import { Skills } from "@/components/Skills";
 import { Certificates } from "@/components/Certificates";
 import { Contact } from "@/components/Contact";
 import { ChatWidget } from "@/components/ChatWidget";
+import StatsPage from "@/pages/StatsPage";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -31,6 +33,7 @@ function Site() {
 
   useEffect(() => {
     initAudioOnGesture();
+    initAnalytics();
   }, []);
 
   useEffect(() => {
@@ -109,10 +112,11 @@ function Site() {
 }
 
 export default function App() {
+  const isStats = window.location.pathname === "/stats";
   return (
     <ThemeProvider>
       <MotionProvider>
-        <Site />
+        {isStats ? <StatsPage /> : <Site />}
       </MotionProvider>
     </ThemeProvider>
   );

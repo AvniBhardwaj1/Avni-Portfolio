@@ -2,6 +2,7 @@ import { Download, Moon, PersonStanding, Sun } from "lucide-react";
 import { useTheme } from "@/theme/ThemeContext";
 import { useMotion } from "@/theme/MotionContext";
 import { scrollToSection } from "@/lib/scroll";
+import { track } from "@/lib/analytics";
 
 const LINKS = [
   { label: "Work", target: "#work" },
@@ -40,6 +41,7 @@ export const Nav = () => {
           <a
             href="/Avni_Bhardwaj_Resume.pdf"
             download
+            onClick={() => track("resume_download")}
             data-testid="resume-download-button"
             data-magnetic
             className="ml-2 flex h-9 items-center gap-2 rounded-full bg-accent px-4 font-mono text-[11px] uppercase tracking-[0.15em] text-accent-foreground transition-transform hover:scale-105 active:scale-95"

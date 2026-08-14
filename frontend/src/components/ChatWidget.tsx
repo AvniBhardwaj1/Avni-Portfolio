@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Bot, MessageSquareText, Send, X } from "lucide-react";
 import { useChat } from "@ai-sdk/react";
 import type { Message } from "ai";
+import { track } from "@/lib/analytics";
 
 const INTRO =
   "I am Avni's digital clone. I handle the small talk so she can focus on writing Python and orchestrating Kubernetes clusters. What do you want to know?";
@@ -97,7 +98,13 @@ const ChatPanel = ({
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-foreground/10 p-3">
+      <form
+        onSubmit={(e) => {
+          track("chat_message");
+          handleSubmit(e);
+        }}
+        className="flex items-center gap-2 border-t border-foreground/10 p-3"
+      >
         <input
           data-testid="chat-input"
           value={input}
