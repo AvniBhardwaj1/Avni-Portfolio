@@ -1,4 +1,4 @@
-import { Download, Moon, PersonStanding, Sun } from "lucide-react";
+import { Download, Moon, PersonStanding, Sun, TerminalSquare } from "lucide-react";
 import { useTheme } from "@/theme/ThemeContext";
 import { useMotion } from "@/theme/MotionContext";
 import { scrollToSection } from "@/lib/scroll";
@@ -11,7 +11,7 @@ const LINKS = [
   { label: "Contact", target: "#contact" },
 ];
 
-export const Nav = () => {
+export const Nav = ({ onOpenTerminal }: { onOpenTerminal: () => void }) => {
   const { theme, toggle } = useTheme();
   const { reduced, toggle: toggleMotion } = useMotion();
   return (
@@ -38,6 +38,16 @@ export const Nav = () => {
               {l.label}
             </button>
           ))}
+          <button
+            data-testid="terminal-open-button"
+            data-magnetic
+            onClick={onOpenTerminal}
+            aria-label="Open terminal"
+            title="Open the terminal — type help"
+            className="ml-2 flex h-9 w-9 items-center justify-center rounded-full border border-foreground/10 transition-colors hover:border-accent hover:text-accent"
+          >
+            <TerminalSquare className="h-4 w-4" />
+          </button>
           <a
             href="/Avni_Bhardwaj_Resume.pdf"
             download

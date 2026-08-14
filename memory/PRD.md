@@ -60,6 +60,14 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 - Google Analytics: gtag loader wired in initGA(), activates when REACT_APP_GA_ID is set in frontend/.env (currently empty — user must supply GA4 Measurement ID).
 - Certificate photos still pending user's folder (discs show placeholders; drop cert-01.jpg..cert-05.jpg into frontend/public/certificates/).
 
+## v9 (2026-08-14)
+- Weekly Stats Email: Emergent managed Resend (EMERGENT_EMAIL_KEY, from_name "Avni Bhardwaj Portfolio", reply-to her Gmail). HTML digest with week stats (visitors, page views, downloads, opt-ins, chats, top projects, dwell). asyncio scheduler sends Mondays 09:00 IST (marker in db.settings), manual trigger POST /api/analytics/weekly-email (x-stats-token). Guardrail gate _assert_safe_email on every send. Test send verified: real email_id returned, delivered to avnibhardwaj01.ab@gmail.com.
+- Stats aggregation refactored into shared _aggregate() helper.
+- GA4: still awaiting user's Measurement ID (REACT_APP_GA_ID in frontend/.env).
+
+## v10 (2026-08-14)
+- AVNI://TERMINAL: m4tt72/terminal-inspired modal (navbar Terminal icon, ESC/backdrop close). Commands: help, whoami, about, skills, projects, experience, achievements, contact, socials, quote, resume, github/linkedin/leetcode (open links), theme (flips site theme), sudo joke, clear/Ctrl+L, exit. Arrow-key history, Tab autocomplete. `ask <question>` streams the digital clone (same /api/chat session as the widget — shared memory). Tracks terminal_open + terminal chat_message events.
+
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.
 2. Add chat history persistence + basic rate limiting.

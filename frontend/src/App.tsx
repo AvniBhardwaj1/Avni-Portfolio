@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -22,6 +22,7 @@ import { Skills } from "@/components/Skills";
 import { Certificates } from "@/components/Certificates";
 import { Contact } from "@/components/Contact";
 import { ChatWidget } from "@/components/ChatWidget";
+import { Terminal } from "@/components/Terminal";
 import StatsPage from "@/pages/StatsPage";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -30,6 +31,7 @@ function Site() {
   const lenisRef = useRef<Lenis | null>(null);
   const gesture = useGestureScroll(lenisRef);
   const { reduced } = useMotion();
+  const [terminalOpen, setTerminalOpen] = useState(false);
 
   useEffect(() => {
     initAudioOnGesture();
@@ -66,7 +68,7 @@ function Site() {
     <div className="min-h-screen bg-background font-body text-foreground">
       <MeshGradient />
       <Scene3D />
-      <Nav />
+      <Nav onOpenTerminal={() => setTerminalOpen(true)} />
       <main className="relative z-10">
         <Hero gesture={gesture} />
         <Marquee />
@@ -77,6 +79,7 @@ function Site() {
         <Contact />
       </main>
       <ChatWidget />
+      <Terminal open={terminalOpen} onClose={() => setTerminalOpen(false)} />
       <Cursor />
 
       <div
