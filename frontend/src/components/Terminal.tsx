@@ -26,7 +26,8 @@ const BANNER: Line[] = [
 const COMMAND_NAMES = [
   "help", "whoami", "about", "skills", "projects", "experience", "achievements",
   "contact", "socials", "quote", "resume", "github", "linkedin", "leetcode",
-  "theme", "ask", "sudo", "clear", "exit",
+  "theme", "ask", "ls", "pwd", "date", "echo", "banner", "certificates",
+  "hireme", "matrix", "guess", "sudo", "clear", "exit",
 ];
 
 const OUTPUTS: Record<string, string[]> = {
@@ -83,9 +84,10 @@ const OUTPUTS: Record<string, string[]> = {
   ],
   help: [
     "help · whoami · about · skills · projects · experience · achievements",
-    "contact · socials · quote · resume · github · linkedin · leetcode",
+    "contact · socials · quote · resume · certificates · github · linkedin · leetcode",
+    "ls · pwd · date · echo <txt> · banner · hireme · theme · sudo",
     "ask <question>   ask the digital clone anything",
-    "theme            flip light/dark",
+    "matrix · guess   easter eggs. guess is a game — you will lose gracefully",
     "clear / Ctrl+L   wipe the screen · exit / ESC  close terminal",
   ],
 };
@@ -94,6 +96,11 @@ const QUOTES = [
   '"Today no knowledge, tomorrow master."',
   '"It works on my machine."',
   '"Turning caffeine into scalable architecture."',
+  '"Kubernetes orchestrates my containers. Coffee orchestrates me."',
+  '"My pipelines have fewer leaks than my deadlines."',
+  '"I speak English, Hindi, Korean (I) — and fluent Python."',
+  '"TF-IDF helps me find words that are contextually important, not globally common. Same energy for life."',
+  '"Zero-maintenance is a lifestyle, not just an architecture choice."',
 ];
 
 export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
@@ -104,6 +111,7 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
   const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const gameRef = useRef<{ target: number; tries: number } | null>(null);
   const { toggle } = useTheme();
 
   useEffect(() => {
@@ -172,6 +180,63 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
       track("chat_message", { source: "terminal" });
       return ask(rest.join(" "));
     }
+    if (gameRef.current) {
+      if (cmd.toLowerCase() === "guess exit") {
+        gameRef.current = null;
+        return push({ kind: "sys", text: "game over. the number keeps its secrets." });
+      }
+      const n = parseInt(cmd, 10);
+      if (!Number.isNaN(n)) {
+        const g = gameRef.current;
+        g.tries++;
+        if (n === g.target) {
+          gameRef.current = null;
+          return push({ kind: "out", text: `correct — ${n} in ${g.tries} ${g.tries === 1 ? "try" : "tries"}. avni would hire you for that alone.` });
+        }
+        return push({ kind: "sys", text: n < g.target ? "higher." : "lower." });
+      }
+    }
+    if (name === "guess") {
+      gameRef.current = { target: 1 + Math.floor(Math.random() * 10), tries: 0 };
+      return push({ kind: "sys", text: "i picked a number between 1 and 10. type your guess. `guess exit` quits." });
+    }
+    if (name === "matrix") {
+      const chars = "アイウエオカキクケコサシスセソ01<>[]{}=+*/\\|";
+      let n = 0;
+      const iv = setInterval(() => {
+        n++;
+        push({
+          kind: "out",
+          text: Array.from({ length: 68 }, () => chars[Math.floor(Math.random() * chars.length)]).join(""),
+        });
+        if (n >= 10) {
+          clearInterval(iv);
+          push({ kind: "sys", text: "wake up, neo. the a380 has you." });
+        }
+      }, 120);
+      return;
+    }
+    if (name === "hireme") {
+      window.open(
+        "mailto:avnibhardwaj01.ab@gmail.com?subject=" + encodeURIComponent("Let's build something meaningful"),
+        "_self",
+      );
+      return push(
+        { kind: "out", text: "opening your mail client with the subject pre-written, because i am thoughtful like that." },
+        { kind: "out", text: "short pitch: airbus-grade pipelines, agentic AI, zero-maintenance automation. résumé is one `resume` away." },
+      );
+    }
+    if (name === "ls") return push({ kind: "out", text: "about.txt  skills.txt  contact.txt  resume.pdf  projects/  achievements/  secrets/ (permission denied)" });
+    if (name === "pwd") return push({ kind: "out", text: "/home/visitor/avni-portfolio" });
+    if (name === "date") return push({ kind: "out", text: new Date().toString() });
+    if (name === "echo") return push({ kind: "out", text: rest.join(" ") || "echo… echo… echo…" });
+    if (name === "banner") return push(...BANNER);
+    if (name === "certificates")
+      return push(
+        { kind: "out", text: "aws academy — cloud architecting (2025)" },
+        { kind: "out", text: "tableau foundation — intellipaat (2025)" },
+        { kind: "sys", text: "the spinning disc carousel is further down the page. photos incoming." },
+      );
     if (name === "theme") {
       toggle();
       return push({ kind: "sys", text: "theme flipped. the terminal stays dark — terminals don't do beige." });

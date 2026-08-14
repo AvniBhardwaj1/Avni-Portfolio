@@ -22,6 +22,13 @@ const getSessionId = () => {
   return id;
 };
 
+const SUGGESTIONS = [
+  "What did Avni build at Airbus?",
+  "What's her tech stack?",
+  "Is she open to internships?",
+  "Summarize her best projects",
+];
+
 const ChatPanel = ({
   sessionId,
   initialMessages,
@@ -29,7 +36,7 @@ const ChatPanel = ({
   sessionId: string;
   initialMessages: Message[];
 }) => {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat({
     api: API,
     streamProtocol: "text",
     body: { sessionId },
@@ -98,14 +105,31 @@ const ChatPanel = ({
         )}
       </div>
 
+      {messages.length === 1 && (
+        <div className="flex flex-wrap gap-2 px-5 pb-2" data-testid="chat-suggestions">
+          {SUGGESTIONS.map((q) => (
+            <button
+              key={q}
+              data-testid={`chat-suggestion-${SUGGESTIONS.indexOf(q)}`}
+              onClick={() => {
+                track("chat_message", { source: "suggestion" });
+                append({ role: "user", content: q });
+              }}
+              className="rounded-full border border-accent/30 px-3 py-1.5 font-mono text-[10px] text-accent transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      )}
+
       <form
         onSubmit={(e) => {
           track("chat_message");
           handleSubmit(e);
         }}
         className="flex items-center gap-2 border-t border-foreground/10 p-3"
-      >
-        <input
+      >        <input
           data-testid="chat-input"
           value={input}
           onChange={handleInputChange}

@@ -4,8 +4,8 @@ import { Award, ChevronLeft, ChevronRight } from "lucide-react";
 import { Chapter } from "@/components/Chapter";
 
 const CERTS = [
-  { id: "cert-01", label: "Certificate 01", img: "/certificates/cert-01.jpg" },
-  { id: "cert-02", label: "Certificate 02", img: "/certificates/cert-02.jpg" },
+  { id: "cert-01", label: "AWS Academy — Cloud Architecting", img: "/certificates/cert-01.jpg" },
+  { id: "cert-02", label: "Tableau Foundation — Intellipaat", img: "/certificates/cert-02.jpg" },
   { id: "cert-03", label: "Certificate 03", img: "/certificates/cert-03.jpg" },
   { id: "cert-04", label: "Certificate 04", img: "/certificates/cert-04.jpg" },
   { id: "cert-05", label: "Certificate 05", img: "/certificates/cert-05.jpg" },

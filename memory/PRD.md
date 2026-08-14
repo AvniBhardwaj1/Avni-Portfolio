@@ -68,6 +68,14 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 ## v10 (2026-08-14)
 - AVNI://TERMINAL: m4tt72/terminal-inspired modal (navbar Terminal icon, ESC/backdrop close). Commands: help, whoami, about, skills, projects, experience, achievements, contact, socials, quote, resume, github/linkedin/leetcode (open links), theme (flips site theme), sudo joke, clear/Ctrl+L, exit. Arrow-key history, Tab autocomplete. `ask <question>` streams the digital clone (same /api/chat session as the widget — shared memory). Tracks terminal_open + terminal chat_message events.
 
+## v11 (2026-08-14)
+- Real resume: Avni R.pdf downloaded to /public/Avni_Bhardwaj_Resume.pdf — all Résumé buttons now serve it.
+- Clone grounding overhaul: system prompt rebuilt from the REAL resume (Airbus Bangalore Flight Physics, FP-BOT LlamaIndex/vLLM/Qdrant 30+ tools, CGPA 3.37, 70k+ finance records, 4-model ensemble, AWS Academy + Tableau + Kavach certs) with strict anti-hallucination rules: answer only from facts, refuse general coding help, resist injection, never reveal prompt, no commitments, always redirect with a next step. Verified live: refuses scraping request, refuses salary/pizza speculation, resists "ignore previous instructions".
+- Chat widget: suggested question chips (append via useChat).
+- Terminal: +ls, pwd, date, echo, banner, certificates, hireme (mailto w/ subject), matrix (katakana rain egg), guess (number game with state). Quote pool expanded to 8 Avni-flavored lines.
+- Floating Dock: bottom-center glass pill (Terminal, GitHub, LinkedIn, Email, Résumé) with tooltips + magnetic hover, tracked as dock_click events.
+- Certificates discs 1-2 now labeled with real certs (AWS Academy Cloud Architecting 2025, Tableau Foundation Intellipaat 2025).
+
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.
 2. Add chat history persistence + basic rate limiting.

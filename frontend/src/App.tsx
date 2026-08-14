@@ -23,6 +23,7 @@ import { Certificates } from "@/components/Certificates";
 import { Contact } from "@/components/Contact";
 import { ChatWidget } from "@/components/ChatWidget";
 import { Terminal } from "@/components/Terminal";
+import { Dock } from "@/components/Dock";
 import StatsPage from "@/pages/StatsPage";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -80,6 +81,7 @@ function Site() {
       </main>
       <ChatWidget />
       <Terminal open={terminalOpen} onClose={() => setTerminalOpen(false)} />
+      <Dock onOpenTerminal={() => setTerminalOpen(true)} />
       <Cursor />
 
       <div
