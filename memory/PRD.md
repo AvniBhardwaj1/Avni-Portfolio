@@ -77,7 +77,9 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 - Certificates discs 1-2 now labeled with real certs (AWS Academy Cloud Architecting 2025, Tableau Foundation Intellipaat 2025).
 
 ## v12 (2026-08-14)
-- Real certificates live: 5 PDFs (Accenture Forage, ML Workshop @ Techkriti IIT Kanpur, Robotics Workshop @ Techkriti, Chaitanya IIM Indore merit, MP Police community service) stored in /public/certificates/ as PDF + rendered JPG (PyMuPDF, downscaled to ~900px). Discs show the real certificate art, spin on hover, and click through to open the full PDF. Clone prompt + terminal `certificates` command updated with the full cert list.
+- Real certificates live: 10 PDFs (Accenture Forage, ML + Robotics Workshops @ Techkriti IIT Kanpur, Chaitanya merit IIM Indore, MP Police community service, Techkriti Innovation Challenge merit, Accenture iAspire Go-for-Gold, GDSC Lead completion, HitNext organisation, AWS Academy Cloud Architecting 60h badge) in /public/certificates/ as PDF + JPG.
+- Gramophone player: discs are vinyl records with groove rings + spindle; clicking one FLIP-animates it (framer-motion layoutId) onto a turntable modal — platter rings, dropping tonearm, disc spins (3s), "NOW SPINNING" panel with full cert image + description + Open-original-PDF link. X button exits with a genie swirl back into the shelf. Reduced-motion safe.
+- Clone prompt + terminal `certificates` updated with all 10 certs.
 
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.

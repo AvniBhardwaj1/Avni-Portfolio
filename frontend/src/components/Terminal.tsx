@@ -233,9 +233,10 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
     if (name === "banner") return push(...BANNER);
     if (name === "certificates")
       return push(
-        { kind: "out", text: "accenture forage · ML workshop · robotics workshop · chaitanya (IIM indore) · MP police community service" },
-        { kind: "out", text: "+ aws academy cloud architecting (2025) · tableau foundation, intellipaat (2025)" },
-        { kind: "sys", text: "spin the discs in the certificates section below — click one to open the real thing." },
+        { kind: "out", text: "accenture forage · ML + robotics workshops (techkriti, IIT kanpur) · chaitanya merit (IIM indore)" },
+        { kind: "out", text: "techkriti innovation challenge · iAspire go-for-gold (accenture) · GDSC lead cert · hitnext org" },
+        { kind: "out", text: "aws academy cloud architecting badge (60h) · tableau foundation (intellipaat) · MP police community service" },
+        { kind: "sys", text: "spin the vinyls in the certificates section — drop one on the turntable." },
       );
     if (name === "theme") {
       toggle();

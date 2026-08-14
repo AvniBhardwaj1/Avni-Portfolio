@@ -238,6 +238,22 @@
     animation: disc-spin 7s linear infinite;
 }
 
+.vinyl-grooves {
+    background: repeating-radial-gradient(
+        circle at center,
+        transparent 0 3px,
+        hsl(var(--foreground) / 0.08) 3px 4px
+    );
+}
+
+.vinyl-playing {
+    animation: disc-spin 3s linear infinite;
+}
+
+.reduced-motion .vinyl-playing {
+    animation: none !important;
+}
+
 .reduced-motion .cert-disc {
     animation: none !important;
 }
