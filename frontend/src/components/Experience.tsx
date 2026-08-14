@@ -101,6 +101,8 @@ const PROJECTS: Project[] = [
 
 const CERTS = ["CERT_01", "CERT_02", "CERT_03", "CERT_04", "CERT_05"];
 
+const INDEX_COLORS = ["text-accent", "text-accent2", "text-accent3"];
+
 const Card = ({ project, i }: { project: Project; i: number }) => {
   const clickable = Boolean(project.href);
   return (
@@ -117,7 +119,7 @@ const Card = ({ project, i }: { project: Project; i: number }) => {
       }`}
     >
       <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
-        <span className="text-accent">{project.index}</span>
+        <span className={INDEX_COLORS[i % 3]}>{project.index}</span>
         <span className="flex items-center gap-2">
           {project.period}
           {clickable && (

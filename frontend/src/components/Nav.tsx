@@ -1,4 +1,4 @@
-import { Moon, PersonStanding, Sun } from "lucide-react";
+import { Download, Moon, PersonStanding, Sun } from "lucide-react";
 import { useTheme } from "@/theme/ThemeContext";
 import { useMotion } from "@/theme/MotionContext";
 import { scrollToSection } from "@/lib/scroll";
@@ -37,6 +37,16 @@ export const Nav = () => {
               {l.label}
             </button>
           ))}
+          <a
+            href="/Avni_Bhardwaj_Resume.pdf"
+            download
+            data-testid="resume-download-button"
+            data-magnetic
+            className="ml-2 flex h-9 items-center gap-2 rounded-full bg-accent px-4 font-mono text-[11px] uppercase tracking-[0.15em] text-accent-foreground transition-transform hover:scale-105 active:scale-95"
+          >
+            <Download className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Résumé</span>
+          </a>
           <button
             data-testid="motion-toggle"
             data-magnetic

@@ -41,7 +41,8 @@ function A380({ onReady, reduced }: { onReady: (groups: Groups, fly: THREE.Group
     if (doneRef.current || !flyRef.current) return;
     doneRef.current = true;
 
-    const root = scene;
+    const root = scene.clone(true);
+    flyRef.current.add(root);
     root.updateMatrixWorld(true);
     const size = new THREE.Box3().setFromObject(root).getSize(new THREE.Vector3());
     if (size.z > size.x) root.rotation.y = Math.PI / 2;
@@ -142,11 +143,7 @@ function A380({ onReady, reduced }: { onReady: (groups: Groups, fly: THREE.Group
     onReady(cats, flyRef.current);
   }, [scene, onReady]);
 
-  return (
-    <group ref={flyRef}>
-      <primitive object={scene} />
-    </group>
-  );
+  return <group ref={flyRef} />;
 }
 
 useGLTF.preload("/models/a380.glb");
@@ -204,6 +201,7 @@ export const AircraftAssembly = ({ dark }: { dark: boolean }) => {
       tl.to(model.fly.rotation, { z: 0.6, y: -Math.PI * 0.12, duration: 0.14, ease: "power2.in" }, 0.85);
       tl.to(model.fly.position, { x: -20, y: 5, duration: 0.14, ease: "power2.in" }, 0.85);
       tl.to([cardLRef.current, cardRRef.current], { opacity: 0, duration: 0.07 }, 0.87);
+      ScrollTrigger.refresh();
     }, sectionRef);
     return () => ctx.revert();
   }, [model]);

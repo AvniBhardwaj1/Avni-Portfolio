@@ -19,6 +19,8 @@ const GROUPS = [
   },
 ];
 
+const GROUP_COLORS = ["text-accent", "text-accent2", "text-accent3"];
+
 export const Skills = () => (
   <section
     id="skills"
@@ -36,7 +38,7 @@ export const Skills = () => (
           transition={{ duration: 0.6, delay: gi * 0.1, ease: "easeOut" }}
           data-testid={`skill-group-${group.id}`}
         >
-          <p className="mb-6 font-mono text-xs uppercase tracking-[0.3em] text-accent">
+          <p className={`mb-6 font-mono text-xs uppercase tracking-[0.3em] ${GROUP_COLORS[gi % 3]}`}>
             {group.title}
           </p>
           <ul className="flex flex-col">

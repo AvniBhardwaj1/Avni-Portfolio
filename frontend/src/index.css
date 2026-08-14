@@ -21,6 +21,8 @@
         --muted-foreground: 220 12% 42%;
         --accent: 191 91% 38%;
         --accent-foreground: 0 0% 100%;
+        --accent-2: 262 70% 52%;
+        --accent-3: 28 90% 46%;
         --destructive: 0 72% 51%;
         --destructive-foreground: 0 0% 100%;
         --border: 220 16% 88%;
@@ -43,6 +45,8 @@
         --muted-foreground: 217 15% 62%;
         --accent: 187 95% 60%;
         --accent-foreground: 225 40% 6%;
+        --accent-2: 262 90% 74%;
+        --accent-3: 38 95% 62%;
         --destructive: 0 62% 50%;
         --destructive-foreground: 210 30% 96%;
         --border: 220 18% 15%;
@@ -158,14 +162,14 @@
 }
 
 .blob-b {
-    background: radial-gradient(circle at center, #fde3c8, transparent 62%);
+    background: radial-gradient(circle at center, #ddd6fe, transparent 62%);
     bottom: -20%;
     right: -10%;
     animation: drift-b 32s ease-in-out infinite alternate;
 }
 
 .blob-c {
-    background: radial-gradient(circle at center, #bae6fd, transparent 62%);
+    background: radial-gradient(circle at center, #fecdd3, transparent 62%);
     top: 30%;
     left: 45%;
     opacity: 0.4;

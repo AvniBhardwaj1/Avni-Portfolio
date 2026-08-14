@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import {
   ArrowUpRight,
   Braces,
+  Download,
   Github,
   GraduationCap,
   Languages,
@@ -75,7 +76,13 @@ export const Contact = () => (
             }}
             className="block text-[clamp(2.75rem,9vw,7.5rem)]"
           >
-            {i === 1 ? <span className="text-accent glow-accent">{line}</span> : line}
+            {i === 1 ? (
+              <span className="bg-gradient-to-r from-[hsl(var(--accent))] to-[hsl(var(--accent-2))] bg-clip-text text-transparent">
+                {line}
+              </span>
+            ) : (
+              line
+            )}
           </motion.span>
         </motion.span>
       ))}
@@ -144,6 +151,16 @@ export const Contact = () => (
       >
         <Mail className="h-4 w-4" />
         Email me
+      </a>
+      <a
+        href="/Avni_Bhardwaj_Resume.pdf"
+        download
+        data-testid="contact-resume-button"
+        data-magnetic
+        className="flex items-center gap-3 rounded-full border border-foreground/15 px-6 py-3 font-mono text-xs uppercase tracking-[0.15em] transition-colors hover:border-accent hover:text-accent"
+      >
+        <Download className="h-4 w-4" />
+        Résumé
       </a>
       <a
         href="https://github.com/avnibhardwaj1"

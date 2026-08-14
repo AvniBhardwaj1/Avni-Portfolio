@@ -43,6 +43,12 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 - Contact section rebuilt: "CONTACT ME // LET'S CONNECT" kicker, LET'S CONNECT. masked headline, collaboration intro copy, details grid (Location: Indore MP, Email, Education: NMIMS Indore, Mobile: +91 96913 85721, Languages: English/Hindi/Korean (I)) with lucide icons; social pills retained.
 - Humor quotes marquee (reverse, 70s) above footer: "Today no knowledge, tomorrow master." / "It works on my machine." / "Turning caffeine into scalable architecture." Clone prompt now uses these when asked about her learning process (verified live).
 
+## v6 (2026-08-14)
+- BUGFIX: aircraft vanished after switching to Projects tab and back — root cause: A380 component mutated the useGLTF-cached scene (meshes attached into discarded groups). Fixed by cloning the scene per mount (scene.clone(true)) + ScrollTrigger.refresh() after timeline creation. Verified via real wheel-scroll: exploded → assembly → fly-off all scrub correctly after tab roundtrip.
+- Background particles calmed (900→340 particles, smaller, lower opacity) per user feedback.
+- Light theme color variety: added --accent-2 (violet) and --accent-3 (amber); violet/rose mesh blobs; gradient CONNECT. headline; skill group titles and project card indices cycle through cyan/violet/amber.
+- Résumé download: generated Avni_Bhardwaj_Resume.pdf (reportlab, scripts/make_resume.py) in /public; Résumé buttons in navbar and contact section.
+
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.
 2. Add chat history persistence + basic rate limiting.

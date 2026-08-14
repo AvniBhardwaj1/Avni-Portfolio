@@ -30,7 +30,7 @@ function ParticleField({ progress, dark }: { progress: Refs["progress"]; dark: b
   const points = useRef<THREE.Points>(null);
   const texture = useMemo(() => makeDotTexture(), []);
   const positions = useMemo(() => {
-    const count = 900;
+    const count = 340;
     const arr = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       arr[i * 3] = (Math.random() - 0.5) * 24;
@@ -57,11 +57,11 @@ function ParticleField({ progress, dark }: { progress: Refs["progress"]; dark: b
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.09}
+        size={0.06}
         map={texture}
         transparent
         depthWrite={false}
-        opacity={dark ? 0.7 : 0.4}
+        opacity={dark ? 0.4 : 0.2}
         color={dark ? "#67e8f9" : "#0e7490"}
         sizeAttenuation
       />
@@ -107,7 +107,7 @@ function NodeCloud({ progress, dark }: { progress: Refs["progress"]; dark: boole
           <meshBasicMaterial
             color={dark ? "#67e8f9" : "#155e75"}
             transparent
-            opacity={dark ? 0.9 : 0.6}
+            opacity={dark ? 0.55 : 0.35}
           />
         </mesh>
       ))}

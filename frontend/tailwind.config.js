@@ -44,6 +44,8 @@ module.exports = {
           DEFAULT: 'hsl(var(--accent))',
           foreground: 'hsl(var(--accent-foreground))'
         },
+        accent2: 'hsl(var(--accent-2))',
+        accent3: 'hsl(var(--accent-3))',
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))'
