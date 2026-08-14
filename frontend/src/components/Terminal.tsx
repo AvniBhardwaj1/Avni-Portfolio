@@ -233,10 +233,10 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
     if (name === "banner") return push(...BANNER);
     if (name === "certificates")
       return push(
-        { kind: "out", text: "accenture forage · ML + robotics workshops (techkriti, IIT kanpur) · chaitanya merit (IIM indore)" },
-        { kind: "out", text: "techkriti innovation challenge · iAspire go-for-gold (accenture) · GDSC lead cert · hitnext org" },
-        { kind: "out", text: "aws academy cloud architecting badge (60h) · tableau foundation (intellipaat) · MP police community service" },
-        { kind: "sys", text: "spin the vinyls in the certificates section — drop one on the turntable." },
+        { kind: "out", text: "accenture forage · ML + robotics workshops (techkriti) · chaitanya merit · techkriti innovation" },
+        { kind: "out", text: "iAspire gold · GDSC lead · hitnext org · AWS academy (60h) · tableau · oracle winner" },
+        { kind: "out", text: "conference paper presenter (2022) · ISC2 CC cybersecurity (udemy) · kavach 2023 grand finale" },
+        { kind: "sys", text: "14 vinyls on the shelf below — drop one on the turntable and listen for the crackle." },
       );
     if (name === "theme") {
       toggle();

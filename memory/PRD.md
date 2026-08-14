@@ -81,6 +81,11 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 - Gramophone player: discs are vinyl records with groove rings + spindle; clicking one FLIP-animates it (framer-motion layoutId) onto a turntable modal — platter rings, dropping tonearm, disc spins (3s), "NOW SPINNING" panel with full cert image + description + Open-original-PDF link. X button exits with a genie swirl back into the shelf. Reduced-motion safe.
 - Clone prompt + terminal `certificates` updated with all 10 certs.
 
+## v13 (2026-08-14)
+- 4 more certificates (14 total): Conference Paper Presenter (STME NMIMS 2022), ISC2 CC Cybersecurity (Udemy 17.5h 2025), Oracle Challenge Winner (team TECH-TITANS), Kavach 2023 Grand Finale (NM_VISIONARYTITANS).
+- Turntable audio: procedural vinyl crackle (Web Audio — brown noise + random pops through bandpass, lib/sounds.ts startCrackle/stopCrackle) plays while a certificate spins on the platter, fades out on close.
+- NOTE: the Google Cloud Study Jams certificate appeared as an inline image in chat but was NOT among the uploaded files — needs a file upload to add.
+
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.
 2. Add chat history persistence + basic rate limiting.

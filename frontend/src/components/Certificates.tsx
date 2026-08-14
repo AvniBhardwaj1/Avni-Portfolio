@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Award, ChevronLeft, ChevronRight, ExternalLink, X } from "lucide-react";
 import { Chapter } from "@/components/Chapter";
 import { track } from "@/lib/analytics";
+import { startCrackle, stopCrackle } from "@/lib/sounds";
 
 type Cert = { id: string; label: string; sub: string; desc: string; img: string; pdf: string };
 
@@ -17,6 +18,10 @@ const CERTS: Cert[] = [
   { id: "cert-08", label: "GDSC Lead — Certificate of Completion", sub: "Google Developer Student Clubs · 2023–24", desc: "Official Google recognition for serving as Google Developer Student Club Lead, 2023–24.", img: "/certificates/cert-08.jpg", pdf: "/certificates/cert-08.pdf" },
   { id: "cert-09", label: "HitNext Challenge — Organisation", sub: "GDSC × NMIMS Indore · 2023", desc: "Certificate of Organisation for volunteering in the HitNext Challenge at NMIMS Indore.", img: "/certificates/cert-09.jpg", pdf: "/certificates/cert-09.pdf" },
   { id: "cert-10", label: "AWS Academy — Cloud Architecting", sub: "AWS Academy · 60-hour badge, Nov 2025", desc: "AWS Academy Graduate — Cloud Architecting training badge, 60 course hours, Credly verified.", img: "/certificates/cert-10.jpg", pdf: "/certificates/cert-10.pdf" },
+  { id: "cert-11", label: "Conference Paper Presenter", sub: "STME NMIMS Indore · Sep 2022", desc: "Paper presenter at the International Conference on Recent Paradigm in Computer Science and Engineering.", img: "/certificates/cert-11.jpg", pdf: "/certificates/cert-11.pdf" },
+  { id: "cert-12", label: "ISC2 Certified in Cybersecurity (CC)", sub: "Udemy · 17.5 hours, Apr 2025", desc: "Completed the full ISC2 Certified in Cybersecurity (CC) course on Udemy.", img: "/certificates/cert-12.jpg", pdf: "/certificates/cert-12.pdf" },
+  { id: "cert-13", label: "Oracle Challenge — Winner", sub: "GDSC STME · Team TECH-TITANS", desc: "Certificate of Achievement for outstanding performance in the Oracle Challenge, team TECH-TITANS.", img: "/certificates/cert-13.jpg", pdf: "/certificates/cert-13.pdf" },
+  { id: "cert-14", label: "Kavach 2023 — Grand Finale", sub: "Govt. of India · Cybersecurity Hackathon", desc: "Grand Finale participant at Kavach 2023, the national cybersecurity hackathon, with team NM_VISIONARYTITANS.", img: "/certificates/cert-14.jpg", pdf: "/certificates/cert-14.pdf" },
 ];
 
 const DiscFace = ({ cert }: { cert: Cert }) => (
@@ -39,6 +44,11 @@ const DiscFace = ({ cert }: { cert: Cert }) => (
 export const Certificates = () => {
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<Cert | null>(null);
+
+  useEffect(() => {
+    if (active) startCrackle();
+    else stopCrackle();
+  }, [active]);
 
   const scrollBy = (dir: number) => {
     trackRef.current?.scrollBy({ left: dir * 260, behavior: "smooth" });
