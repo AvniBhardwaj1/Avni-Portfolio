@@ -2,8 +2,8 @@ import { Braces, Github, Linkedin, Mail } from "lucide-react";
 
 const LINKS = [
   { id: "github", href: "https://github.com/avnibhardwaj1", Icon: Github, label: "GitHub" },
-  { id: "linkedin", href: "https://www.linkedin.com/in/avnibhardwaj", Icon: Linkedin, label: "LinkedIn" },
-  { id: "leetcode", href: "https://leetcode.com/u/avnibhardwaj1", Icon: Braces, label: "LeetCode" },
+  { id: "linkedin", href: "https://www.linkedin.com/in/avni-bhardwaj10/", Icon: Linkedin, label: "LinkedIn" },
+  { id: "leetcode", href: "https://leetcode.com/u/AvniBhardwaj10/", Icon: Braces, label: "LeetCode" },
   { id: "email", href: "mailto:avnibhardwaj01.ab@gmail.com", Icon: Mail, label: "Email" },
 ];
 

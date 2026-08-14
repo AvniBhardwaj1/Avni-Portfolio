@@ -15,16 +15,18 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 ## Implemented
 - 2026-08-14 (v1): Hero masked name reveal, gesture scroll (MediaPipe) with live preview panel, theme-adaptive 3D wireframe network/torus-knot/icosahedron background scrubbed by ScrollTrigger, marquee, experience cards, skills clusters, contact footer, chat widget (mocked), light(default)/dark toggle.
 - 2026-08-14 (v2): Robot avatar (useGLTF) with head/eye mouse tracking; scroll-scrubbed exploded→assembled→fly-off aircraft (pinned 300% section, GSAP timeline); live digital-clone chat (real LLM streaming, witty persona); pearl light theme + animated mesh gradient blobs; custom inverted-color magnetic cursor (GSAP quickTo); glass sticky tabs splitting Industry vs AI & Data Projects (added Personalized AI Financial Advisor card); GSAP parallax on project cards; GitHub/LinkedIn/LeetCode/email socials in hero + footer; console.log easter egg.
+- 2026-08-14 (v3): Replaced robot with procedural Animoji-style character (head + pupils track cursor, blink cycle, bob); gesture scroll is now strictly opt-in (no auto camera request; "Enable Camera for Gesture Scroll" button); aircraft upgraded from primitives to a detailed 524-mesh Airbus A380 glTF (Flightradar24 model, converted glTF 1.0→2.0 via gltf-pipeline, stored at /public/models/a380.glb) — meshes auto-grouped into fuselage/wingL/wingR/4 engine clusters/tailV/tailH/gear by node-name regex + centroid clustering, exploded with centroid-direction offsets, scrubbed assembly, dual glassmorphism cards (FP-BOT left, AirSimuPy + Fortran validation right), nose-first banked fly-off; content updates (GitHub Actions digest, Agentic RAG + Llama-3 8B Unsloth, Kafka/ClickHouse skills); real LinkedIn (/in/avni-bhardwaj10/) and LeetCode (/u/AvniBhardwaj10/) URLs everywhere incl. chat prompt.
 
 ## Verified
 - /api/chat streams real GPT-5.4-mini answers about Avni (curl + UI).
-- Aircraft assembly scrub states (exploded/assembled/card overlay), tabs switch, theme toggle adapts 3D materials, chat live in UI, hero robot framed correctly.
-- Gesture scroll auto-activates with camera (headless test used fake camera). Model loads from Google CDN — needs network.
+- A380: exploded float, assembled state with both glass cards, banked nose-first fly-off. Tabs switch, theme toggle adapts 3D lighting, Animoji eye/head tracking + blink verified in both themes.
+- Camera confirmed OFF on load (opt-in only). Real webcam tracking NOT verified (headless fake camera) — needs manual test.
+- Photo attachment never arrived — avatar is a stylized default, not photo-derived.
 
 ## Backlog
-- P0: Replace placeholder robot.glb with custom avatar GLB; real LinkedIn URL (currently placeholder /in/avnibhardwaj) and LeetCode URL (/u/avnibhardwaj1 placeholder).
-- P1: Persist chat history in MongoDB per session; rate-limit /api/chat; robot idle animation (Idle clip via drei's useAnimations).
-- P2: Mobile gesture fallback message polish; accessibility pass (reduced-motion mode); aircraft model upgrade to real GLTF.
+- P0: Re-attach Avni's photo to personalize the Animoji (hair/skin/style) or commission a rigged GLB avatar; A380 has no interior meshes (seats/windows don't exist in this model) — swap for a model with interior if needed.
+- P1: Persist chat history in MongoDB per session; rate-limit /api/chat; avatar idle animations.
+- P2: Mobile gesture fallback polish; reduced-motion accessibility mode.
 
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.

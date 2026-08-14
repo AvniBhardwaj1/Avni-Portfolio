@@ -5,12 +5,12 @@ const GROUPS = [
   {
     id: "data-cloud",
     title: "Data Engineering & Cloud",
-    items: ["AWS", "Google Cloud", "Docker", "Kubernetes", "Apache Flink"],
+    items: ["AWS", "Docker", "Kubernetes", "Kafka", "ClickHouse"],
   },
   {
     id: "ai-ml",
     title: "AI & Machine Learning",
-    items: ["PyTorch", "LangChain", "LlamaIndex", "Generative AI"],
+    items: ["PyTorch", "LangChain", "RAG"],
   },
   {
     id: "backend",

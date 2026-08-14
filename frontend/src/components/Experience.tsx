@@ -28,9 +28,10 @@ const AIRBUS: Project = {
   org: "Airbus — Data & AI Engineering Intern",
   points: [
     "Architected FP-BOT, a Dockerized RAG pipeline deployed via Jenkins CI/CD, enabling natural-language querying of technical documentation through a FastAPI service.",
-    "Built AirSimuPy, a Python + PySide6 simulation platform that executes block-diagram data pipelines as NetworkX graphs with NumPy compute.",
+    "Built AirSimuPy, a Python + PySide6 simulation platform executing block-diagram data pipelines as NetworkX graphs with NumPy compute — via a Hybrid Compiled Architecture.",
+    "Executed mathematical validation of a Python-based Sorting Tool against legacy Fortran solvers.",
   ],
-  stack: ["Python", "FastAPI", "RAG", "Docker", "Jenkins", "PySide6", "NetworkX", "NumPy"],
+  stack: ["Python", "FastAPI", "RAG", "Docker", "Jenkins", "PySide6", "NetworkX", "NumPy", "Fortran"],
 };
 
 const PROJECTS: Project[] = [
@@ -41,20 +42,20 @@ const PROJECTS: Project[] = [
     title: "Autonomous AI Research Agent",
     org: "Independent Build — Pydantic AI × Gemini",
     points: [
-      "Engineered a zero-maintenance, autonomous LLM agent using Pydantic AI and Gemini that scans, ranks, and synthesizes high-signal daily research digests.",
+      "Engineered a zero-maintenance, autonomous LLM agent using Pydantic AI and Gemini that scans, ranks, and synthesizes high-signal daily research digests — shipped on schedule via GitHub Actions.",
     ],
-    stack: ["Pydantic AI", "Gemini", "LLM Agents", "Automation"],
+    stack: ["Pydantic AI", "Gemini", "LLM Agents", "GitHub Actions"],
   },
   {
     id: "fin-advisor",
     index: "03",
     period: "AI PRODUCT",
     title: "Personalized AI Financial Advisor",
-    org: "Independent Build — LLM Reasoning × Data Pipelines",
+    org: "Independent Build — Agentic RAG × Llama-3",
     points: [
-      "Built a personalized AI financial advisor that analyzes spending patterns and delivers tailored, conversational money guidance powered by LLM reasoning over structured transaction data.",
+      "Built an Agentic RAG system using LangChain ReAct, fine-tuning Llama-3 (8B) via Unsloth and PyTorch to deliver personalized, conversational financial guidance.",
     ],
-    stack: ["Python", "LangChain", "FastAPI", "LLM Tooling"],
+    stack: ["LangChain", "ReAct Agents", "Llama-3 8B", "Unsloth", "PyTorch"],
   },
   {
     id: "dl-research",
@@ -63,7 +64,7 @@ const PROJECTS: Project[] = [
     title: "Ensemble Deep Learning Framework",
     org: "Deep Learning Research — Computer Vision",
     points: [
-      "Architected an ensemble deep learning framework integrating DenseNet201 and SE-ResNet50 to optimize image-classification performance.",
+      "Architected an ensemble deep learning framework integrating DenseNet201 and SE-ResNet50 in PyTorch to optimize image-classification performance.",
     ],
     stack: ["PyTorch", "DenseNet201", "SE-ResNet50", "Ensembles"],
   },

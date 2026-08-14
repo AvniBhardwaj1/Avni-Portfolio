@@ -13,7 +13,6 @@ export function useGestureScroll(lenisRef: { current: Lenis | null }) {
   const landmarkerRef = useRef<any>(null);
   const rafRef = useRef<number>(0);
   const smoothRef = useRef<number | null>(null);
-  const startedRef = useRef(false);
 
   const disable = useCallback(() => {
     cancelAnimationFrame(rafRef.current);
@@ -88,12 +87,6 @@ export function useGestureScroll(lenisRef: { current: Lenis | null }) {
       setStatus(err?.name === "NotAllowedError" ? "denied" : "error");
     }
   }, [status, lenisRef]);
-
-  useEffect(() => {
-    if (startedRef.current) return;
-    startedRef.current = true;
-    enable();
-  }, [enable]);
 
   useEffect(() => disable, [disable]);
 

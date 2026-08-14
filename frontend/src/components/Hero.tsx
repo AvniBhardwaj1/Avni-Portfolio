@@ -16,7 +16,7 @@ const lineReveal = {
 };
 
 const STATUS_TEXT: Record<string, string> = {
-  idle: "Gesture scroll ready",
+  idle: "Gesture scroll ready — camera stays off until you opt in",
   loading: "Loading hand-tracking model",
   active: "Gesture scroll live — move index finger up / down",
   denied: "Camera access denied — enable it in your browser",
@@ -119,7 +119,7 @@ export const Hero = ({ gesture }: { gesture: ReturnType<typeof useGestureScroll>
                   onClick={enable}
                   className="mt-1 font-mono text-xs text-accent underline decoration-accent/40 underline-offset-4 transition-colors hover:text-foreground"
                 >
-                  Enable Camera to Scroll with Gestures
+                  Enable Camera for Gesture Scroll
                 </button>
               )}
             </div>

@@ -1,222 +1,239 @@
-import { useLayoutEffect, useRef } from "react";
-import type { ReactElement } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-type Part = {
-  id: string;
-  geo: ReactElement;
-  pos: [number, number, number];
-  rot: [number, number, number];
-  exploded: [number, number, number];
-  explodedRot: [number, number, number];
-  accent?: boolean;
-};
+const ENGINE_PART =
+  /^(engine|fan|ftf|stage|turbine|nozzle|bypass|cascade|cowl|intake|nosecone|pylon|reverse|rim|poly|object01|comph|cylinder01)/i;
+const WING = /^(wingseg|leading|trailing|slat|slot|flap|aileron|spoiler|tip|winglet)/i;
+const TAIL_V = /^(vstab|rudder|upperrudder|lowerrudder)/i;
+const TAIL_H = /^(stabilizer|elev)/i;
+const GEAR = /^gear/i;
+const SHADOW = /^shadow/i;
 
-const PARTS: Part[] = [
-  {
-    id: "fuselage",
-    geo: <cylinderGeometry args={[0.42, 0.42, 5.6, 24]} />,
-    pos: [0, 0, 0],
-    rot: [0, 0, Math.PI / 2],
-    exploded: [-7, 2.5, -2],
-    explodedRot: [0.6, 0.4, 2.4],
-  },
-  {
-    id: "nose",
-    geo: <coneGeometry args={[0.42, 1.2, 24]} />,
-    pos: [3.4, 0, 0],
-    rot: [0, 0, -Math.PI / 2],
-    exploded: [5.5, -2.5, 1.5],
-    explodedRot: [1.2, 0.8, -0.6],
-  },
-  {
-    id: "tail-cone",
-    geo: <coneGeometry args={[0.42, 1.0, 24]} />,
-    pos: [-3.3, 0, 0],
-    rot: [0, 0, Math.PI / 2],
-    exploded: [-5, -3, 2.5],
-    explodedRot: [-0.8, 1.1, 0.4],
-  },
-  {
-    id: "wing-l",
-    geo: <boxGeometry args={[1.5, 0.1, 3.0]} />,
-    pos: [-0.4, 0, 2.2],
-    rot: [0, 0, 0],
-    exploded: [-2, 4, 6],
-    explodedRot: [0.5, 0.9, 0.7],
-    accent: true,
-  },
-  {
-    id: "wing-r",
-    geo: <boxGeometry args={[1.5, 0.1, 3.0]} />,
-    pos: [-0.4, 0, -2.2],
-    rot: [0, 0, 0],
-    exploded: [1.5, -4.5, -6],
-    explodedRot: [-0.6, -0.4, 1.2],
-    accent: true,
-  },
-  {
-    id: "engine-l",
-    geo: <cylinderGeometry args={[0.28, 0.28, 1.1, 18]} />,
-    pos: [0.2, -0.45, 1.5],
-    rot: [0, 0, Math.PI / 2],
-    exploded: [3.5, 3.5, 4],
-    explodedRot: [1.4, 0.2, 0.9],
-  },
-  {
-    id: "engine-r",
-    geo: <cylinderGeometry args={[0.28, 0.28, 1.1, 18]} />,
-    pos: [0.2, -0.45, -1.5],
-    rot: [0, 0, Math.PI / 2],
-    exploded: [-3.5, -4, -4],
-    explodedRot: [-1.1, 0.7, -0.5],
-  },
-  {
-    id: "tail-fin",
-    geo: <boxGeometry args={[0.8, 1.3, 0.12]} />,
-    pos: [-2.6, 0.75, 0],
-    rot: [0, 0, 0],
-    exploded: [6, 4.5, -3],
-    explodedRot: [0.9, -1.2, 0.3],
-    accent: true,
-  },
-  {
-    id: "stab-l",
-    geo: <boxGeometry args={[0.7, 0.08, 1.1]} />,
-    pos: [-2.6, 0.3, 0.85],
-    rot: [0, 0, 0],
-    exploded: [0.5, -5, 5],
-    explodedRot: [-0.4, 1.3, -0.9],
-  },
-  {
-    id: "stab-r",
-    geo: <boxGeometry args={[0.7, 0.08, 1.1]} />,
-    pos: [-2.6, 0.3, -0.85],
-    rot: [0, 0, 0],
-    exploded: [-6, 1, -5],
-    explodedRot: [1.1, -0.6, 0.8],
-  },
+const GROUP_IDS = [
+  "fuselage",
+  "wingL",
+  "wingR",
+  "eng0",
+  "eng1",
+  "eng2",
+  "eng3",
+  "tailV",
+  "tailH",
+  "gear",
 ];
+
+type Groups = Record<string, THREE.Group>;
+
+function A380({ onReady }: { onReady: (groups: Groups, fly: THREE.Group) => void }) {
+  const { scene } = useGLTF("/models/a380.glb");
+  const flyRef = useRef<THREE.Group>(null);
+  const doneRef = useRef(false);
+
+  useLayoutEffect(() => {
+    if (doneRef.current || !flyRef.current) return;
+    doneRef.current = true;
+
+    const root = scene;
+    root.updateMatrixWorld(true);
+    const size = new THREE.Box3().setFromObject(root).getSize(new THREE.Vector3());
+    if (size.z > size.x) root.rotation.y = Math.PI / 2;
+    root.scale.setScalar(9 / Math.max(size.x, size.z));
+    root.updateMatrixWorld(true);
+    const center = new THREE.Box3().setFromObject(root).getCenter(new THREE.Vector3());
+    root.position.sub(center);
+    root.updateMatrixWorld(true);
+
+    const cats: Groups = {};
+    GROUP_IDS.forEach((id) => {
+      const g = new THREE.Group();
+      g.name = `cat-${id}`;
+      cats[id] = g;
+      flyRef.current!.add(g);
+    });
+
+    const meshes: THREE.Mesh[] = [];
+    root.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh) meshes.push(o as THREE.Mesh);
+    });
+
+    const wp = new THREE.Vector3();
+    const engineCore = meshes.filter((m) => /^engine/i.test(m.name));
+    const left = engineCore.filter((m) => m.getWorldPosition(wp).z < 0);
+    const right = engineCore.filter((m) => m.getWorldPosition(wp).z >= 0);
+    const splitBySpan = (arr: THREE.Mesh[]) => {
+      const sorted = [...arr].sort(
+        (a, b) => Math.abs(a.getWorldPosition(wp).z) - Math.abs(b.getWorldPosition(wp).z),
+      );
+      return [sorted.slice(0, Math.ceil(sorted.length / 2)), sorted.slice(Math.ceil(sorted.length / 2))];
+    };
+    const [lIn, lOut] = splitBySpan(left);
+    const [rIn, rOut] = splitBySpan(right);
+    const clusters = [lOut, lIn, rIn, rOut].map((arr) => {
+      const c = new THREE.Vector3();
+      arr.forEach((m) => c.add(m.getWorldPosition(wp)));
+      return arr.length ? c.divideScalar(arr.length) : new THREE.Vector3();
+    });
+
+    meshes.forEach((m) => {
+      if (SHADOW.test(m.name)) {
+        m.visible = false;
+        return;
+      }
+      let target: THREE.Group;
+      if (ENGINE_PART.test(m.name)) {
+        m.getWorldPosition(wp);
+        let best = 0;
+        let bestDist = Infinity;
+        clusters.forEach((c, i) => {
+          const d = wp.distanceTo(c);
+          if (d < bestDist) {
+            bestDist = d;
+            best = i;
+          }
+        });
+        target = cats[`eng${best}`];
+      } else if (WING.test(m.name)) {
+        target = m.getWorldPosition(wp).z < 0 ? cats.wingL : cats.wingR;
+      } else if (TAIL_V.test(m.name)) {
+        target = cats.tailV;
+      } else if (TAIL_H.test(m.name)) {
+        target = cats.tailH;
+      } else if (GEAR.test(m.name)) {
+        target = cats.gear;
+      } else {
+        target = cats.fuselage;
+      }
+      target.attach(m);
+    });
+
+    GROUP_IDS.forEach((id, i) => {
+      const g = cats[id];
+      if (!g.children.length) return;
+      const c = new THREE.Vector3();
+      g.children.forEach((ch) => c.add(ch.getWorldPosition(wp)));
+      c.divideScalar(g.children.length);
+      const dir = c.length() > 0.6 ? c.clone().normalize() : new THREE.Vector3(0, 1, 0);
+      const dist = id === "fuselage" ? 2.4 : 4.2 + (i % 3) * 1.3;
+      g.position.set(
+        dir.x * dist,
+        dir.y * dist + (i % 2 === 0 ? 2.4 : -2.2),
+        dir.z * dist,
+      );
+      g.rotation.set(((i * 37) % 10) / 12 - 0.4, ((i * 53) % 10) / 12 - 0.4, ((i * 71) % 10) / 12 - 0.4);
+    });
+
+    onReady(cats, flyRef.current);
+  }, [scene, onReady]);
+
+  return (
+    <group ref={flyRef}>
+      <primitive object={scene} />
+    </group>
+  );
+}
+
+useGLTF.preload("/models/a380.glb");
 
 export const AircraftAssembly = ({ dark }: { dark: boolean }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const groupRef = useRef<THREE.Group>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const partsRef = useRef<THREE.Mesh[]>([]);
+  const cardLRef = useRef<HTMLDivElement>(null);
+  const cardRRef = useRef<HTMLDivElement>(null);
+  const [model, setModel] = useState<{ groups: Groups; fly: THREE.Group } | null>(null);
 
   useLayoutEffect(() => {
-    let ctx: gsap.Context | undefined;
-    let raf = 0;
-    const init = () => {
-      if (
-        !sectionRef.current ||
-        !groupRef.current ||
-        !cardRef.current ||
-        partsRef.current.filter(Boolean).length !== PARTS.length
-      ) {
-        raf = requestAnimationFrame(init);
-        return;
-      }
-      ctx = gsap.context(() => {
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top top",
-            end: "+=300%",
-            scrub: 1,
-            pin: true,
-            anticipatePin: 1,
-          },
-        });
-        partsRef.current.forEach((mesh, i) => {
-          const p = PARTS[i];
-          if (!mesh || !p) return;
-          tl.to(
-            mesh.position,
-            { x: p.pos[0], y: p.pos[1], z: p.pos[2], duration: 0.5, ease: "power2.inOut" },
-            i * 0.02,
-          );
-          tl.to(
-            mesh.rotation,
-            { x: p.rot[0], y: p.rot[1], z: p.rot[2], duration: 0.5, ease: "power2.inOut" },
-            i * 0.02,
-          );
-        });
-        tl.to(groupRef.current!.rotation, { y: Math.PI * 0.35, duration: 0.12, ease: "sine.inOut" }, 0.68);
-        tl.fromTo(
-          cardRef.current,
-          { opacity: 0, y: 40 },
-          { opacity: 1, y: 0, duration: 0.1, ease: "power2.out" },
-          0.7,
-        );
-        tl.to(
-          groupRef.current!.rotation,
-          { z: -0.65, y: Math.PI * 0.1, duration: 0.14, ease: "power2.in" },
-          0.84,
-        );
-        tl.to(groupRef.current!.position, { x: 18, y: 4.5, duration: 0.14, ease: "power2.in" }, 0.84);
-        tl.to(cardRef.current, { opacity: 0, y: -30, duration: 0.08 }, 0.88);
-      }, sectionRef);
-    };
-    raf = requestAnimationFrame(init);
-    return () => {
-      cancelAnimationFrame(raf);
-      ctx?.revert();
-    };
-  }, []);
+    if (!model || !sectionRef.current) return;
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "+=320%",
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1,
+        },
+      });
+      GROUP_IDS.forEach((id, i) => {
+        const g = model.groups[id];
+        if (!g || !g.children.length) return;
+        tl.to(g.position, { x: 0, y: 0, z: 0, duration: 0.5, ease: "power2.inOut" }, i * 0.035);
+        tl.to(g.rotation, { x: 0, y: 0, z: 0, duration: 0.5, ease: "power2.inOut" }, i * 0.035);
+      });
+      tl.to(model.fly.rotation, { y: Math.PI * 0.3, duration: 0.14, ease: "sine.inOut" }, 0.66);
+      tl.fromTo(cardLRef.current, { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.1, ease: "power2.out" }, 0.68);
+      tl.fromTo(cardRRef.current, { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.1, ease: "power2.out" }, 0.72);
+      tl.to(model.fly.rotation, { z: 0.6, y: -Math.PI * 0.12, duration: 0.14, ease: "power2.in" }, 0.85);
+      tl.to(model.fly.position, { x: -20, y: 5, duration: 0.14, ease: "power2.in" }, 0.85);
+      tl.to([cardLRef.current, cardRRef.current], { opacity: 0, duration: 0.07 }, 0.87);
+    }, sectionRef);
+    return () => ctx.revert();
+  }, [model]);
 
   return (
     <div ref={sectionRef} className="relative h-screen overflow-hidden" data-testid="aircraft-assembly">
       <div className="pointer-events-none absolute inset-0">
-        <Canvas camera={{ position: [0, 1.6, 9.5], fov: 45 }} dpr={[1, 1.75]} gl={{ antialias: true, alpha: true }}>
+        <Canvas camera={{ position: [0, 1.4, 11], fov: 42 }} dpr={[1, 1.75]} gl={{ antialias: true, alpha: true }}>
           <ambientLight intensity={dark ? 0.5 : 0.85} />
           <directionalLight position={[6, 8, 4]} intensity={dark ? 1.6 : 1.1} color={dark ? "#bfefff" : "#ffffff"} />
           <directionalLight position={[-6, 3, -4]} intensity={dark ? 0.5 : 0.4} color={dark ? "#155e75" : "#7dd3fc"} />
-          <group ref={groupRef}>
-            {PARTS.map((p, i) => (
-              <mesh
-                key={p.id}
-                ref={(m) => {
-                  if (m) partsRef.current[i] = m;
-                }}
-                position={p.exploded}
-                rotation={p.explodedRot}
-              >
-                {p.geo}
-                <meshStandardMaterial
-                  color={p.accent ? "#22d3ee" : dark ? "#64748b" : "#aebac8"}
-                  metalness={0.65}
-                  roughness={0.3}
-                />
-              </mesh>
-            ))}
-          </group>
+          <A380 onReady={(groups, fly) => setModel({ groups, fly })} />
         </Canvas>
       </div>
 
       <div className="pointer-events-none absolute left-6 top-24 md:left-16 lg:left-24">
-        <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent">Scroll to assemble</p>
+        <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent">Scroll to assemble the A380</p>
         <h3 className="mt-3 font-display text-4xl font-bold tracking-tight md:text-6xl">
           Built at Airbus<span className="text-accent">.</span>
         </h3>
       </div>
 
       <div
-        ref={cardRef}
+        ref={cardLRef}
         style={{ opacity: 0 }}
-        data-testid="airbus-overlay-card"
-        className="pointer-events-none absolute bottom-24 right-6 max-w-sm rounded-2xl border border-foreground/10 bg-background/70 p-6 backdrop-blur-xl md:right-16 lg:right-24"
+        data-testid="airbus-card-fpbot"
+        className="pointer-events-none absolute left-6 top-[26%] max-w-sm rounded-2xl border border-foreground/10 bg-background/60 p-7 backdrop-blur-xl md:left-16 lg:left-24"
       >
-        <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent">Assembly complete</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent">Airbus India — Internship</p>
+        <h4 className="mt-3 font-display text-2xl font-bold tracking-tight">FP-BOT</h4>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          FP-BOT — a Dockerized RAG pipeline shipped via Jenkins CI/CD — and AirSimuPy, a
-          PySide6 simulation engine executing block-diagram pipelines on NetworkX graphs.
+          Architected a Dockerized RAG pipeline deployed via Jenkins CI/CD — natural-language
+          querying of technical documentation through a FastAPI service.
         </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {["RAG", "Docker", "Jenkins", "FastAPI"].map((t) => (
+            <span key={t} className="rounded-full border border-foreground/10 px-3 py-1 font-mono text-[10px] text-muted-foreground">
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div
+        ref={cardRRef}
+        style={{ opacity: 0 }}
+        data-testid="airbus-card-airsimupy"
+        className="pointer-events-none absolute bottom-[18%] right-6 max-w-sm rounded-2xl border border-foreground/10 bg-background/60 p-7 backdrop-blur-xl md:right-16 lg:right-24"
+      >
+        <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent">Simulation Engine & Validation</p>
+        <h4 className="mt-3 font-display text-2xl font-bold tracking-tight">AirSimuPy</h4>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          Python + PySide6 platform executing block-diagram data pipelines on NetworkX graphs
+          with NumPy — built on a Hybrid Compiled Architecture. Also validated a Python-based
+          Sorting Tool against legacy Fortran solvers.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {["PySide6", "NetworkX", "NumPy", "Fortran"].map((t) => (
+            <span key={t} className="rounded-full border border-foreground/10 px-3 py-1 font-mono text-[10px] text-muted-foreground">
+              {t}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );

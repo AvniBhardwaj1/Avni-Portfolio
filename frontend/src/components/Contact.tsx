@@ -77,7 +77,7 @@ export const Contact = () => (
         <ArrowUpRight className="h-3.5 w-3.5" />
       </a>
       <a
-        href="https://www.linkedin.com/in/avnibhardwaj"
+        href="https://www.linkedin.com/in/avni-bhardwaj10/"
         target="_blank"
         rel="noreferrer"
         data-testid="contact-linkedin-link"
@@ -89,7 +89,7 @@ export const Contact = () => (
         <ArrowUpRight className="h-3.5 w-3.5" />
       </a>
       <a
-        href="https://leetcode.com/u/avnibhardwaj1"
+        href="https://leetcode.com/u/AvniBhardwaj10/"
         target="_blank"
         rel="noreferrer"
         data-testid="contact-leetcode-link"
