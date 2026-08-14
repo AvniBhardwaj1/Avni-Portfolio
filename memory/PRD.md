@@ -38,6 +38,11 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 - Projects & Certificates: clickable magnetic cards (Research Agent, Financial Advisor, MapMyNotes, Pediatric Bone Age, IoT Actuator) + 5 dashed certificate placeholder slots linking to LinkedIn certifications.
 - Leadership & Achievements: vertical timeline (7 nodes) with scroll-scrubbed glowing line, node reveal animations, dot glow on viewport entry, "View all achievements" expander.
 
+## v5 (2026-08-14)
+- Hero avatar scrapped; replaced with real 2D photo (/public/portrait.webp, rotated/cropped from user upload) in a glassmorphism frame with soft shadow, 3D tilt-on-hover (framer-motion springs), and floating "Indore · Open to opportunities" chip. HeroAvatar.tsx + robot.glb deleted.
+- Contact section rebuilt: "CONTACT ME // LET'S CONNECT" kicker, LET'S CONNECT. masked headline, collaboration intro copy, details grid (Location: Indore MP, Email, Education: NMIMS Indore, Mobile: +91 96913 85721, Languages: English/Hindi/Korean (I)) with lucide icons; social pills retained.
+- Humor quotes marquee (reverse, 70s) above footer: "Today no knowledge, tomorrow master." / "It works on my machine." / "Turning caffeine into scalable architecture." Clone prompt now uses these when asked about her learning process (verified live).
+
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.
 2. Add chat history persistence + basic rate limiting.

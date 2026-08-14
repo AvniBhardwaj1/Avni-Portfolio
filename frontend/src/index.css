@@ -99,6 +99,11 @@
     animation: marquee-scroll 45s linear infinite;
 }
 
+.marquee-slow {
+    animation-duration: 70s;
+    animation-direction: reverse;
+}
+
 @keyframes blink-dot {
     0%,
     80%,

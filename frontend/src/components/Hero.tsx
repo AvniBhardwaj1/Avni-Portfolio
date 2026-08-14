@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowDown, CameraOff, Hand, Loader2, ScanFace } from "lucide-react";
 import type { useGestureScroll } from "@/hooks/useGestureScroll";
-import { useTheme } from "@/theme/ThemeContext";
-import { HeroAvatar } from "@/components/HeroAvatar";
+import { Portrait } from "@/components/Portrait";
 import { SocialLinks } from "@/components/SocialLinks";
 
 const NAME_LINES = ["AVNI", "BHARDWAJ"];
@@ -25,7 +24,6 @@ const STATUS_TEXT: Record<string, string> = {
 
 export const Hero = ({ gesture }: { gesture: ReturnType<typeof useGestureScroll> }) => {
   const { status, enable } = gesture;
-  const { theme } = useTheme();
   return (
     <section
       id="hero"
@@ -126,18 +124,9 @@ export const Hero = ({ gesture }: { gesture: ReturnType<typeof useGestureScroll>
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.94 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5, duration: 0.9, ease: "easeOut" }}
-          className="relative hidden h-[560px] lg:block"
-          data-testid="hero-avatar"
-        >
-          <HeroAvatar dark={theme === "dark"} />
-          <p className="absolute bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-            It watches your cursor back
-          </p>
-        </motion.div>
+        <div className="relative hidden lg:block">
+          <Portrait />
+        </div>
       </div>
 
       {status !== "active" && (
