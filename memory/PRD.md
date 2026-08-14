@@ -76,6 +76,9 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 - Floating Dock: bottom-center glass pill (Terminal, GitHub, LinkedIn, Email, Résumé) with tooltips + magnetic hover, tracked as dock_click events.
 - Certificates discs 1-2 now labeled with real certs (AWS Academy Cloud Architecting 2025, Tableau Foundation Intellipaat 2025).
 
+## v12 (2026-08-14)
+- Real certificates live: 5 PDFs (Accenture Forage, ML Workshop @ Techkriti IIT Kanpur, Robotics Workshop @ Techkriti, Chaitanya IIM Indore merit, MP Police community service) stored in /public/certificates/ as PDF + rendered JPG (PyMuPDF, downscaled to ~900px). Discs show the real certificate art, spin on hover, and click through to open the full PDF. Clone prompt + terminal `certificates` command updated with the full cert list.
+
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.
 2. Add chat history persistence + basic rate limiting.

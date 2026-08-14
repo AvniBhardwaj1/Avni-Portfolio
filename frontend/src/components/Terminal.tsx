@@ -233,9 +233,9 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
     if (name === "banner") return push(...BANNER);
     if (name === "certificates")
       return push(
-        { kind: "out", text: "aws academy — cloud architecting (2025)" },
-        { kind: "out", text: "tableau foundation — intellipaat (2025)" },
-        { kind: "sys", text: "the spinning disc carousel is further down the page. photos incoming." },
+        { kind: "out", text: "accenture forage · ML workshop · robotics workshop · chaitanya (IIM indore) · MP police community service" },
+        { kind: "out", text: "+ aws academy cloud architecting (2025) · tableau foundation, intellipaat (2025)" },
+        { kind: "sys", text: "spin the discs in the certificates section below — click one to open the real thing." },
       );
     if (name === "theme") {
       toggle();

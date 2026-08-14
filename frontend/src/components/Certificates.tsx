@@ -4,11 +4,11 @@ import { Award, ChevronLeft, ChevronRight } from "lucide-react";
 import { Chapter } from "@/components/Chapter";
 
 const CERTS = [
-  { id: "cert-01", label: "AWS Academy — Cloud Architecting", img: "/certificates/cert-01.jpg" },
-  { id: "cert-02", label: "Tableau Foundation — Intellipaat", img: "/certificates/cert-02.jpg" },
-  { id: "cert-03", label: "Certificate 03", img: "/certificates/cert-03.jpg" },
-  { id: "cert-04", label: "Certificate 04", img: "/certificates/cert-04.jpg" },
-  { id: "cert-05", label: "Certificate 05", img: "/certificates/cert-05.jpg" },
+  { id: "cert-01", label: "Accenture — Forage Virtual Experience", img: "/certificates/cert-01.jpg", pdf: "/certificates/cert-01.pdf" },
+  { id: "cert-02", label: "Machine Learning Workshop", img: "/certificates/cert-02.jpg", pdf: "/certificates/cert-02.pdf" },
+  { id: "cert-03", label: "Robotics Workshop", img: "/certificates/cert-03.jpg", pdf: "/certificates/cert-03.pdf" },
+  { id: "cert-04", label: "Chaitanya — IIM Indore", img: "/certificates/cert-04.jpg", pdf: "/certificates/cert-04.pdf" },
+  { id: "cert-05", label: "Community Service — MP Police", img: "/certificates/cert-05.jpg", pdf: "/certificates/cert-05.pdf" },
 ];
 
 export const Certificates = () => {
@@ -33,15 +33,18 @@ export const Certificates = () => {
           className="cert-track flex snap-x snap-mandatory gap-10 overflow-x-auto px-2 py-8"
         >
           {CERTS.map((cert, i) => (
-            <motion.div
+            <motion.a
               key={cert.id}
+              href={cert.pdf}
+              target="_blank"
+              rel="noreferrer"
               initial={{ opacity: 0, scale: 0.85 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.6, delay: i * 0.07, ease: "easeOut" }}
               data-testid={`cert-disc-${cert.id}`}
               data-magnetic
-              className="group relative aspect-square w-44 shrink-0 snap-center md:w-56"
+              className="group relative block aspect-square w-44 shrink-0 snap-center md:w-56"
             >
               <div className="cert-disc absolute inset-0 overflow-hidden rounded-full border-2 border-accent/25 bg-gradient-to-br from-accent/15 via-background to-accent2/15 shadow-[0_18px_50px_-18px_hsl(var(--foreground)/0.35)] transition-colors group-hover:border-accent/60">
                 <img
@@ -52,15 +55,15 @@ export const Certificates = () => {
                     e.currentTarget.style.display = "none";
                   }}
                 />
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/40">
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/40 opacity-0 transition-opacity group-hover:opacity-100">
                   <Award className="h-6 w-6 text-accent" />
-                  <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                  <span className="px-6 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-foreground">
                     {cert.label}
                   </span>
                 </div>
               </div>
               <div className="pointer-events-none absolute inset-3 rounded-full border border-dashed border-foreground/15" />
-            </motion.div>
+            </motion.a>
           ))}
         </div>
 
@@ -84,7 +87,7 @@ export const Certificates = () => {
             <ChevronRight className="h-4 w-4" />
           </button>
           <p className="ml-3 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-            Scroll the discs — real certificate photos drop in here
+            Scroll the discs — click one to open the certificate
           </p>
         </div>
       </div>
