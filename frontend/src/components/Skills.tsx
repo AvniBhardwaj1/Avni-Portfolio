@@ -25,7 +25,7 @@ export const Skills = () => (
     data-testid="skills-section"
     className="relative z-10 px-6 py-32 md:px-16 lg:px-24"
   >
-    <Chapter no="02" title="Skills" id="skills" />
+    <Chapter no="03" title="Skills" id="skills" />
     <div className="grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-8">
       {GROUPS.map((group, gi) => (
         <motion.div

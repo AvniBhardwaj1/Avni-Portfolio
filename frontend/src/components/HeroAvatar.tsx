@@ -42,10 +42,12 @@ function Character() {
     }
   });
 
-  const skin = "#eab891";
-  const skinDeep = "#d99e73";
-  const hair = "#241a14";
-  const hoodie = "#2f3b4c";
+  const skin = "#c68a5b";
+  const skinDeep = "#a96f43";
+  const hair = "#191210";
+  const blazer = "#1e2a45";
+  const scarf = "#aebccd";
+  const gold = "#d4af37";
 
   return (
     <group ref={rootRef}>
@@ -54,13 +56,21 @@ function Character() {
           <sphereGeometry args={[0.78, 48, 48]} />
           <meshStandardMaterial color={skin} roughness={0.55} />
         </mesh>
-        <mesh position={[0, 0.26, -0.1]} scale={[1.04, 0.92, 1.04]}>
+        <mesh position={[0, 0.24, -0.1]} scale={[1.06, 0.95, 1.06]}>
           <sphereGeometry args={[0.78, 48, 48]} />
-          <meshStandardMaterial color={hair} roughness={0.75} />
+          <meshStandardMaterial color={hair} roughness={0.7} />
         </mesh>
-        <mesh position={[0, -0.06, -0.72]}>
-          <sphereGeometry args={[0.24, 24, 24]} />
-          <meshStandardMaterial color={hair} roughness={0.75} />
+        <mesh position={[0, -0.3, -0.42]} scale={[0.98, 1.15, 0.72]}>
+          <sphereGeometry args={[0.62, 32, 32]} />
+          <meshStandardMaterial color={hair} roughness={0.7} />
+        </mesh>
+        <mesh position={[-0.62, -0.38, 0.12]} scale={[0.34, 0.95, 0.45]}>
+          <sphereGeometry args={[0.3, 24, 24]} />
+          <meshStandardMaterial color={hair} roughness={0.7} />
+        </mesh>
+        <mesh position={[0.62, -0.38, 0.12]} scale={[0.34, 0.95, 0.45]}>
+          <sphereGeometry args={[0.3, 24, 24]} />
+          <meshStandardMaterial color={hair} roughness={0.7} />
         </mesh>
         <group ref={eyeLRef} position={[-0.27, 0.08, 0.6]}>
           <mesh>
@@ -96,15 +106,15 @@ function Character() {
         </mesh>
         <mesh position={[0, -0.2, 0.64]} rotation={[0, 0, Math.PI * 1.125]}>
           <torusGeometry args={[0.24, 0.035, 12, 32, Math.PI * 0.75]} />
-          <meshStandardMaterial color="#7c4a32" roughness={0.5} />
+          <meshStandardMaterial color="#8f4a3a" roughness={0.5} />
         </mesh>
         <mesh position={[-0.44, -0.14, 0.55]} scale={[1, 0.6, 0.4]}>
           <sphereGeometry args={[0.09, 16, 16]} />
-          <meshStandardMaterial color="#f2a0a0" roughness={0.7} transparent opacity={0.75} />
+          <meshStandardMaterial color="#f2a0a0" roughness={0.7} transparent opacity={0.65} />
         </mesh>
         <mesh position={[0.44, -0.14, 0.55]} scale={[1, 0.6, 0.4]}>
           <sphereGeometry args={[0.09, 16, 16]} />
-          <meshStandardMaterial color="#f2a0a0" roughness={0.7} transparent opacity={0.75} />
+          <meshStandardMaterial color="#f2a0a0" roughness={0.7} transparent opacity={0.65} />
         </mesh>
         <mesh position={[-0.76, 0, 0]}>
           <sphereGeometry args={[0.12, 16, 16]} />
@@ -114,22 +124,34 @@ function Character() {
           <sphereGeometry args={[0.12, 16, 16]} />
           <meshStandardMaterial color={skin} roughness={0.55} />
         </mesh>
+        <mesh position={[-0.78, -0.12, 0.06]}>
+          <sphereGeometry args={[0.035, 12, 12]} />
+          <meshStandardMaterial color={gold} metalness={0.9} roughness={0.2} />
+        </mesh>
+        <mesh position={[0.78, -0.12, 0.06]}>
+          <sphereGeometry args={[0.035, 12, 12]} />
+          <meshStandardMaterial color={gold} metalness={0.9} roughness={0.2} />
+        </mesh>
       </group>
       <mesh position={[0, -1.45, 0]}>
         <capsuleGeometry args={[0.58, 0.7, 8, 24]} />
-        <meshStandardMaterial color={hoodie} roughness={0.8} />
+        <meshStandardMaterial color={blazer} roughness={0.75} />
       </mesh>
-      <mesh position={[0, -1.35, 0.55]}>
-        <boxGeometry args={[0.05, 0.85, 0.04]} />
-        <meshStandardMaterial color="#22d3ee" roughness={0.4} />
+      <mesh position={[0, -0.92, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.34, 0.1, 12, 32]} />
+        <meshStandardMaterial color={scarf} roughness={0.85} />
+      </mesh>
+      <mesh position={[0, -1.28, 0.5]} rotation={[0.1, 0, 0]}>
+        <boxGeometry args={[0.22, 0.5, 0.06]} />
+        <meshStandardMaterial color={scarf} roughness={0.85} />
       </mesh>
       <mesh position={[-0.62, -1.2, 0]}>
         <sphereGeometry args={[0.24, 24, 24]} />
-        <meshStandardMaterial color={hoodie} roughness={0.8} />
+        <meshStandardMaterial color={blazer} roughness={0.75} />
       </mesh>
       <mesh position={[0.62, -1.2, 0]}>
         <sphereGeometry args={[0.24, 24, 24]} />
-        <meshStandardMaterial color={hoodie} roughness={0.8} />
+        <meshStandardMaterial color={blazer} roughness={0.75} />
       </mesh>
     </group>
   );

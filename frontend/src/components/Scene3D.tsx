@@ -12,9 +12,66 @@ type Refs = {
   pointer: { current: { x: number; y: number } };
 };
 
-function NodeNetwork({ progress, dark }: { progress: Refs["progress"]; dark: boolean }) {
+function makeDotTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 64;
+  canvas.height = 64;
+  const ctx = canvas.getContext("2d")!;
+  const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grad.addColorStop(0, "rgba(255,255,255,1)");
+  grad.addColorStop(0.4, "rgba(255,255,255,0.7)");
+  grad.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 64, 64);
+  return new THREE.CanvasTexture(canvas);
+}
+
+function ParticleField({ progress, dark }: { progress: Refs["progress"]; dark: boolean }) {
+  const points = useRef<THREE.Points>(null);
+  const texture = useMemo(() => makeDotTexture(), []);
+  const positions = useMemo(() => {
+    const count = 900;
+    const arr = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      arr[i * 3] = (Math.random() - 0.5) * 24;
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 15;
+      arr[i * 3 + 2] = (Math.random() - 0.5) * 14 - 2;
+    }
+    return arr;
+  }, []);
+
+  useFrame((state) => {
+    const p = points.current;
+    if (!p) return;
+    const t = state.clock.elapsedTime;
+    const prog = progress.current;
+    p.rotation.y = t * 0.02 + prog * Math.PI;
+    p.rotation.x = Math.sin(t * 0.08) * 0.08 + prog * 0.4;
+    p.position.z = prog * 4;
+    p.position.y = Math.sin(t * 0.15) * 0.3 - prog * 1.5;
+  });
+
+  return (
+    <points ref={points}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.09}
+        map={texture}
+        transparent
+        depthWrite={false}
+        opacity={dark ? 0.7 : 0.4}
+        color={dark ? "#67e8f9" : "#0e7490"}
+        sizeAttenuation
+      />
+    </points>
+  );
+}
+
+function NodeCloud({ progress, dark }: { progress: Refs["progress"]; dark: boolean }) {
   const group = useRef<THREE.Group>(null);
-  const { nodes, linePositions } = useMemo(() => {
+  const nodes = useMemo(() => {
     const pts: THREE.Vector3[] = [];
     const count = 26;
     for (let i = 0; i < count; i++) {
@@ -28,15 +85,7 @@ function NodeNetwork({ progress, dark }: { progress: Refs["progress"]; dark: boo
         ).multiplyScalar(3.4),
       );
     }
-    const lines: number[] = [];
-    for (let i = 0; i < count; i++) {
-      for (let j = i + 1; j < count; j++) {
-        if (pts[i].distanceTo(pts[j]) < 2.4) {
-          lines.push(pts[i].x, pts[i].y, pts[i].z, pts[j].x, pts[j].y, pts[j].z);
-        }
-      }
-    }
-    return { nodes: pts, linePositions: new Float32Array(lines) };
+    return pts;
   }, []);
 
   useFrame((state) => {
@@ -52,72 +101,17 @@ function NodeNetwork({ progress, dark }: { progress: Refs["progress"]; dark: boo
 
   return (
     <group ref={group}>
-      <lineSegments>
-        <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[linePositions, 3]} />
-        </bufferGeometry>
-        <lineBasicMaterial
-          color={dark ? "#22d3ee" : "#0e7490"}
-          transparent
-          opacity={dark ? 0.26 : 0.16}
-        />
-      </lineSegments>
       {nodes.map((n, i) => (
         <mesh key={i} position={n}>
           <sphereGeometry args={[0.05, 8, 8]} />
           <meshBasicMaterial
             color={dark ? "#67e8f9" : "#155e75"}
             transparent
-            opacity={dark ? 0.9 : 0.65}
+            opacity={dark ? 0.9 : 0.6}
           />
         </mesh>
       ))}
     </group>
-  );
-}
-
-function WireShapes({ progress, dark }: { progress: Refs["progress"]; dark: boolean }) {
-  const knot = useRef<THREE.Mesh>(null);
-  const ico = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    const t = state.clock.elapsedTime;
-    const p = progress.current;
-    if (knot.current) {
-      knot.current.rotation.x = t * 0.12 + p * 2.2;
-      knot.current.rotation.y = t * 0.09 + p * 3.1;
-      knot.current.position.z = -3.5 + p * 3;
-      knot.current.scale.setScalar(1 + p * 0.6);
-    }
-    if (ico.current) {
-      ico.current.rotation.y = -t * 0.1 - p * 2.0;
-      ico.current.rotation.z = t * 0.07;
-      ico.current.position.z = -2 + p * 1.5;
-      ico.current.position.y = 1.2 - p * 2.4;
-    }
-  });
-
-  return (
-    <>
-      <mesh ref={knot} position={[3.4, 0.2, -3.5]}>
-        <torusKnotGeometry args={[1.7, 0.45, 140, 18]} />
-        <meshBasicMaterial
-          wireframe
-          color={dark ? "#0e7490" : "#155e75"}
-          transparent
-          opacity={dark ? 0.32 : 0.14}
-        />
-      </mesh>
-      <mesh ref={ico} position={[-3.8, 1.2, -2]}>
-        <icosahedronGeometry args={[1.5, 1]} />
-        <meshBasicMaterial
-          wireframe
-          color={dark ? "#67e8f9" : "#0e7490"}
-          transparent
-          opacity={dark ? 0.4 : 0.2}
-        />
-      </mesh>
-    </>
   );
 }
 
@@ -167,8 +161,8 @@ export const Scene3D = () => {
         dpr={[1, 1.75]}
         gl={{ antialias: true, alpha: true }}
       >
-        <NodeNetwork progress={progress} dark={dark} />
-        <WireShapes progress={progress} dark={dark} />
+        <ParticleField progress={progress} dark={dark} />
+        <NodeCloud progress={progress} dark={dark} />
         <CameraRig pointer={pointer} />
       </Canvas>
     </div>

@@ -1,15 +1,18 @@
-import { Moon, Sun } from "lucide-react";
+import { Moon, PersonStanding, Sun } from "lucide-react";
 import { useTheme } from "@/theme/ThemeContext";
+import { useMotion } from "@/theme/MotionContext";
 import { scrollToSection } from "@/lib/scroll";
 
 const LINKS = [
   { label: "Work", target: "#work" },
+  { label: "Journey", target: "#journey" },
   { label: "Skills", target: "#skills" },
   { label: "Contact", target: "#contact" },
 ];
 
 export const Nav = () => {
   const { theme, toggle } = useTheme();
+  const { reduced, toggle: toggleMotion } = useMotion();
   return (
     <header
       data-testid="main-nav"
@@ -34,6 +37,18 @@ export const Nav = () => {
               {l.label}
             </button>
           ))}
+          <button
+            data-testid="motion-toggle"
+            data-magnetic
+            onClick={toggleMotion}
+            aria-label="Toggle reduced motion"
+            title={reduced ? "Reduced motion on — click to enable animations" : "Animations on — click for reduced motion"}
+            className={`ml-2 flex h-9 w-9 items-center justify-center rounded-full border transition-colors hover:border-accent hover:text-accent ${
+              reduced ? "border-accent text-accent" : "border-foreground/10"
+            }`}
+          >
+            <PersonStanding className="h-4 w-4" />
+          </button>
           <button
             data-testid="theme-toggle"
             onClick={toggle}

@@ -73,7 +73,7 @@ export const Hero = ({ gesture }: { gesture: ReturnType<typeof useGestureScroll>
               data-testid="hero-title"
               className="font-mono text-sm uppercase tracking-[0.25em] text-foreground/80"
             >
-              Data, Cloud &amp; AI Engineer
+              Computer Engineering | Data, Cloud &amp; AI
             </p>
             <p
               data-testid="hero-tagline"

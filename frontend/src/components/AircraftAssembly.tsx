@@ -4,6 +4,8 @@ import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { playLock, playWhoosh } from "@/lib/sounds";
+import { useMotion } from "@/theme/MotionContext";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -30,7 +32,7 @@ const GROUP_IDS = [
 
 type Groups = Record<string, THREE.Group>;
 
-function A380({ onReady }: { onReady: (groups: Groups, fly: THREE.Group) => void }) {
+function A380({ onReady, reduced }: { onReady: (groups: Groups, fly: THREE.Group) => void; reduced: boolean }) {
   const { scene } = useGLTF("/models/a380.glb");
   const flyRef = useRef<THREE.Group>(null);
   const doneRef = useRef(false);
@@ -120,12 +122,21 @@ function A380({ onReady }: { onReady: (groups: Groups, fly: THREE.Group) => void
       c.divideScalar(g.children.length);
       const dir = c.length() > 0.6 ? c.clone().normalize() : new THREE.Vector3(0, 1, 0);
       const dist = id === "fuselage" ? 2.4 : 4.2 + (i % 3) * 1.3;
-      g.position.set(
+      const exPos: [number, number, number] = [
         dir.x * dist,
         dir.y * dist + (i % 2 === 0 ? 2.4 : -2.2),
         dir.z * dist,
-      );
-      g.rotation.set(((i * 37) % 10) / 12 - 0.4, ((i * 53) % 10) / 12 - 0.4, ((i * 71) % 10) / 12 - 0.4);
+      ];
+      const exRot: [number, number, number] = [
+        ((i * 37) % 10) / 12 - 0.4,
+        ((i * 53) % 10) / 12 - 0.4,
+        ((i * 71) % 10) / 12 - 0.4,
+      ];
+      g.userData.exploded = { pos: exPos, rot: exRot };
+      if (!reduced) {
+        g.position.set(...exPos);
+        g.rotation.set(...exRot);
+      }
     });
 
     onReady(cats, flyRef.current);
@@ -145,9 +156,30 @@ export const AircraftAssembly = ({ dark }: { dark: boolean }) => {
   const cardLRef = useRef<HTMLDivElement>(null);
   const cardRRef = useRef<HTMLDivElement>(null);
   const [model, setModel] = useState<{ groups: Groups; fly: THREE.Group } | null>(null);
+  const { reduced } = useMotion();
 
   useLayoutEffect(() => {
-    if (!model || !sectionRef.current) return;
+    if (!model) return;
+    GROUP_IDS.forEach((id) => {
+      const g = model.groups[id];
+      const e = g?.userData.exploded;
+      if (!g || !e) return;
+      if (reduced) {
+        g.position.set(0, 0, 0);
+        g.rotation.set(0, 0, 0);
+      } else {
+        g.position.set(e.pos[0], e.pos[1], e.pos[2]);
+        g.rotation.set(e.rot[0], e.rot[1], e.rot[2]);
+      }
+    });
+    if (reduced) {
+      model.fly.position.set(0, 0, 0);
+      model.fly.rotation.set(0, Math.PI * 0.3, 0);
+    }
+  }, [model, reduced]);
+
+  useLayoutEffect(() => {
+    if (!model || !sectionRef.current || reduced) return;
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -164,6 +196,7 @@ export const AircraftAssembly = ({ dark }: { dark: boolean }) => {
         if (!g || !g.children.length) return;
         tl.to(g.position, { x: 0, y: 0, z: 0, duration: 0.5, ease: "power2.inOut" }, i * 0.035);
         tl.to(g.rotation, { x: 0, y: 0, z: 0, duration: 0.5, ease: "power2.inOut" }, i * 0.035);
+        tl.call(playLock, [], i * 0.035 + 0.48);
       });
       tl.to(model.fly.rotation, { y: Math.PI * 0.3, duration: 0.14, ease: "sine.inOut" }, 0.66);
       tl.fromTo(cardLRef.current, { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.1, ease: "power2.out" }, 0.68);
@@ -182,7 +215,7 @@ export const AircraftAssembly = ({ dark }: { dark: boolean }) => {
           <ambientLight intensity={dark ? 0.5 : 0.85} />
           <directionalLight position={[6, 8, 4]} intensity={dark ? 1.6 : 1.1} color={dark ? "#bfefff" : "#ffffff"} />
           <directionalLight position={[-6, 3, -4]} intensity={dark ? 0.5 : 0.4} color={dark ? "#155e75" : "#7dd3fc"} />
-          <A380 onReady={(groups, fly) => setModel({ groups, fly })} />
+          <A380 onReady={(groups, fly) => setModel({ groups, fly })} reduced={reduced} />
         </Canvas>
       </div>
 
@@ -195,7 +228,7 @@ export const AircraftAssembly = ({ dark }: { dark: boolean }) => {
 
       <div
         ref={cardLRef}
-        style={{ opacity: 0 }}
+        style={{ opacity: reduced ? 1 : 0 }}
         data-testid="airbus-card-fpbot"
         className="pointer-events-none absolute left-6 top-[26%] max-w-sm rounded-2xl border border-foreground/10 bg-background/60 p-7 backdrop-blur-xl md:left-16 lg:left-24"
       >
@@ -216,7 +249,7 @@ export const AircraftAssembly = ({ dark }: { dark: boolean }) => {
 
       <div
         ref={cardRRef}
-        style={{ opacity: 0 }}
+        style={{ opacity: reduced ? 1 : 0 }}
         data-testid="airbus-card-airsimupy"
         className="pointer-events-none absolute bottom-[18%] right-6 max-w-sm rounded-2xl border border-foreground/10 bg-background/60 p-7 backdrop-blur-xl md:right-16 lg:right-24"
       >

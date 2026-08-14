@@ -10,7 +10,7 @@ export const Contact = () => (
     data-testid="contact-section"
     className="relative z-10 px-6 pb-10 pt-32 md:px-16 lg:px-24"
   >
-    <Chapter no="03" title="Contact" id="contact" />
+    <Chapter no="04" title="Contact" id="contact" />
 
     <h3 className="font-display font-bold leading-[0.95] tracking-tight" data-testid="contact-headline">
       {LINES.map((line, i) => (

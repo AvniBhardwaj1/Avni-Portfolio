@@ -3,8 +3,11 @@ import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { X } from "lucide-react";
+import { MotionConfig } from "framer-motion";
 import { ThemeProvider } from "@/theme/ThemeContext";
+import { MotionProvider, useMotion } from "@/theme/MotionContext";
 import { setLenis } from "@/lib/scroll";
+import { initAudioOnGesture } from "@/lib/sounds";
 import { useGestureScroll } from "@/hooks/useGestureScroll";
 import { Scene3D } from "@/components/Scene3D";
 import { Cursor } from "@/components/Cursor";
@@ -13,6 +16,7 @@ import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
 import { Marquee } from "@/components/Marquee";
 import { Experience } from "@/components/Experience";
+import { Timeline } from "@/components/Timeline";
 import { Skills } from "@/components/Skills";
 import { Contact } from "@/components/Contact";
 import { ChatWidget } from "@/components/ChatWidget";
@@ -22,8 +26,14 @@ gsap.registerPlugin(ScrollTrigger);
 function Site() {
   const lenisRef = useRef<Lenis | null>(null);
   const gesture = useGestureScroll(lenisRef);
+  const { reduced } = useMotion();
 
   useEffect(() => {
+    initAudioOnGesture();
+  }, []);
+
+  useEffect(() => {
+    if (reduced) return;
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
     lenisRef.current = lenis;
     setLenis(lenis);
@@ -34,9 +44,10 @@ function Site() {
     return () => {
       gsap.ticker.remove(tick);
       setLenis(null);
+      lenisRef.current = null;
       lenis.destroy();
     };
-  }, []);
+  }, [reduced]);
 
   useEffect(() => {
     console.log(
@@ -47,6 +58,7 @@ function Site() {
   }, []);
 
   return (
+    <MotionConfig reducedMotion={reduced ? "always" : "never"}>
     <div className="min-h-screen bg-background font-body text-foreground">
       <MeshGradient />
       <Scene3D />
@@ -55,10 +67,12 @@ function Site() {
         <Hero gesture={gesture} />
         <Marquee />
         <Experience />
+        <Timeline />
         <Skills />
         <Contact />
       </main>
       <ChatWidget />
+      <Cursor />
 
       <div
         data-testid="gesture-preview-panel"
@@ -88,13 +102,16 @@ function Site() {
         </div>
       </div>
     </div>
+    </MotionConfig>
   );
 }
 
 export default function App() {
   return (
     <ThemeProvider>
-      <Site />
+      <MotionProvider>
+        <Site />
+      </MotionProvider>
     </ThemeProvider>
   );
 }

@@ -206,6 +206,31 @@
     }
 }
 
+.dot-lit {
+    background: hsl(var(--accent));
+    box-shadow: 0 0 16px hsl(var(--accent) / 0.9);
+}
+
+.reduced-motion .marquee-track,
+.reduced-motion .mesh-blob {
+    animation: none;
+}
+
+.reduced-motion .typing-dot {
+    animation: none;
+    opacity: 1;
+}
+
+@media (pointer: fine) {
+    .reduced-motion html,
+    .reduced-motion body,
+    .reduced-motion a,
+    .reduced-motion button,
+    .reduced-motion input {
+        cursor: auto;
+    }
+}
+
 @layer base {
     [data-debug-wrapper="true"] {
         display: contents !important;

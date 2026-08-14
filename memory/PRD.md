@@ -25,8 +25,18 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 
 ## Backlog
 - P0: Re-attach Avni's photo to personalize the Animoji (hair/skin/style) or commission a rigged GLB avatar; A380 has no interior meshes (seats/windows don't exist in this model) — swap for a model with interior if needed.
-- P1: Persist chat history in MongoDB per session; rate-limit /api/chat; avatar idle animations.
-- P2: Mobile gesture fallback polish; reduced-motion accessibility mode.
+- P1: Rate-limit /api/chat; avatar idle animations; fill 5 certificate placeholder cards with real credentials; point project cards at exact repo URLs (currently profile/guessed links).
+- P2: Mobile gesture fallback polish.
+
+## v4 (2026-08-14)
+- Photo-matched Animoji: warm skin tone, shoulder-length dark wavy hair with side locks, gold stud earrings, navy blazer + pale scarf (from user photo).
+- Headline → "Computer Engineering | Data, Cloud & AI".
+- Background 3D: wireframes replaced with a soft particle field + node cloud (no generic wireframe shapes), scroll-reactive.
+- Clone Memory: chat persists per visitor — sessionId in localStorage, messages stored in MongoDB (db.chat_messages), GET /api/chat/history hydrates useChat on load.
+- Assembly Sound Design: Web Audio servo clicks as each A380 group locks + whoosh on fly-off (initialized on first user gesture).
+- Reduced Motion Mode: person-standing toggle in navbar (also respects prefers-reduced-motion); disables Lenis, scrub timelines (A380 renders statically assembled with cards visible), custom cursor, marquee/blob animations, framer reveals.
+- Projects & Certificates: clickable magnetic cards (Research Agent, Financial Advisor, MapMyNotes, Pediatric Bone Age, IoT Actuator) + 5 dashed certificate placeholder slots linking to LinkedIn certifications.
+- Leadership & Achievements: vertical timeline (7 nodes) with scroll-scrubbed glowing line, node reveal animations, dot glow on viewport entry, "View all achievements" expander.
 
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.

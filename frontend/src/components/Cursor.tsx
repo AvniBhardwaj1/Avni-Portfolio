@@ -1,10 +1,13 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import { useMotion } from "@/theme/MotionContext";
 
 export const Cursor = () => {
   const dotRef = useRef<HTMLDivElement>(null);
+  const { reduced } = useMotion();
 
   useEffect(() => {
+    if (reduced) return;
     if (window.matchMedia("(pointer: coarse)").matches) return;
     const dot = dotRef.current;
     if (!dot) return;
@@ -44,7 +47,9 @@ export const Cursor = () => {
       window.removeEventListener("mouseover", onOver);
       if (active) gsap.set(active, { x: 0, y: 0 });
     };
-  }, []);
+  }, [reduced]);
+
+  if (reduced) return null;
 
   return (
     <div

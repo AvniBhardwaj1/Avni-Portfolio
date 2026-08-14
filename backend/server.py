@@ -78,11 +78,10 @@ class ChatRequest(BaseModel):
 
 AVNI_SYSTEM_PROMPT = """You are Avni Bhardwaj's digital clone - a witty, slightly cheeky AI double living on her portfolio. You handle recruiter small talk so Avni can focus on writing Python and orchestrating Kubernetes clusters. Keep replies concise (2-4 sentences), sprinkle in light humor, and never invent facts. Refer to Avni in third person ("she", "her") since you are her clone, not her.
 
-Facts about Avni Bhardwaj, Data, Cloud & AI Engineer:
+Facts about Avni Bhardwaj - B.Tech Computer Engineering, working across Data, Cloud & AI:
 - Airbus India internship: architected FP-BOT, a Dockerized RAG pipeline deployed via Jenkins CI/CD for natural-language querying of technical documentation via FastAPI. Built AirSimuPy, a Python + PySide6 simulation platform using NetworkX and NumPy to execute block-diagram data pipelines via a Hybrid Compiled Architecture. Executed mathematical validation of a Python-based Sorting Tool against legacy Fortran solvers.
-- Autonomous AI Research Agent: a zero-maintenance LLM agent built with Pydantic AI and Gemini that synthesizes high-signal daily research digests, shipped on schedule via GitHub Actions.
-- Personalized AI Financial Advisor: an Agentic RAG system built with LangChain ReAct, fine-tuning Llama-3 (8B) via Unsloth and PyTorch.
-- Deep Learning Research: an ensemble framework integrating DenseNet201 and SE-ResNet50 in PyTorch to optimize image classification.
+- Projects: Autonomous AI Research Agent (zero-maintenance Pydantic AI + Gemini agent synthesizing daily digests via GitHub Actions); Personalized AI Financial Advisor (Agentic RAG with LangChain ReAct, fine-tuned Llama-3 8B via Unsloth and PyTorch); MapMyNotes (NLP study companion built with Streamlit and Google Gemini that converts text into mind maps); Pediatric Bone Age Prediction (ensemble of DenseNet201 and SE-ResNet50 for medical diagnostics); IoT Actuator Control (Arduino Uno + ESP8266 hardware integration).
+- Achievements: National Finalist at Chaitanya leadership event, Atharv Ranbhoomi'24 IIM Indore (Team INNOV8, top 20 of 977); GDSC Lead 2023-24; Techinnovation 6th Rank Winner at IIT Kanpur twice (CCTV analytics platform frontend, top 5 of 25,000 applicants; autonomous environmental monitoring prototype); Organizing Committee at WittyHacks 4.0 NMIMS Indore; Top 10 at Execute Hackathon (AI fashion try-on with TensorFlow + OpenCV); Winner of GDSC Oracle Challenge 2023.
 - Skills - Data Engineering & Cloud: AWS, Docker, Kubernetes, Kafka, ClickHouse. AI & ML: PyTorch, LangChain, RAG. Backend: Python, C++, FastAPI.
 - Contact: avnibhardwaj01.ab@gmail.com, github.com/avnibhardwaj1, linkedin.com/in/avni-bhardwaj10, leetcode.com/u/AvniBhardwaj10.
 If asked something off-topic, deflect with humor and steer back to Avni's work. Never use markdown formatting - no asterisks, no bullet symbols, no headers - plain conversational text only."""
@@ -97,12 +96,27 @@ async def chat_clone(req: ChatRequest):
     ).with_model("openai", "gpt-5.4-mini")
 
     async def generate():
+        full: List[str] = []
         try:
+            await db.chat_messages.insert_one({
+                "sessionId": req.sessionId,
+                "role": "user",
+                "content": user_text,
+                "ts": datetime.now(timezone.utc).isoformat(),
+            })
             async for event in chat.stream_message(UserMessage(text=user_text)):
                 if isinstance(event, TextDelta):
+                    full.append(event.content)
                     yield event.content
                 elif isinstance(event, StreamDone):
                     break
+            if full:
+                await db.chat_messages.insert_one({
+                    "sessionId": req.sessionId,
+                    "role": "assistant",
+                    "content": "".join(full),
+                    "ts": datetime.now(timezone.utc).isoformat(),
+                })
         except Exception:
             logger.exception("chat stream failed")
             yield "My clone brain glitched - email the human original at avnibhardwaj01.ab@gmail.com."
@@ -112,6 +126,18 @@ async def chat_clone(req: ChatRequest):
         media_type="text/plain",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+@api_router.get("/chat/history")
+async def chat_history(sessionId: str = "default"):
+    docs = await db.chat_messages.find(
+        {"sessionId": sessionId}, {"_id": 0}
+    ).sort("ts", 1).to_list(200)
+    return {
+        "messages": [
+            {"id": str(i), "role": d["role"], "content": d["content"]}
+            for i, d in enumerate(docs)
+        ]
+    }
 
 # Include the router in the main app
 app.include_router(api_router)
