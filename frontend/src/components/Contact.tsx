@@ -12,6 +12,7 @@ import {
   Phone,
 } from "lucide-react";
 import { Chapter } from "@/components/Chapter";
+import { NowCard } from "@/components/NowCard";
 import { track } from "@/lib/analytics";
 
 const LINES = ["LET'S", "CONNECT."];
@@ -100,6 +101,8 @@ export const Contact = () => (
       Interested in a collaboration, internship, or product-focused project? I’m always
       open to new ideas and new teams. Reach out and let’s build something meaningful.
     </motion.p>
+
+    <NowCard />
 
     <motion.div
       initial={{ opacity: 0, y: 20 }}

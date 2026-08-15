@@ -25,6 +25,7 @@ import { ChatWidget } from "@/components/ChatWidget";
 import { Terminal } from "@/components/Terminal";
 import { Dock } from "@/components/Dock";
 import { GestureCursor } from "@/components/GestureCursor";
+import { FlightPath } from "@/components/FlightPath";
 import StatsPage from "@/pages/StatsPage";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -84,6 +85,7 @@ function Site() {
       <Terminal open={terminalOpen} onClose={() => setTerminalOpen(false)} />
       <Dock onOpenTerminal={() => setTerminalOpen(true)} />
       <Cursor />
+      <FlightPath />
       {gesture.status === "active" && <GestureCursor cursorRef={gesture.cursorRef} />}
 
       <div

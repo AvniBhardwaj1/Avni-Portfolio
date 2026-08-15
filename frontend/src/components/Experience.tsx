@@ -1,6 +1,6 @@
-import { useLayoutEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight, Github, X } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Chapter } from "@/components/Chapter";
@@ -12,6 +12,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 type Tab = "industry" | "projects";
 
+type ProjectDetails = {
+  problem: string;
+  architecture: string[];
+  impact: string[];
+};
+
 type Project = {
   id: string;
   index: string;
@@ -21,6 +27,7 @@ type Project = {
   points: string[];
   stack: string[];
   href?: string;
+  details: ProjectDetails;
 };
 
 const AIRBUS: Project = {
@@ -35,6 +42,19 @@ const AIRBUS: Project = {
     "Executed mathematical validation of a Python-based Sorting Tool against legacy Fortran solvers.",
   ],
   stack: ["Python", "FastAPI", "RAG", "Docker", "Jenkins", "PySide6", "NetworkX", "NumPy", "Fortran"],
+  details: {
+    problem:
+      "Flight-physics engineers were digging through dense technical documentation and Fortran-era tooling — the answers existed, but finding them was slow.",
+    architecture: [
+      "FP-BOT: Dockerized RAG service (FastAPI + LlamaIndex + vLLM + Qdrant) exposing 30+ engineering tools through one natural-language interface, shipped via Jenkins CI/CD.",
+      "AirSimuPy: PySide6 desktop platform that executes block-diagram simulation pipelines as NetworkX graphs with NumPy compute — a hybrid compiled architecture.",
+      "Sorting Tool: mathematical validation of a modern Python solver against legacy Fortran references.",
+    ],
+    impact: [
+      "30+ internal tools queryable in plain English",
+      "Legacy Fortran logic formally verified against modern Python",
+    ],
+  },
 };
 
 const PROJECTS: Project[] = [
@@ -49,6 +69,19 @@ const PROJECTS: Project[] = [
     ],
     stack: ["Python", "Gemini", "GitHub Actions", "Gmail SMTP"],
     href: "https://github.com/AvniBhardwaj1/Briefing-Bot-Automation",
+    details: {
+      problem:
+        "Keeping up with AI news daily is a job in itself — and most digest bots need constant babysitting.",
+      architecture: [
+        "GitHub Actions cron on a strict source allowlist — no scraping free-for-all.",
+        "Gemini synthesizes headlines plus a verified Fact of the Day, under prompt-injection defenses.",
+        "Gmail SMTP ships a formatted HTML digest every morning.",
+      ],
+      impact: [
+        "Zero-maintenance — it runs itself every single day",
+        "Hardened against prompt injection from untrusted source content",
+      ],
+    },
   },
   {
     id: "fin-advisor",
@@ -61,6 +94,20 @@ const PROJECTS: Project[] = [
     ],
     stack: ["LangChain", "ReAct", "Llama-3", "Ollama", "Streamlit"],
     href: "https://github.com/AvniBhardwaj1/personal-finance-assistant",
+    details: {
+      problem:
+        "Financial advice tools either hallucinate numbers or burn money on hosted inference.",
+      architecture: [
+        "Quantized Llama-3 (GGUF) fine-tuned and served fully locally via Ollama.",
+        "LangChain ReAct agent — reasoning stays with the LLM, facts stay with tools.",
+        "Live yfinance price lookups + CSV client records (70k+ finance rows).",
+        "Streamlit front end for conversations and reports.",
+      ],
+      impact: [
+        "Fully local — zero inference cost, zero data leaves the machine",
+        "Tool-grounded answers: the LLM never invents a figure",
+      ],
+    },
   },
   {
     id: "mapmynotes",
@@ -73,6 +120,16 @@ const PROJECTS: Project[] = [
     ],
     stack: ["Streamlit", "Gemini", "D3.js", "PyMuPDF"],
     href: "https://github.com/AvniBhardwaj1/MapMyNotes",
+    details: {
+      problem:
+        "Dense PDFs and lecture slides don't turn themselves into study material.",
+      architecture: [
+        "PyMuPDF ingestion for PDFs, slides, or raw text.",
+        "Gemini extracts the full concept hierarchy end to end.",
+        "D3.js renders interactive mind maps with hover explanations, flashcards, and quizzes.",
+      ],
+      impact: ["Any PDF becomes an interactive study companion in one pass"],
+    },
   },
   {
     id: "bone-age",
@@ -85,6 +142,15 @@ const PROJECTS: Project[] = [
     ],
     stack: ["PyTorch", "DenseNet201", "SE-ResNet50", "Medical AI"],
     href: "https://github.com/AvniBhardwaj1",
+    details: {
+      problem:
+        "Pediatric bone-age assessment is manual, slow, and varies between radiologists.",
+      architecture: [
+        "4-model ensemble fusing DenseNet201 and SE-ResNet50 feature extractors.",
+        "PyTorch training pipeline over pediatric X-ray datasets.",
+      ],
+      impact: ["Research-grade ensemble framework for medical diagnostics"],
+    },
   },
   {
     id: "iot-actuator",
@@ -97,6 +163,15 @@ const PROJECTS: Project[] = [
     ],
     stack: ["Arduino Uno", "ESP8266", "IoT", "C++"],
     href: "https://github.com/AvniBhardwaj1",
+    details: {
+      problem:
+        "Remote actuator control needs a reliable handshake between hardware and the network.",
+      architecture: [
+        "Arduino Uno drives the actuators; ESP8266 handles Wi-Fi communication.",
+        "Real-time signal handling written in C++.",
+      ],
+      impact: ["Working end-to-end remote actuator control build"],
+    },
   },
   {
     id: "jobhunt",
@@ -109,6 +184,20 @@ const PROJECTS: Project[] = [
     ],
     stack: ["Python", "Claude / Gemini / Groq", "GitHub Actions", "pytest"],
     href: "https://github.com/AvniBhardwaj1/Job_search_automation",
+    details: {
+      problem:
+        "Job hunting is a full-time job — thousands of postings, almost all irrelevant.",
+      architecture: [
+        "Reads public ATS APIs (Greenhouse, Lever, Ashby) directly.",
+        "Deterministic prefiltering drops ~99% of postings before any LLM call.",
+        "An LLM scores the survivors against a resume and drafts application kits.",
+        "GitHub Actions cron emails a daily digest; pytest covers the pipeline.",
+      ],
+      impact: [
+        "~99% of noise removed before a single token is spent",
+        "Daily digest of only the roles worth reading",
+      ],
+    },
   },
   {
     id: "weather-mcp",
@@ -121,6 +210,16 @@ const PROJECTS: Project[] = [
     ],
     stack: ["Node.js", "REST", "Redis", "Jest"],
     href: "https://github.com/AvniBhardwaj1/weather-mcp-server",
+    details: {
+      problem:
+        "Weather APIs return inconsistent shapes that quietly break downstream consumers.",
+      architecture: [
+        "MCP-style Node.js service normalizing OpenWeatherMap into one stable JSON contract.",
+        "TTL/Redis caching plus uniform error responses.",
+        "Jest test suite and a demo browser UI.",
+      ],
+      impact: ["One stable contract for current conditions and daily forecasts"],
+    },
   },
   {
     id: "fake-news",
@@ -133,6 +232,14 @@ const PROJECTS: Project[] = [
     ],
     stack: ["NLP", "TF-IDF", "scikit-learn", "Streamlit"],
     href: "https://github.com/AvniBhardwaj1/MLPROJECT",
+    details: {
+      problem: "Most misinformation classifiers are opaque black boxes.",
+      architecture: [
+        "TF-IDF vectorization with threshold-based cosine-similarity clustering.",
+        "Full EDA notebook plus a Streamlit prediction app.",
+      ],
+      impact: ["89% accuracy with balanced precision and recall"],
+    },
   },
   {
     id: "typing-game",
@@ -145,69 +252,205 @@ const PROJECTS: Project[] = [
     ],
     stack: ["JavaScript", "HTML", "CSS"],
     href: "https://github.com/AvniBhardwaj1/speed-typing-game",
+    details: {
+      problem: "Typing trainers are either ugly, paywalled, or both.",
+      architecture: [
+        "Vanilla JS engine tracking WPM and accuracy in real time.",
+        "Instant visual feedback loop — no frameworks, no dependencies.",
+      ],
+      impact: ["Live WPM + accuracy tracking in a zero-dependency browser game"],
+    },
   },
 ];
 
 const INDEX_COLORS = ["text-accent", "text-accent2", "text-accent3"];
 
-const Card = ({ project, i }: { project: Project; i: number }) => {
-  const clickable = Boolean(project.href);
-  return (
-    <motion.article
-      initial={{ opacity: 0, y: 36 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.7, delay: i * 0.06, ease: "easeOut" }}
-      data-testid={`project-card-${project.id}`}
-      onClick={() => {
-        track("card_click", { id: project.id, title: project.title });
-        if (clickable) window.open(project.href, "_blank", "noreferrer");
-      }}
-      data-magnetic={clickable ? "" : undefined}
-      className={`group flex h-full flex-col gap-6 rounded-2xl border border-foreground/10 bg-background/70 p-8 backdrop-blur-sm transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-accent/60 ${
-        clickable ? "cursor-pointer" : ""
-      }`}
-    >
-      <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
-        <span className={INDEX_COLORS[i % 3]}>{project.index}</span>
-        <span className="flex items-center gap-2">
-          {project.period}
-          {clickable && (
-            <ArrowUpRight className="h-3.5 w-3.5 transition-colors group-hover:text-accent" />
-          )}
+const Card = ({
+  project,
+  i,
+  onOpen,
+}: {
+  project: Project;
+  i: number;
+  onOpen: (p: Project) => void;
+}) => (
+  <motion.article
+    layoutId={`project-card-${project.id}`}
+    initial={{ opacity: 0, y: 48, rotateX: 14 }}
+    whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+    viewport={{ once: true, margin: "-60px" }}
+    transition={{ duration: 0.85, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+    style={{ transformPerspective: 1000 }}
+    data-testid={`project-card-${project.id}`}
+    onClick={() => {
+      track("card_click", { id: project.id, title: project.title });
+      onOpen(project);
+    }}
+    data-magnetic
+    className="group flex h-full cursor-pointer flex-col gap-6 rounded-2xl border border-foreground/10 bg-background/70 p-8 backdrop-blur-sm transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-accent/60"
+  >
+    <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+      <span className={INDEX_COLORS[i % 3]}>{project.index}</span>
+      <span className="flex items-center gap-2">
+        {project.period}
+        <ArrowUpRight className="h-3.5 w-3.5 transition-colors group-hover:text-accent" />
+      </span>
+    </div>
+    <div>
+      <h3 className="font-display text-2xl font-bold tracking-tight md:text-3xl">{project.title}</h3>
+      <p className="mt-2 font-mono text-xs uppercase tracking-[0.2em] text-accent">{project.org}</p>
+    </div>
+    <ul className="flex flex-col gap-3">
+      {project.points.map((point) => (
+        <li key={point} className="flex gap-3 text-sm leading-relaxed text-muted-foreground md:text-base">
+          <span className="mt-2 h-1 w-1 shrink-0 rotate-45 bg-accent" />
+          {point}
+        </li>
+      ))}
+    </ul>
+    <div className="mt-auto flex flex-wrap gap-2 pt-2">
+      {project.stack.map((tech) => (
+        <span
+          key={tech}
+          className="rounded-full border border-foreground/10 px-3 py-1 font-mono text-[11px] text-muted-foreground transition-colors group-hover:border-accent/30"
+        >
+          {tech}
         </span>
-      </div>
-      <div>
-        <h3 className="font-display text-2xl font-bold tracking-tight md:text-3xl">{project.title}</h3>
-        <p className="mt-2 font-mono text-xs uppercase tracking-[0.2em] text-accent">{project.org}</p>
-      </div>
-      <ul className="flex flex-col gap-3">
-        {project.points.map((point) => (
-          <li key={point} className="flex gap-3 text-sm leading-relaxed text-muted-foreground md:text-base">
-            <span className="mt-2 h-1 w-1 shrink-0 rotate-45 bg-accent" />
-            {point}
-          </li>
-        ))}
-      </ul>
-      <div className="mt-auto flex flex-wrap gap-2 pt-2">
-        {project.stack.map((tech) => (
-          <span
-            key={tech}
-            className="rounded-full border border-foreground/10 px-3 py-1 font-mono text-[11px] text-muted-foreground transition-colors group-hover:border-accent/30"
+      ))}
+    </div>
+    <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground/70 transition-colors group-hover:text-accent">
+      Tap to unfold the build
+    </p>
+  </motion.article>
+);
+
+const DetailBlock = ({
+  label,
+  items,
+  diamond,
+}: {
+  label: string;
+  items: string[];
+  diamond?: boolean;
+}) => (
+  <div>
+    <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.3em] text-accent">{label}</p>
+    <ul className="flex flex-col gap-2.5">
+      {items.map((item) => (
+        <li key={item} className="flex gap-3 text-sm leading-relaxed text-muted-foreground md:text-base">
+          {diamond && <span className="mt-2 h-1.5 w-1.5 shrink-0 rotate-45 bg-accent" />}
+          {item}
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+
+const ProjectOverlay = ({
+  project,
+  i,
+  onClose,
+}: {
+  project: Project;
+  i: number;
+  onClose: () => void;
+}) => {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      data-testid="project-overlay"
+      className="fixed inset-0 z-[70] flex items-center justify-center bg-background/70 p-4 backdrop-blur-md md:p-8"
+      onClick={onClose}
+    >
+      <motion.div
+        layoutId={`project-card-${project.id}`}
+        transition={{ type: "spring", stiffness: 220, damping: 26 }}
+        onClick={(e) => e.stopPropagation()}
+        className="flex max-h-[85vh] w-full max-w-3xl flex-col gap-6 overflow-y-auto rounded-2xl border border-accent/30 bg-background/95 p-8 shadow-[0_50px_120px_-30px_hsl(var(--foreground)/0.4)] backdrop-blur-2xl md:p-10"
+      >
+        <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+          <span className={INDEX_COLORS[i % 3]}>{project.index} · {project.period}</span>
+          <button
+            data-testid="project-overlay-close"
+            onClick={onClose}
+            aria-label="Close project details"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-foreground/10 text-muted-foreground transition-colors hover:border-accent hover:text-accent"
           >
-            {tech}
-          </span>
-        ))}
-      </div>
-    </motion.article>
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div>
+          <h3 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
+            {project.title}
+          </h3>
+          <p className="mt-2 font-mono text-xs uppercase tracking-[0.2em] text-accent">
+            {project.org}
+          </p>
+        </div>
+
+        <div>
+          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.3em] text-accent">
+            The problem
+          </p>
+          <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
+            {project.details.problem}
+          </p>
+        </div>
+
+        <DetailBlock label="Architecture" items={project.details.architecture} diamond />
+        <DetailBlock label="Impact" items={project.details.impact} diamond />
+
+        <div className="flex flex-wrap gap-2">
+          {project.stack.map((tech) => (
+            <span
+              key={tech}
+              className="rounded-full border border-foreground/10 px-3 py-1 font-mono text-[11px] text-muted-foreground"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+
+        {project.href && (
+          <a
+            href={project.href}
+            target="_blank"
+            rel="noreferrer"
+            data-testid="project-overlay-github"
+            data-magnetic
+            className="mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 font-mono text-xs uppercase tracking-[0.2em] text-accent-foreground transition-transform hover:scale-[1.03] active:scale-95"
+          >
+            <Github className="h-4 w-4" />
+            View on GitHub
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </a>
+        )}
+      </motion.div>
+    </motion.div>
   );
 };
 
 export const Experience = () => {
   const [tab, setTab] = useState<Tab>("industry");
+  const [selected, setSelected] = useState<Project | null>(null);
   const { theme } = useTheme();
   const dark = theme === "dark";
   const projectsRef = useRef<HTMLDivElement>(null);
+
+  const openProject = (p: Project) => {
+    setSelected(p);
+    track("project_expand", { id: p.id, title: p.title });
+  };
 
   useLayoutEffect(() => {
     if (tab !== "projects") return;
@@ -232,6 +475,11 @@ export const Experience = () => {
     setTab(t);
     requestAnimationFrame(() => ScrollTrigger.refresh());
   };
+
+  const allProjects = [AIRBUS, ...PROJECTS];
+  const selectedIndex = selected
+    ? allProjects.findIndex((p) => p.id === selected.id)
+    : 0;
 
   return (
     <section
@@ -273,7 +521,7 @@ export const Experience = () => {
             <AircraftAssembly dark={dark} />
           </div>
           <div className="mt-16 max-w-4xl">
-            <Card project={AIRBUS} i={0} />
+            <Card project={AIRBUS} i={0} onOpen={openProject} />
           </div>
         </div>
       ) : (
@@ -281,12 +529,22 @@ export const Experience = () => {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {PROJECTS.map((p, i) => (
               <div key={p.id} data-parallax-card>
-                <Card project={p} i={i} />
+                <Card project={p} i={i + 1} onOpen={openProject} />
               </div>
             ))}
           </div>
         </div>
       )}
+
+      <AnimatePresence>
+        {selected && (
+          <ProjectOverlay
+            project={selected}
+            i={selectedIndex}
+            onClose={() => setSelected(null)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 };

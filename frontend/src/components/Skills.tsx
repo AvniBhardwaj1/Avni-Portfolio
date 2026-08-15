@@ -1,5 +1,6 @@
-import { motion } from "framer-motion";
 import { Chapter } from "@/components/Chapter";
+import { FlipIn } from "@/components/Reveal";
+import { GitHubHeatmap } from "@/components/GitHubHeatmap";
 
 const GROUPS = [
   {
@@ -30,13 +31,10 @@ export const Skills = () => (
     <Chapter no="03" title="Skills" id="skills" />
     <div className="grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-8">
       {GROUPS.map((group, gi) => (
-        <motion.div
+        <FlipIn
           key={group.id}
-          initial={{ opacity: 0, y: 28 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.6, delay: gi * 0.1, ease: "easeOut" }}
-          data-testid={`skill-group-${group.id}`}
+          delay={gi * 0.1}
+          testId={`skill-group-${group.id}`}
         >
           <p className={`mb-6 font-mono text-xs uppercase tracking-[0.3em] ${GROUP_COLORS[gi % 3]}`}>
             {group.title}
@@ -57,8 +55,9 @@ export const Skills = () => (
               </li>
             ))}
           </ul>
-        </motion.div>
+        </FlipIn>
       ))}
     </div>
+    <GitHubHeatmap />
   </section>
 );

@@ -94,6 +94,15 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 - Portrait.tsx → cinematic slideshow: AnimatePresence crossfade (1.1s) + Ken-Burns slow zoom/pan per slide, 5.2s interval, alternating pan direction, dot indicators + click-to-jump when >1 photo. PHOTOS array in file — single photo (/portrait.webp) renders as graceful Ken-Burns fallback until user uploads more photos.
 - Fixed regression from parallel same-file edits: STATUS_TEXT/useState clobber in Hero.tsx reapplied sequentially.
 
+## v15 (2026-08-15) — "Cooler site" batch: 6 features
+- Scroll-linked section transitions: Chapter.tsx headings now masked slide-up (MaskedTitle in Reveal.tsx — outer mask owns whileInView, inner animates via variants; observing the clipped inner span never triggers IntersectionObserver) + parallax drift via useScroll; FlipIn (rotateX 3D flip) applied to Skills groups and all project cards.
+- Live GitHub heatmap: GET /api/github/contributions proxy (jogruber API primary, GitHub HTML tooltip parser fallback, 12h in-memory cache) → GitHubHeatmap.tsx in Skills section: 26-week grid, cells rise with per-column stagger, hover tooltips, "N contributions this year" (verified live: 129). Fails silent if unavailable.
+- Project cards unfold: every project now has details {problem, architecture[], impact[]} — click morphs card into ProjectOverlay (layoutId shared-element spring) with The Problem / Architecture / Impact blocks + View on GitHub (skipped for Airbus, no href). Closes via X/ESC/backdrop. Tracks project_expand. Cards no longer open GitHub directly.
+- Ambient reactive background: MeshGradient.tsx rewritten — blobs drift with cursor velocity (pointermove energy, smoothed), pulse layer + brightness breathe with vinyl crackle level (AnalyserNode tapped in sounds.ts startCrackle, getAudioLevel()). Reduced-motion safe. .mesh-wrap/.mesh-pulse CSS added.
+- Flight path: FlightPath.tsx — fixed right-edge (xl only) vertical route, lucide Plane (rotate-135) rides scroll progress, waypoint dots (work/journey/skills/certs/contact) measured from section offsets, click flies to section.
+- Now card: NowCard.tsx in Contact — pulsing LIVE badge, ticking IST clock, editable STATUS lines (Building FP-BOT @ Airbus, Listening lo-fi), Indore weather via keyless Open-Meteo (graceful "—" fallback).
+- Test report: /app/test_reports/iteration_1.json — 100% pass backend+frontend. Regression test added: /app/backend/tests/test_github_contributions.py.
+
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.
 2. Add chat history persistence + basic rate limiting.
@@ -102,3 +111,4 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 5. GA4 Measurement ID (G-XXXXXXX) still needed from user → REACT_APP_GA_ID in frontend/.env.
 6. Chat Quality Meter (thumbs up/down on clone answers → satisfaction score on /stats). P1.
 7. Terminal Mini-Game (Wordle-style tech terms / typing race). P2.
+8. Refactor: split Experience.tsx (~551 lines) into data/Card/ProjectOverlay modules.

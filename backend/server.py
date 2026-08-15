@@ -362,6 +362,74 @@ async def trigger_weekly_email(x_stats_token: str = Header(default="")):
     email_id = await send_weekly_digest()
     return {"status": "sent", "email_id": email_id}
 
+# --- GitHub contributions proxy (12h in-memory cache) ---
+GITHUB_USER = "AvniBhardwaj1"
+_gh_cache: dict = {"ts": 0.0, "data": None}
+
+
+def _parse_github_html(html_text: str) -> dict | None:
+    """Fallback parser for github.com/users/<user>/contributions markup."""
+    cells: dict = {}
+    for tag in re.findall(r"<td\b[^>]*ContributionCalendar-day[^>]*>", html_text):
+        mid = re.search(r'id="([^"]+)"', tag)
+        mdate = re.search(r'data-date="(\d{4}-\d{2}-\d{2})"', tag)
+        mlevel = re.search(r'data-level="(\d)"', tag)
+        if mid and mdate and mlevel:
+            cells[mid.group(1)] = {"date": mdate.group(1), "count": 0, "level": int(mlevel.group(1))}
+    if not cells:
+        return None
+    for tip in re.finditer(
+        r'<tool-tip[^>]*for="([^"]+)"[^>]*>([^<]*)</tool-tip>', html_text
+    ):
+        cell = cells.get(tip.group(1))
+        if cell:
+            mnum = re.search(r"(\d+)", tip.group(2))
+            cell["count"] = int(mnum.group(1)) if mnum else 0
+    days = sorted(cells.values(), key=lambda d: d["date"])
+    return {"total": sum(d["count"] for d in days), "days": days, "source": "github-html"}
+
+
+@api_router.get("/github/contributions")
+async def github_contributions():
+    now = datetime.now(timezone.utc).timestamp()
+    if _gh_cache["data"] and now - _gh_cache["ts"] < 12 * 3600:
+        return _gh_cache["data"]
+    data = None
+    try:
+        async with httpx.AsyncClient(timeout=12) as hc:
+            r = await hc.get(
+                f"https://github-contributions-api.jogruber.de/v4/{GITHUB_USER}?y=last"
+            )
+            if r.status_code == 200:
+                j = r.json()
+                days = [
+                    {"date": d["date"], "count": d["count"], "level": d["level"]}
+                    for d in j.get("contributions", [])
+                ]
+                if days:
+                    total = j.get("total", {}).get("lastYear") or sum(
+                        d["count"] for d in days
+                    )
+                    data = {"total": total, "days": days, "source": "live"}
+    except Exception:
+        data = None
+    if not data:
+        try:
+            async with httpx.AsyncClient(
+                timeout=12, headers={"User-Agent": "Mozilla/5.0"}
+            ) as hc:
+                r = await hc.get(f"https://github.com/users/{GITHUB_USER}/contributions")
+                if r.status_code == 200:
+                    data = _parse_github_html(r.text)
+        except Exception:
+            data = None
+    if not data or not data.get("days"):
+        raise HTTPException(status_code=502, detail="GitHub contributions unavailable")
+    _gh_cache["ts"] = now
+    _gh_cache["data"] = data
+    return data
+
+
 # Include the router in the main app
 app.include_router(api_router)
 

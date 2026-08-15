@@ -293,3 +293,17 @@
     outline-offset: 3px;
     border-radius: 6px;
 }
+
+.mesh-wrap {
+    position: absolute;
+    inset: 0;
+    will-change: transform, filter;
+}
+
+.mesh-pulse {
+    position: absolute;
+    inset: -10%;
+    background: radial-gradient(circle at 50% 42%, hsl(var(--accent) / 0.16), transparent 60%);
+    opacity: 0;
+    will-change: transform, opacity;
+}

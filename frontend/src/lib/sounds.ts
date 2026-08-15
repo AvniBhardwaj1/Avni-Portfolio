@@ -61,6 +61,20 @@ export const playWhoosh = () => {
 };
 
 let crackle: { src: AudioBufferSourceNode; gain: GainNode } | null = null;
+let crackleAnalyser: { analyser: AnalyserNode; data: Uint8Array } | null = null;
+
+/** Smoothed 0..1 loudness of the vinyl crackle — drives the reactive background. */
+export const getAudioLevel = () => {
+  if (!crackleAnalyser) return 0;
+  const { analyser, data } = crackleAnalyser;
+  analyser.getByteTimeDomainData(data);
+  let sum = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    const v = (data[i] - 128) / 128;
+    sum += v * v;
+  }
+  return Math.min(1, Math.sqrt(sum / (data.length / 4)) * 6);
+};
 
 export const startCrackle = () => {
   try {
@@ -88,6 +102,10 @@ export const startCrackle = () => {
     gain.gain.setValueAtTime(0.0001, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.045, ctx.currentTime + 0.7);
     src.connect(filter).connect(gain).connect(ctx.destination);
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 512;
+    gain.connect(analyser);
+    crackleAnalyser = { analyser, data: new Uint8Array(analyser.fftSize) };
     src.start();
     crackle = { src, gain };
   } catch {
@@ -99,6 +117,7 @@ export const stopCrackle = () => {
   if (!crackle || !audioCtx) return;
   const { src, gain } = crackle;
   crackle = null;
+  crackleAnalyser = null;
   try {
     gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.25);
     window.setTimeout(() => {
