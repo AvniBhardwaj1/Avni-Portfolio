@@ -157,7 +157,7 @@ export const Contact = () => (
         Email me
       </a>
       <a
-        href="/Avni_Bhardwaj_Resume.pdf"
+        href={`${process.env.PUBLIC_URL ?? ""}/Avni_Bhardwaj_Resume.pdf`}
         download
         onClick={() => track("resume_download")}
         data-testid="contact-resume-button"

@@ -64,7 +64,9 @@ export function useGestureScroll(lenisRef: { current: Lenis | null }) {
       streamRef.current = stream;
 
       const vision = await import("@mediapipe/tasks-vision");
-      const fileset = await vision.FilesetResolver.forVisionTasks("/mediapipe/wasm");
+      const fileset = await vision.FilesetResolver.forVisionTasks(
+        `${process.env.PUBLIC_URL ?? ""}/mediapipe/wasm`,
+      );
       const options = (delegate: "GPU" | "CPU") => ({
         baseOptions: { modelAssetPath: MODEL_URL, delegate },
         runningMode: "VIDEO" as const,

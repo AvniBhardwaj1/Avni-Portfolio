@@ -9,7 +9,7 @@ import {
 
 // Add more photos by dropping them in /public and appending paths here.
 // With a single photo the slideshow gracefully falls back to a static Ken-Burns frame.
-const PHOTOS = ["/portrait.webp"];
+const PHOTOS = [`${process.env.PUBLIC_URL ?? ""}/portrait.webp`];
 const SLIDE_MS = 5200;
 
 export const Portrait = () => {

@@ -7,6 +7,8 @@ import { startCrackle, stopCrackle } from "@/lib/sounds";
 
 type Cert = { id: string; label: string; sub: string; desc: string; img: string; pdf: string };
 
+const PUB = process.env.PUBLIC_URL ?? "";
+
 const CERTS: Cert[] = [
   { id: "cert-01", label: "Accenture — Forage Virtual Experience", sub: "Accenture · Forage", desc: "Virtual experience program simulating real project work the Accenture way.", img: "/certificates/cert-01.jpg", pdf: "/certificates/cert-01.pdf" },
   { id: "cert-02", label: "Machine Learning Workshop", sub: "Techkriti · IIT Kanpur", desc: "Hands-on machine learning workshop at Techkriti, IIT Kanpur's annual tech festival.", img: "/certificates/cert-02.jpg", pdf: "/certificates/cert-02.pdf" },
@@ -27,7 +29,7 @@ const CERTS: Cert[] = [
 const DiscFace = ({ cert }: { cert: Cert }) => (
   <>
     <img
-      src={cert.img}
+      src={`${PUB}${cert.img}`}
       alt={cert.label}
       className="h-full w-full rounded-full object-cover"
       onError={(e) => {
@@ -177,13 +179,13 @@ export const Certificates = () => {
                 <p className="mt-1 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{active.sub}</p>
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{active.desc}</p>
                 <img
-                  src={active.img}
+                  src={`${PUB}${active.img}`}
                   alt={active.label}
                   className="mt-6 max-h-56 w-full rounded-xl border border-foreground/10 object-contain"
                   data-testid="cert-player-image"
                 />
                 <a
-                  href={active.pdf}
+                  href={`${PUB}${active.pdf}`}
                   target="_blank"
                   rel="noreferrer"
                   data-testid="cert-player-pdf-link"

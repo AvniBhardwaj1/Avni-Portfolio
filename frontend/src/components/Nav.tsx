@@ -49,7 +49,7 @@ export const Nav = ({ onOpenTerminal }: { onOpenTerminal: () => void }) => {
             <TerminalSquare className="h-4 w-4" />
           </button>
           <a
-            href="/Avni_Bhardwaj_Resume.pdf"
+            href={`${process.env.PUBLIC_URL ?? ""}/Avni_Bhardwaj_Resume.pdf`}
             download
             onClick={() => track("resume_download")}
             data-testid="resume-download-button"

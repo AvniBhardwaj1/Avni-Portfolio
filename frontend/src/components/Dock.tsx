@@ -15,7 +15,7 @@ export const Dock = ({ onOpenTerminal }: { onOpenTerminal: () => void }) => {
     { id: "github", label: "GitHub", Icon: Github, href: "https://github.com/avnibhardwaj1" },
     { id: "linkedin", label: "LinkedIn", Icon: Linkedin, href: "https://www.linkedin.com/in/avni-bhardwaj10/" },
     { id: "email", label: "Email", Icon: Mail, href: "mailto:avnibhardwaj01.ab@gmail.com" },
-    { id: "resume", label: "Résumé", Icon: Download, href: "/Avni_Bhardwaj_Resume.pdf" },
+    { id: "resume", label: "Résumé", Icon: Download, href: `${process.env.PUBLIC_URL ?? ""}/Avni_Bhardwaj_Resume.pdf` },
   ];
 
   const cls =

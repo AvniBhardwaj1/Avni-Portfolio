@@ -243,7 +243,7 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
       return push({ kind: "sys", text: "theme flipped. the terminal stays dark — terminals don't do beige." });
     }
     if (name === "resume") {
-      window.open("/Avni_Bhardwaj_Resume.pdf", "_blank", "noreferrer");
+      window.open(`${process.env.PUBLIC_URL ?? ""}/Avni_Bhardwaj_Resume.pdf`, "_blank", "noreferrer");
       track("resume_download", { source: "terminal" });
       return push({ kind: "sys", text: "résumé downloading…" });
     }

@@ -103,6 +103,13 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 - Now card: NowCard.tsx in Contact — pulsing LIVE badge, ticking IST clock, editable STATUS lines (Building FP-BOT @ Airbus, Listening lo-fi), Indore weather via keyless Open-Meteo (graceful "—" fallback).
 - Test report: /app/test_reports/iteration_1.json — 100% pass backend+frontend. Regression test added: /app/backend/tests/test_github_contributions.py.
 
+## v16 (2026-08-15) — Free hybrid deployment prep (GitHub Pages + Render + Atlas)
+- All hardcoded public asset paths converted to `${process.env.PUBLIC_URL}` prefixes (certificates img/pdf usage sites, portrait, a380.glb, mediapipe wasm, resume links in Nav/Dock/Contact/Terminal). Dev + Emergent unaffected (PUBLIC_URL empty outside the GH workflow).
+- Stats route now also reachable via `#stats` hash (GH Pages has no SPA fallback for /stats).
+- Added: .github/workflows/deploy.yml (yarn build with PUBLIC_URL=/Avni-Portfolio + REACT_APP_BACKEND_URL repo variable → actions/deploy-pages), render.yaml (free blueprint: rootDir backend, uvicorn server:app --port $PORT, healthCheck /api/), backend/.env.example, DEPLOY.md (full $0 step-by-step: Atlas M0 → Render blueprint with env vars → Pages via Actions).
+- Validated: production build with PUBLIC_URL=/Avni-Portfolio succeeds; built index.html correctly references /Avni-Portfolio/static/...; Emergent preview still compiles + 200. Deployment agent: pass (only WARN is .env gitignored — intended).
+- User-side steps remaining: Save to GitHub → Atlas M0 cluster → Render blueprint deploy with env vars from backend/.env → repo variable REACT_APP_BACKEND_URL=<render-url> → Settings→Pages→GitHub Actions.
+
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.
 2. Add chat history persistence + basic rate limiting.

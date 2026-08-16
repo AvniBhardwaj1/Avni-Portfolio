@@ -132,7 +132,9 @@ function Site() {
 }
 
 export default function App() {
-  const isStats = window.location.pathname === "/stats";
+  const isStats =
+    window.location.pathname.endsWith("/stats") ||
+    window.location.hash.replace("#", "").replace(/^\//, "") === "stats";
   return (
     <ThemeProvider>
       <MotionProvider>

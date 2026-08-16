@@ -33,7 +33,7 @@ const GROUP_IDS = [
 type Groups = Record<string, THREE.Group>;
 
 function A380({ onReady, reduced }: { onReady: (groups: Groups, fly: THREE.Group) => void; reduced: boolean }) {
-  const { scene } = useGLTF("/models/a380.glb");
+  const { scene } = useGLTF(`${process.env.PUBLIC_URL ?? ""}/models/a380.glb`);
   const flyRef = useRef<THREE.Group>(null);
   const doneRef = useRef(false);
 
@@ -146,7 +146,7 @@ function A380({ onReady, reduced }: { onReady: (groups: Groups, fly: THREE.Group
   return <group ref={flyRef} />;
 }
 
-useGLTF.preload("/models/a380.glb");
+useGLTF.preload(`${process.env.PUBLIC_URL ?? ""}/models/a380.glb`);
 
 export const AircraftAssembly = ({ dark }: { dark: boolean }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
