@@ -1,63 +1,70 @@
-# Free Deployment Guide — GitHub Pages + Render + MongoDB Atlas
+# Free Deployment Guide — Vercel + MongoDB Atlas
 
-Everything below is $0. No credit card needed for any step.
+Everything below is $0. **No credit card needed for anything.**
 
 ## Architecture
 
-- **Frontend (static)** → GitHub Pages at `https://avnibhardwaj1.github.io/Avni-Portfolio/`
-- **Backend (FastAPI)** → Render free web service
+- **Frontend + Backend (FastAPI) + Cron** → Vercel free Hobby plan, one project, one URL like `https://avni-portfolio.vercel.app`
 - **Database** → MongoDB Atlas M0 (free forever, 512 MB)
+
+The backend runs as a Vercel Python serverless function (`/api/index.py` reuses `backend/server.py`). The weekly digest email runs via Vercel Cron (daily 09:00 IST check, sends Mondays only).
 
 ---
 
-## Step 1 — Push this code to GitHub
+## Step 1 — MongoDB Atlas (free database)
+
+1. https://cloud.mongodb.com → sign up free
+2. Create an **M0 FREE** cluster (AWS, Mumbai region is fine)
+3. Database Access → Add Database User → save the username + password
+4. Network Access → **Allow Access from Anywhere** (`0.0.0.0/0`) — required so Vercel can reach it
+5. Connect → **Drivers** → Python → copy the connection string:
+   `mongodb+srv://<user>:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority`
+   (replace `<password>` with the database user's password)
+
+## Step 2 — Push this code to GitHub
 
 Use **"Save to GitHub"** in the Emergent chat input → select repo `avnibhardwaj1/Avni-Portfolio` → branch `main` → PUSH.
 
-(`.env` files are gitignored — your secrets never leave this workspace.)
+(`.env` files are gitignored — secrets never leave this workspace.)
 
-## Step 2 — MongoDB Atlas (free database)
+## Step 3 — Vercel (free hosting for everything)
 
-1. Go to https://cloud.mongodb.com → sign up free
-2. Create an **M0 FREE** cluster (any region near you)
-3. Database Access → Add Database User → username + password (save these)
-4. Network Access → Add IP Address → **Allow Access from Anywhere** (`0.0.0.0/0`) — required so Render can reach it
-5. Clusters → Connect → Drivers → copy the connection string, looks like:
-   `mongodb+srv://<user>:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority`
+1. https://vercel.com → sign up **with GitHub** (free, no card)
+2. **Add New → Project** → import `Avni-Portfolio`
+3. Leave **Root Directory** as the repo root (the included `vercel.json` handles the frontend build + API)
+4. Before deploying, open **Environment Variables** and add:
 
-## Step 3 — Render (free backend)
+   | Name | Value |
+   |---|---|
+   | `MONGO_URL` | your Atlas connection string from Step 1 |
+   | `DB_NAME` | `avni_portfolio` |
+   | `EMERGENT_LLM_KEY` | from `backend/.env` in your Emergent workspace |
+   | `EMERGENT_EMAIL_KEY` | from `backend/.env` |
+   | `STATS_TOKEN` | from `backend/.env` |
+   | `DIGEST_EMAIL` | from `backend/.env` (where the weekly digest goes) |
+   | `EMAIL_FROM_NAME` | from `backend/.env` |
+   | `EMAIL_REPLY_TO` | from `backend/.env` |
+   | `SITE_URL` | `https://<your-project>.vercel.app` |
+   | `CORS_ORIGINS` | `https://<your-project>.vercel.app` |
+   | `CRON_SECRET` | make up a long random string (protects the cron endpoint) |
 
-1. Go to https://render.com → sign up with GitHub (free)
-2. New → **Blueprint** → select the `Avni-Portfolio` repo (it reads `render.yaml` automatically)
-3. When prompted, fill in the environment variables:
-   - `MONGO_URL` — your Atlas connection string from Step 2
-   - `DB_NAME` — any name, e.g. `avni_portfolio`
-   - `CORS_ORIGINS` — `https://avnibhardwaj1.github.io`
-   - `EMERGENT_LLM_KEY`, `EMERGENT_EMAIL_KEY`, `STATS_TOKEN`, `DIGEST_EMAIL`, `EMAIL_FROM_NAME`, `EMAIL_REPLY_TO` — copy the values from `backend/.env` in your Emergent workspace (or reuse your own keys)
-   - `SITE_URL` — `https://avnibhardwaj1.github.io/Avni-Portfolio/`
-4. Deploy. When live, Render gives you a URL like `https://avni-portfolio-api.onrender.com`
-5. Verify: open `https://<your-render-url>/api/` — you should get a JSON response
+   You do NOT need `REACT_APP_BACKEND_URL` — frontend and API share the same origin on Vercel.
 
-> Free-tier note: Render free services sleep after ~15 min idle. First visit after sleep takes ~30-60s to wake — normal, not a bug. The weekly digest email still runs on its schedule.
+5. **Deploy**. ~2-3 minutes later your site is live.
 
-## Step 4 — GitHub Pages (free frontend)
+## Step 4 — Verify the live site
 
-1. In the repo on GitHub → **Settings → Secrets and variables → Actions → Variables** tab → New repository variable:
-   - Name: `REACT_APP_BACKEND_URL`
-   - Value: `https://<your-render-url>` (no trailing slash)
-2. **Settings → Pages** → Source: **GitHub Actions**
-3. Push any commit to `main` (or Actions tab → "Deploy frontend to GitHub Pages" → Run workflow)
-4. Wait ~2 min → your site is live at https://avnibhardwaj1.github.io/Avni-Portfolio/
-
-## Step 5 — Done. Verify the live site
-
-- Hero loads, A380 assembles on scroll
-- Chat widget answers (needs `EMERGENT_LLM_KEY` set on Render)
-- Skills section shows the GitHub heatmap (proxied through your Render backend)
-- Stats dashboard: `https://avnibhardwaj1.github.io/Avni-Portfolio/#stats` (GitHub Pages has no SPA fallback for `/stats` — the `#stats` hash works instead)
+- `https://<your-project>.vercel.app` — hero, A380, vinyls, everything
+- `https://<your-project>.vercel.app/api/` — should return a JSON "Hello World"
+- Chat widget answers (needs `EMERGENT_LLM_KEY`)
+- Skills section shows the live GitHub heatmap
+- Stats dashboard: `https://<your-project>.vercel.app/stats`
 
 ## Notes
 
-- Your Emergent preview keeps working exactly as before — the subpath changes only activate when `PUBLIC_URL` is set (the GitHub workflow sets it).
-- If the chat or heatmap shows errors on the live site but works on Emergent preview, check Render logs first — it's almost always a missing env var or Atlas network access.
-- To update the site later: make changes here, "Save to GitHub", and both deployments update automatically (GitHub rebuilds Pages, Render auto-deploys on push if you keep auto-deploy on).
+- Your Emergent preview keeps working exactly as before — nothing here affects it.
+- Every push to `main` auto-redeploys on Vercel. No GitHub Actions needed.
+- Serverless means the first API call after idle can take a few seconds (cold start) — normal on the free plan.
+- The weekly digest email still goes out Mondays 09:00 IST via Vercel Cron.
+- If the Vercel build log shows a Python dependency error, check the function logs under your project → Deployments → Functions.
+- Optional later: add a custom domain in Vercel → Settings → Domains (free).

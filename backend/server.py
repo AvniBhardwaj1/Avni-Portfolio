@@ -14,7 +14,7 @@ from zoneinfo import ZoneInfo
 import httpx
 from dotenv import load_dotenv
 from emergentintegrations.llm.chat import LlmChat, StreamDone, TextDelta, UserMessage
-from fastapi import APIRouter, FastAPI, Header, HTTPException
+from fastapi import APIRouter, FastAPI, Header, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, ConfigDict, Field
@@ -362,6 +362,31 @@ async def trigger_weekly_email(x_stats_token: str = Header(default="")):
     email_id = await send_weekly_digest()
     return {"status": "sent", "email_id": email_id}
 
+
+# Vercel Cron hits this daily at 09:00 IST (03:30 UTC) — sends only on Mondays,
+# once per week (marker in db.settings). On Emergent the asyncio loop handles it.
+@api_router.get("/cron/weekly-digest")
+async def cron_weekly_digest(request: Request, x_stats_token: str = Header(default="")):
+    auth = request.headers.get("authorization", "")
+    cron_secret = os.environ.get("CRON_SECRET", "")
+    cron_ok = bool(cron_secret) and auth == f"Bearer {cron_secret}"
+    token_ok = bool(x_stats_token) and x_stats_token == os.environ.get("STATS_TOKEN")
+    if not (cron_ok or token_ok):
+        raise HTTPException(status_code=401, detail="unauthorized")
+    now = datetime.now(ZoneInfo("Asia/Kolkata"))
+    if now.weekday() != 0:
+        return {"status": "skipped", "reason": "not Monday"}
+    week = now.strftime("%G-W%V")
+    marker = await db.settings.find_one({"key": "weekly_digest"})
+    if marker and marker.get("week") == week:
+        return {"status": "skipped", "reason": "already sent this week"}
+    email_id = await send_weekly_digest()
+    if email_id:
+        await db.settings.update_one(
+            {"key": "weekly_digest"}, {"$set": {"week": week}}, upsert=True
+        )
+    return {"status": "sent", "email_id": email_id}
+
 # --- GitHub contributions proxy (12h in-memory cache) ---
 GITHUB_USER = "AvniBhardwaj1"
 _gh_cache: dict = {"ts": 0.0, "data": None}
@@ -450,7 +475,9 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("startup")
 async def start_background_tasks():
-    asyncio.create_task(_weekly_digest_loop())
+    # On Vercel (serverless) the weekly digest runs via Vercel Cron instead
+    if not os.environ.get("VERCEL"):
+        asyncio.create_task(_weekly_digest_loop())
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

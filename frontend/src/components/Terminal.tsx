@@ -6,7 +6,7 @@ import { useTheme } from "@/theme/ThemeContext";
 
 type Line = { kind: "cmd" | "out" | "sys"; text: string };
 
-const CHAT_API = `${process.env.REACT_APP_BACKEND_URL}/api/chat`;
+const CHAT_API = `${process.env.REACT_APP_BACKEND_URL ?? ""}/api/chat`;
 
 const getSessionId = () => {
   let id = localStorage.getItem("ab-chat-session");

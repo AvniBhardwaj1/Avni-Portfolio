@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { BarChart3, Lock, RefreshCw } from "lucide-react";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api/analytics`;
+const API = `${process.env.REACT_APP_BACKEND_URL ?? ""}/api/analytics`;
 
 type Stats = {
   visitors: number;

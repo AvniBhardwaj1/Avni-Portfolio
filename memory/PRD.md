@@ -110,6 +110,15 @@ Single-page developer portfolio (React, TypeScript, Tailwind, React Three Fiber,
 - Validated: production build with PUBLIC_URL=/Avni-Portfolio succeeds; built index.html correctly references /Avni-Portfolio/static/...; Emergent preview still compiles + 200. Deployment agent: pass (only WARN is .env gitignored — intended).
 - User-side steps remaining: Save to GitHub → Atlas M0 cluster → Render blueprint deploy with env vars from backend/.env → repo variable REACT_APP_BACKEND_URL=<render-url> → Settings→Pages→GitHub Actions.
 
+## v17 (2026-08-15) — Switched free deployment target: Vercel (user has no credit card; Render asked for one)
+- Whole project on Vercel Hobby ($0, no card): frontend static build + FastAPI as Python serverless function at /api/index.py (sys.path shim into backend/, reuses server.py app). Same-origin API — no CORS/backend-URL config needed.
+- vercel.json: buildCommand (cd frontend && yarn install --frozen-lockfile && yarn build), outputDirectory frontend/build, functions maxDuration 60s, rewrites (/api/(.*) → /api/index.py, catch-all → /index.html), crons (daily 03:30 UTC → /api/cron/weekly-digest).
+- Root requirements.txt = SLIM set for serverless (fastapi, motor, httpx, dotenv, pydantic, email-validator, tzdata, emergentintegrations via cloudfront index). Full backend/requirements.txt unchanged for Emergent.
+- server.py: new GET /api/cron/weekly-digest (Vercel CRON_SECRET bearer or x-stats-token; Monday-guard + weekly marker in db.settings — verified locally: "already sent this week"); startup asyncio digest loop skipped when VERCEL env present.
+- Frontend: REACT_APP_BACKEND_URL ?? "" fallback in ChatWidget, Terminal, analytics.ts, StatsPage, GitHubHeatmap (same-origin relative /api on Vercel; Emergent preview unaffected).
+- Deleted render.yaml + .github/workflows/deploy.yml (GH Pages path abandoned). DEPLOY.md rewritten for Vercel + Atlas. api/index.py import test: 14 routes OK; backend + frontend recompile clean.
+- User steps: push via Save to Github → import repo in Vercel → set env vars (MONGO_URL from Atlas M0, EMERGENT_*, STATS_TOKEN, CRON_SECRET, etc. per DEPLOY.md table) → deploy.
+
 ## Next Tasks
 1. Swap in final avatar model + social URLs from user.
 2. Add chat history persistence + basic rate limiting.

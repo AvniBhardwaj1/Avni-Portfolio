@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Github } from "lucide-react";
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = process.env.REACT_APP_BACKEND_URL ?? "";
 const WEEKS = 26; // ~6 months of activity
 
 type Day = { date: string; count: number; level: number };

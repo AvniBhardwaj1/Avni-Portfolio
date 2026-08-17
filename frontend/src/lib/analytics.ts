@@ -1,4 +1,4 @@
-const API = `${process.env.REACT_APP_BACKEND_URL}/api/analytics`;
+const API = `${process.env.REACT_APP_BACKEND_URL ?? ""}/api/analytics`;
 
 export const getAnalyticsSession = () => {
   let id = localStorage.getItem("ab-analytics-session");

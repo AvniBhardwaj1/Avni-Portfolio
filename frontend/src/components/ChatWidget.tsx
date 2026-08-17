@@ -8,7 +8,7 @@ import { track } from "@/lib/analytics";
 const INTRO =
   "I am Avni's digital clone. I handle the small talk so she can focus on writing Python and orchestrating Kubernetes clusters. What do you want to know?";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api/chat`;
+const API = `${process.env.REACT_APP_BACKEND_URL ?? ""}/api/chat`;
 
 const getSessionId = () => {
   let id = localStorage.getItem("ab-chat-session");
