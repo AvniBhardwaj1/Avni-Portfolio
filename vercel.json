@@ -2,13 +2,24 @@
   "buildCommand": "cd frontend && yarn install --frozen-lockfile && CI=false yarn build",
   "outputDirectory": "frontend/build",
   "functions": {
-    "api/index.py": { "maxDuration": 60 }
+    "api/index.py": {
+      "maxDuration": 60
+    }
   },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.py" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/frontend/build/index.html"
+    }
   ],
   "crons": [
-    { "path": "/api/cron/weekly-digest", "schedule": "30 3 * * *" }
+    {
+      "path": "/api/cron/weekly-digest",
+      "schedule": "30 3 * * *"
+    }
   ]
 }
