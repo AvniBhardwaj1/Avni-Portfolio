@@ -141,7 +141,7 @@ function A380({ onReady, reduced }: { onReady: (groups: Groups, fly: THREE.Group
     });
 
     onReady(cats, flyRef.current);
-  }, [scene, onReady]);
+  }, [scene, onReady, reduced]);
 
   return <group ref={flyRef} />;
 }
