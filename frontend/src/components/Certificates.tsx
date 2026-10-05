@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Award, ChevronLeft, ChevronRight, ExternalLink, X } from "lucide-react";
 import { Chapter } from "@/components/Chapter";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { track } from "@/lib/analytics";
 import { startCrackle, stopCrackle } from "@/lib/sounds";
 
@@ -46,6 +47,8 @@ const DiscFace = ({ cert }: { cert: Cert }) => (
 export const Certificates = () => {
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<Cert | null>(null);
+  const playerRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(Boolean(active), playerRef, () => setActive(null));
 
   useEffect(() => {
     if (active) startCrackle();
@@ -130,12 +133,18 @@ export const Certificates = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             data-testid="cert-player-overlay"
+            role="presentation"
             onClick={(e) => e.target === e.currentTarget && setActive(null)}
             className="fixed inset-0 z-[95] flex items-center justify-center bg-black/60 p-4 backdrop-blur-md"
           >
             <motion.div
+              ref={playerRef}
               exit={{ opacity: 0, scale: 0.12, rotate: 14, y: 160 }}
               transition={{ duration: 0.45, ease: [0.5, 0, 0.75, 0] }}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="cert-player-title"
+              tabIndex={-1}
               className="relative flex w-full max-w-4xl flex-col gap-8 rounded-3xl border border-foreground/10 bg-background/85 p-6 shadow-2xl backdrop-blur-xl md:flex-row md:items-center md:gap-12 md:p-10"
             >
               <button

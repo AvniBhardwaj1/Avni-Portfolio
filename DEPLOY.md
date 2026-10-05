@@ -30,6 +30,7 @@ and account requirements can change, so check the provider's current terms.
 | `STATS_TOKEN` | Yes | Long random secret used by `/stats` and manual digest trigger |
 | `CRON_SECRET` | Yes | Separate long random secret used by the Vercel scheduled digest |
 | `SITE_URL` | Yes | Your canonical HTTPS Vercel URL |
+| `REACT_APP_SITE_URL` | Recommended | The same production URL, used at build time for canonical, Open Graph, sitemap, and robots metadata |
 | `CORS_ORIGINS` | For cross-origin local/API use | Comma-separated allowed origins; set to your site origin |
 | `LLM_PROVIDER` | No | `mock` (default), `groq`, `gemini`, `openrouter`, `anthropic`, or `openai` |
 | `LLM_API_KEY` | For a real LLM | Key for the selected provider; never prefix it with `REACT_APP_` |
@@ -53,6 +54,10 @@ your Resend account. For SMTP, set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`,
 Vercel injects the cron authorization header from `CRON_SECRET`; the endpoint
 rejects requests without the matching bearer token. The configured schedule
 checks daily at 09:00 India time and sends only on Mondays.
+
+The build uses `VERCEL_PROJECT_PRODUCTION_URL` or `VERCEL_URL` for public SEO
+metadata unless `REACT_APP_SITE_URL` is set. Set that public (non-secret)
+variable explicitly if using a custom domain.
 
 Chat accepts at most 1,200 characters per message and 20 messages per request.
 The API uses the newest conversation context (up to 6,000 characters) and

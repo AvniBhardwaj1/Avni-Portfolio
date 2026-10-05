@@ -44,6 +44,7 @@ class FakeDatabase:
     def __init__(self):
         self.chat_rate_limits = FakeRateLimits()
         self.chat_messages = FakeChatMessages()
+        self.contact_submissions = FakeChatMessages()
 
 
 def make_request(ip="203.0.113.10"):
@@ -131,3 +132,45 @@ def test_failed_provider_returns_explicit_mock_fallback(monkeypatch):
         "user",
         "assistant",
     ]
+
+
+def test_contact_submission_is_validated_and_stored(monkeypatch):
+    server = load_server(monkeypatch)
+    fake_db = FakeDatabase()
+    monkeypatch.setattr(server, "db", fake_db)
+    monkeypatch.setattr(server, "_RATE_LIMIT_INDEX_READY", False)
+
+    async def submit():
+        return await server.submit_contact(
+            server.ContactSubmission(
+                name="Recruiter",
+                email="recruiter@example.com",
+                message="I would like to discuss a project.",
+            ),
+            make_request(),
+        )
+
+    response = asyncio.run(submit())
+
+    assert response == {"status": "received"}
+    assert len(fake_db.contact_submissions.documents) == 1
+    assert fake_db.contact_submissions.documents[0]["email"] == "recruiter@example.com"
+
+
+def test_contact_submission_rejects_invalid_email(monkeypatch):
+    server = load_server(monkeypatch)
+
+    async def submit():
+        return await server.submit_contact(
+            server.ContactSubmission(
+                name="Recruiter",
+                email="not-an-email",
+                message="I would like to discuss a project.",
+            ),
+            make_request(),
+        )
+
+    with pytest.raises(HTTPException) as exc:
+        asyncio.run(submit())
+
+    assert exc.value.status_code == 422

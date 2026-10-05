@@ -22,6 +22,7 @@ const HOVER_CLASS = "gesture-hover";
 
 export function useGestureScroll(lenisRef: { current: Lenis | null }) {
   const [status, setStatus] = useState<GestureStatus>("idle");
+  const generationRef = useRef(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const landmarkerRef = useRef<any>(null);
@@ -40,6 +41,7 @@ export function useGestureScroll(lenisRef: { current: Lenis | null }) {
   }, []);
 
   const disable = useCallback(() => {
+    generationRef.current += 1;
     cancelAnimationFrame(rafRef.current);
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
@@ -56,14 +58,26 @@ export function useGestureScroll(lenisRef: { current: Lenis | null }) {
 
   const enable = useCallback(async () => {
     if (status === "loading" || status === "active") return;
+    const generation = generationRef.current + 1;
+    generationRef.current = generation;
+    let stream: MediaStream | null = null;
+    let landmarker: any = null;
     setStatus("loading");
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      stream = await navigator.mediaDevices.getUserMedia({
         video: { width: 640, height: 480, facingMode: "user" },
       });
+      if (generation !== generationRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
       streamRef.current = stream;
 
       const vision = await import("@mediapipe/tasks-vision");
+      if (generation !== generationRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
       const fileset = await vision.FilesetResolver.forVisionTasks(
         `${process.env.PUBLIC_URL ?? ""}/mediapipe/wasm`,
       );
@@ -73,21 +87,26 @@ export function useGestureScroll(lenisRef: { current: Lenis | null }) {
         numHands: 1,
       });
       try {
-        landmarkerRef.current = await vision.HandLandmarker.createFromOptions(
-          fileset,
-          options("GPU"),
-        );
+        landmarker = await vision.HandLandmarker.createFromOptions(fileset, options("GPU"));
       } catch {
-        landmarkerRef.current = await vision.HandLandmarker.createFromOptions(
-          fileset,
-          options("CPU"),
-        );
+        if (generation !== generationRef.current) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+        landmarker = await vision.HandLandmarker.createFromOptions(fileset, options("CPU"));
       }
+      if (generation !== generationRef.current) {
+        landmarker.close();
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+      landmarkerRef.current = landmarker;
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       }
+      if (generation !== generationRef.current) return;
       setStatus("active");
       track("gesture_optin");
 
@@ -167,9 +186,14 @@ export function useGestureScroll(lenisRef: { current: Lenis | null }) {
       };
       rafRef.current = requestAnimationFrame(loop);
     } catch (err: any) {
-      streamRef.current?.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
-      setStatus(err?.name === "NotAllowedError" ? "denied" : "error");
+      landmarker?.close?.();
+      stream?.getTracks().forEach((track) => track.stop());
+      if (generation === generationRef.current) {
+        streamRef.current = null;
+        landmarkerRef.current = null;
+        if (videoRef.current) videoRef.current.srcObject = null;
+        setStatus(err?.name === "NotAllowedError" ? "denied" : "error");
+      }
     }
   }, [status, lenisRef, setHoverEl]);
 

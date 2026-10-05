@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { TerminalSquare, X } from "lucide-react";
 import { track } from "@/lib/analytics";
 import { useTheme } from "@/theme/ThemeContext";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 
 type Line = { kind: "cmd" | "out" | "sys"; text: string };
 
@@ -112,26 +113,21 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<{ target: number; tries: number } | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const { toggle } = useTheme();
+  useDialogFocus(open, dialogRef, onClose);
 
   useEffect(() => {
     if (open) {
       setLines(BANNER);
       track("terminal_open");
-      setTimeout(() => inputRef.current?.focus(), 350);
+      inputRef.current?.focus();
     }
   }, [open]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
   }, [lines]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
 
   const push = (...newLines: Line[]) => setLines((prev) => [...prev, ...newLines]);
 
@@ -303,15 +299,21 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
           data-testid="terminal-overlay"
+          role="presentation"
           onClick={(e) => e.target === e.currentTarget && onClose()}
         >
           <motion.div
+            ref={dialogRef}
             initial={{ opacity: 0, y: 30, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.97 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
             className="flex h-[min(80vh,560px)] w-[min(94vw,760px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0a0f14] shadow-2xl"
             onClick={() => inputRef.current?.focus()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Interactive portfolio terminal"
+            tabIndex={-1}
           >
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
               <div className="flex items-center gap-2">
@@ -355,6 +357,7 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={onKeyDown}
                   data-testid="terminal-input"
+                  aria-label="Terminal command input"
                   spellCheck={false}
                   autoComplete="off"
                   className="flex-1 bg-transparent font-mono text-[13px] text-white caret-cyan-300 outline-none"

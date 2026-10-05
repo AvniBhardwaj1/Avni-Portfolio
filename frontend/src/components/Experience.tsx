@@ -1,10 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Github, X } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Chapter } from "@/components/Chapter";
-import { AircraftAssembly } from "@/components/AircraftAssembly";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useTheme } from "@/theme/ThemeContext";
 import { track } from "@/lib/analytics";
 
@@ -265,6 +265,63 @@ const PROJECTS: Project[] = [
 
 const INDEX_COLORS = ["text-accent", "text-accent2", "text-accent3"];
 
+const AircraftAssembly = lazy(() =>
+  import("@/components/AircraftAssembly").then((module) => ({
+    default: module.AircraftAssembly,
+  })),
+);
+
+const DeferredAircraft = ({ dark }: { dark: boolean }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    if (!("IntersectionObserver" in window)) {
+      setShouldLoad(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setShouldLoad(true);
+        observer.disconnect();
+      },
+      { rootMargin: "500px 0px" },
+    );
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={containerRef} data-testid="aircraft-lazy-container">
+      {shouldLoad ? (
+        <Suspense
+          fallback={
+            <div
+              className="flex min-h-[70vh] items-center justify-center font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground"
+              data-testid="aircraft-loading"
+              aria-busy="true"
+            >
+              Loading Airbus visualization
+            </div>
+          }
+        >
+          <AircraftAssembly dark={dark} />
+        </Suspense>
+      ) : (
+        <div
+          className="min-h-[70vh]"
+          data-testid="aircraft-loading"
+          aria-busy="true"
+          aria-label="Airbus visualization loads when this section is near"
+        />
+      )}
+    </div>
+  );
+};
+
 const Card = ({
   project,
   i,
@@ -282,7 +339,16 @@ const Card = ({
     transition={{ duration: 0.85, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
     style={{ transformPerspective: 1000 }}
     data-testid={`project-card-${project.id}`}
+    role="button"
+    tabIndex={0}
+    aria-label={`Open ${project.title} project details`}
     onClick={() => {
+      track("card_click", { id: project.id, title: project.title });
+      onOpen(project);
+    }}
+    onKeyDown={(event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
       track("card_click", { id: project.id, title: project.title });
       onOpen(project);
     }}
@@ -355,11 +421,8 @@ const ProjectOverlay = ({
   i: number;
   onClose: () => void;
 }) => {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(true, dialogRef, onClose);
 
   return (
     <motion.div
@@ -368,13 +431,19 @@ const ProjectOverlay = ({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
       data-testid="project-overlay"
+      role="presentation"
       className="fixed inset-0 z-[70] flex items-center justify-center bg-background/70 p-4 backdrop-blur-md md:p-8"
       onClick={onClose}
     >
       <motion.div
+        ref={dialogRef}
         layoutId={`project-card-${project.id}`}
         transition={{ type: "spring", stiffness: 220, damping: 26 }}
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="project-overlay-title"
+        tabIndex={-1}
         className="flex max-h-[85vh] w-full max-w-3xl flex-col gap-6 overflow-y-auto rounded-2xl border border-accent/30 bg-background/95 p-8 shadow-[0_50px_120px_-30px_hsl(var(--foreground)/0.4)] backdrop-blur-2xl md:p-10"
       >
         <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
@@ -390,7 +459,7 @@ const ProjectOverlay = ({
         </div>
 
         <div>
-          <h3 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
+          <h3 id="project-overlay-title" className="font-display text-3xl font-bold tracking-tight md:text-4xl">
             {project.title}
           </h3>
           <p className="mt-2 font-mono text-xs uppercase tracking-[0.2em] text-accent">
@@ -518,7 +587,7 @@ export const Experience = () => {
       {tab === "industry" ? (
         <div data-testid="industry-panel">
           <div className="-mx-6 md:-mx-16 lg:-mx-24">
-            <AircraftAssembly dark={dark} />
+            <DeferredAircraft dark={dark} />
           </div>
           <div className="mt-16 max-w-4xl">
             <Card project={AIRBUS} i={0} onOpen={openProject} />

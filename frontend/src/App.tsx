@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -10,7 +10,6 @@ import { setLenis } from "@/lib/scroll";
 import { initAudioOnGesture } from "@/lib/sounds";
 import { initAnalytics } from "@/lib/analytics";
 import { useGestureScroll } from "@/hooks/useGestureScroll";
-import { Scene3D } from "@/components/Scene3D";
 import { Cursor } from "@/components/Cursor";
 import { MeshGradient } from "@/components/MeshGradient";
 import { Nav } from "@/components/Nav";
@@ -30,11 +29,25 @@ import StatsPage from "@/pages/StatsPage";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const Scene3D = lazy(() =>
+  import("@/components/Scene3D").then((module) => ({ default: module.Scene3D })),
+);
+
 function Site() {
   const lenisRef = useRef<Lenis | null>(null);
   const gesture = useGestureScroll(lenisRef);
   const { reduced } = useMotion();
   const [terminalOpen, setTerminalOpen] = useState(false);
+  const [sceneReady, setSceneReady] = useState(false);
+
+  useEffect(() => {
+    if (reduced) {
+      setSceneReady(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setSceneReady(true), 1200);
+    return () => window.clearTimeout(timer);
+  }, [reduced]);
 
   useEffect(() => {
     initAudioOnGesture();
@@ -69,10 +82,21 @@ function Site() {
   return (
     <MotionConfig reducedMotion={reduced ? "always" : "never"}>
     <div className="min-h-screen bg-background font-body text-foreground">
+      <a
+        href="#main-content"
+        data-testid="skip-link"
+        className="sr-only fixed left-4 top-4 z-[110] rounded-lg bg-accent px-4 py-3 font-mono text-xs uppercase text-accent-foreground focus:not-sr-only"
+      >
+        Skip to main content
+      </a>
       <MeshGradient />
-      <Scene3D />
+      {!reduced && sceneReady && (
+        <Suspense fallback={null}>
+          <Scene3D />
+        </Suspense>
+      )}
       <Nav onOpenTerminal={() => setTerminalOpen(true)} />
-      <main className="relative z-10">
+      <main id="main-content" className="relative z-10" data-testid="main-content">
         <Hero gesture={gesture} />
         <Marquee />
         <Experience />

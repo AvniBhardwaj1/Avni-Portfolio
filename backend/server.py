@@ -99,6 +99,11 @@ class ChatRequest(BaseModel):
     messages: list[ChatMessage] = Field(min_length=1, max_length=20)
     sessionId: str = Field(default="default", max_length=64, pattern=r"^[A-Za-z0-9._:-]+$")
 
+class ContactSubmission(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    email: str = Field(min_length=3, max_length=254)
+    message: str = Field(min_length=10, max_length=3000)
+
 PROFILE_DATA = json.loads((ROOT_DIR / "profile.json").read_text(encoding="utf-8"))
 CHAT_PROFILE_DATA = {key: value for key, value in PROFILE_DATA.items() if key != "gaps"}
 AVNI_SYSTEM_PROMPT = f"""You are the portfolio assistant for Avni Bhardwaj. Refer to Avni in third person. Be warm, concise, and professional; mild humor is welcome.
@@ -114,7 +119,12 @@ _CHAT_RATE_LIMIT = 20
 _CHAT_RATE_WINDOW_SECONDS = 60
 
 
-async def _enforce_chat_rate_limit(request: Request) -> None:
+async def _increment_ip_bucket(
+    request: Request,
+    *,
+    scope: str,
+    window_seconds: int,
+) -> tuple[int, int]:
     global _RATE_LIMIT_INDEX_READY
     forwarded_for = request.headers.get("x-forwarded-for", "")
     candidate_ip = forwarded_for.split(",", 1)[0].strip() if forwarded_for else ""
@@ -131,20 +141,20 @@ async def _enforce_chat_rate_limit(request: Request) -> None:
             _RATE_LIMIT_INDEX_READY = True
 
     now = time.time()
-    window = int(now // _CHAT_RATE_WINDOW_SECONDS)
+    window = int(now // window_seconds)
     ip_digest = hmac.new(
         hashlib.sha256(mongo_url.encode()).digest(),
         client_ip.encode(),
         hashlib.sha256,
     ).hexdigest()
-    bucket_id = f"{ip_digest}:{window}"
+    bucket_id = f"{scope}:{ip_digest}:{window}"
     bucket = await db.chat_rate_limits.find_one_and_update(
         {"_id": bucket_id},
         {
             "$inc": {"count": 1},
             "$setOnInsert": {
                 "expiresAt": datetime.fromtimestamp(
-                    (window + 2) * _CHAT_RATE_WINDOW_SECONDS,
+                    (window + 2) * window_seconds,
                     tz=timezone.utc,
                 )
             },
@@ -153,9 +163,18 @@ async def _enforce_chat_rate_limit(request: Request) -> None:
         return_document=ReturnDocument.AFTER,
     )
     if not bucket:
-        raise HTTPException(status_code=503, detail="Chat rate limiter is unavailable")
-    if bucket["count"] > _CHAT_RATE_LIMIT:
-        retry_after = _CHAT_RATE_WINDOW_SECONDS - int(now % _CHAT_RATE_WINDOW_SECONDS)
+        raise HTTPException(status_code=503, detail="Request rate limiter is unavailable")
+    retry_after = window_seconds - int(now % window_seconds)
+    return bucket["count"], retry_after
+
+
+async def _enforce_chat_rate_limit(request: Request) -> None:
+    count, retry_after = await _increment_ip_bucket(
+        request,
+        scope="chat",
+        window_seconds=_CHAT_RATE_WINDOW_SECONDS,
+    )
+    if count > _CHAT_RATE_LIMIT:
         raise HTTPException(
             status_code=429,
             detail="Chat limit reached; please try again shortly",
@@ -223,6 +242,40 @@ async def chat_history(sessionId: str = "default"):
             for i, d in enumerate(docs)
         ]
     }
+
+@api_router.post("/contact")
+async def submit_contact(input: ContactSubmission, request: Request):
+    name = input.name.strip()
+    email = input.email.strip()
+    message = input.message.strip()
+    if not name or len(name) > 100:
+        raise HTTPException(status_code=422, detail="Enter a name up to 100 characters")
+    if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", email):
+        raise HTTPException(status_code=422, detail="Enter a valid email address")
+    if len(message) < 10 or len(message) > 3000:
+        raise HTTPException(status_code=422, detail="Message must be 10 to 3000 characters")
+
+    count, retry_after = await _increment_ip_bucket(
+        request,
+        scope="contact",
+        window_seconds=3600,
+    )
+    if count > 5:
+        raise HTTPException(
+            status_code=429,
+            detail="Contact form limit reached; please try again later",
+            headers={"Retry-After": str(retry_after)},
+        )
+
+    await db.contact_submissions.insert_one(
+        {
+            "name": name,
+            "email": email,
+            "message": message,
+            "createdAt": datetime.now(timezone.utc).isoformat(),
+        }
+    )
+    return {"status": "received"}
 
 class AnalyticsEvent(BaseModel):
     sessionId: str

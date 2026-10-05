@@ -1,3 +1,5 @@
+import { useState } from "react";
+import type { FormEvent } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowUpRight,
@@ -30,6 +32,137 @@ const QUOTES = [
   "It works on my machine.",
   "Turning caffeine into scalable architecture.",
 ];
+
+const CONTACT_API = `${process.env.REACT_APP_BACKEND_URL ?? ""}/api/contact`;
+
+const ContactForm = () => {
+  const [sending, setSending] = useState(false);
+  const [status, setStatus] = useState("");
+  const [error, setError] = useState("");
+
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSending(true);
+    setStatus("");
+    setError("");
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    try {
+      const response = await fetch(CONTACT_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.get("name"),
+          email: data.get("email"),
+          message: data.get("message"),
+        }),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(
+          typeof body?.detail === "string"
+            ? body.detail
+            : "The message could not be sent. Please try again.",
+        );
+      }
+      form.reset();
+      setStatus("Thanks — your message has been sent to Avni.");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "The message could not be sent. Please try again.",
+      );
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <form
+      onSubmit={submit}
+      data-testid="contact-form"
+      aria-busy={sending}
+      className="mt-12 grid max-w-3xl grid-cols-1 gap-5 rounded-3xl border border-foreground/10 bg-background/60 p-6 backdrop-blur-xl md:grid-cols-2 md:p-8"
+    >
+      <h4 className="font-display text-2xl font-bold tracking-tight md:col-span-2">
+        Send a message<span className="text-accent">.</span>
+      </h4>
+      <div className="flex flex-col gap-2">
+        <label htmlFor="contact-name" className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          Your name
+        </label>
+        <input
+          id="contact-name"
+          name="name"
+          data-testid="contact-name-input"
+          autoComplete="name"
+          maxLength={100}
+          required
+          className="min-h-12 rounded-xl border border-foreground/15 bg-background/75 px-4 text-sm outline-none transition-colors focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <label htmlFor="contact-email" className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          Your email
+        </label>
+        <input
+          id="contact-email"
+          name="email"
+          type="email"
+          data-testid="contact-email-input"
+          autoComplete="email"
+          maxLength={254}
+          required
+          className="min-h-12 rounded-xl border border-foreground/15 bg-background/75 px-4 text-sm outline-none transition-colors focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
+        />
+      </div>
+      <div className="flex flex-col gap-2 md:col-span-2">
+        <label htmlFor="contact-message" className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          Message
+        </label>
+        <textarea
+          id="contact-message"
+          name="message"
+          data-testid="contact-message-input"
+          minLength={10}
+          maxLength={3000}
+          rows={5}
+          required
+          className="resize-y rounded-xl border border-foreground/15 bg-background/75 px-4 py-3 text-sm outline-none transition-colors focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
+        />
+      </div>
+      <p
+        id="contact-form-privacy"
+        data-testid="contact-form-privacy"
+        className="text-xs leading-relaxed text-muted-foreground md:col-span-2"
+      >
+        Your message and reply email are stored in MongoDB so Avni can follow up. Please don’t include sensitive information.
+      </p>
+      <div className="flex flex-wrap items-center gap-4 md:col-span-2">
+        <button
+          type="submit"
+          data-testid="contact-submit-button"
+          aria-describedby="contact-form-privacy"
+          disabled={sending}
+          className="rounded-full bg-accent px-6 py-3 font-mono text-xs uppercase tracking-[0.15em] text-accent-foreground transition-colors hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
+        >
+          {sending ? "Sending…" : "Send message"}
+        </button>
+        {status && (
+          <p role="status" aria-live="polite" data-testid="contact-form-status" className="text-sm text-accent">
+            {status}
+          </p>
+        )}
+        {error && (
+          <p role="alert" data-testid="contact-form-error" className="text-sm text-destructive">
+            {error}
+          </p>
+        )}
+      </div>
+    </form>
+  );
+};
 
 const QuoteRow = ({ hidden }: { hidden?: boolean }) => (
   <div className="flex shrink-0 items-center" aria-hidden={hidden}>
@@ -101,6 +234,8 @@ export const Contact = () => (
       Interested in a collaboration, internship, or product-focused project? I’m always
       open to new ideas and new teams. Reach out and let’s build something meaningful.
     </motion.p>
+
+    <ContactForm />
 
     <NowCard />
 
