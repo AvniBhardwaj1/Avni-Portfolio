@@ -1,0 +1,177 @@
+{
+  "name": "Avni Bhardwaj",
+  "bio": [
+    "B.Tech Computer Engineering at NMIMS Indore (2022-2026), CGPA 3.37/4.0.",
+    "Based in Indore, Madhya Pradesh. Works across data engineering, cloud, AI/ML, backend software, and embedded systems.",
+    "Open to collaborations, internships, and product-focused projects.",
+    "Languages: English, Hindi, and Korean (I)."
+  ],
+  "education": [
+    {
+      "qualification": "B.Tech Computer Engineering",
+      "institution": "Narsee Monjee Institute of Management Studies (NMIMS), Indore",
+      "period": "2022-2026",
+      "cgpa": "3.37/4.0"
+    }
+  ],
+  "experience": [
+    {
+      "role": "Flight Physics Capabilities Intern",
+      "organization": "Airbus",
+      "location": "Bangalore",
+      "period": "January-July 2026",
+      "work": [
+        "Architected FP-BOT, a Dockerized retrieval-augmented generation pipeline using LlamaIndex, vLLM, and Qdrant to index documentation from 30+ tools, deployed through Jenkins CI/CD and queried through FastAPI.",
+        "Built AirSimuPy, a Python and PySide6 simulation platform using NetworkX and NumPy to execute block-diagram data pipelines with a Hybrid Compiled Architecture, reducing team reliance on MATLAB Simulink.",
+        "Validated a Python-based Sorting Tool against legacy Fortran solvers."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Autonomous AI Research Agent (Briefing-Bot)",
+      "description": "Uses Pydantic AI and Gemini to filter 100+ daily articles from 5+ feeds into high-signal digests; the portfolio describes 5+ hours saved per week, GitHub Actions scheduling, zero infrastructure cost, and a Pydantic-schema backend.",
+      "url": "https://github.com/AvniBhardwaj1/Briefing-Bot-Automation",
+      "skills": ["Python", "Pydantic AI", "Gemini", "GitHub Actions"]
+    },
+    {
+      "name": "Personalized AI Financial Advisor",
+      "description": "Uses 70k+ Finance-Alpaca/FiQA records, a fine-tuned Llama-3 8B model with Unsloth/PyTorch, LangChain ReAct agentic RAG with live yfinance data, and a Streamlit UI.",
+      "url": "https://github.com/AvniBhardwaj1/personal-finance-assistant",
+      "skills": ["Llama-3", "Unsloth", "PyTorch", "LangChain", "Streamlit"]
+    },
+    {
+      "name": "MapMyNotes",
+      "description": "Turns notes, PDFs, and slides into interactive D3.js mind maps with Gemini explanations, flashcards, and quizzes.",
+      "url": "https://github.com/AvniBhardwaj1/MapMyNotes",
+      "skills": ["Gemini", "D3.js", "Streamlit", "PyMuPDF"]
+    },
+    {
+      "name": "Job Hunt Automation",
+      "description": "Reads public Greenhouse, Lever, and Ashby ATS APIs, prefilters postings, scores resumes with an LLM, drafts application kits, and sends a daily email digest.",
+      "url": "https://github.com/AvniBhardwaj1/Job_search_automation",
+      "skills": ["Python", "LLMs", "ATS APIs", "pytest"]
+    },
+    {
+      "name": "Weather MCP Server",
+      "description": "Normalizes OpenWeatherMap responses, uses TTL/Redis caching, and includes Jest tests and a demo UI.",
+      "url": "https://github.com/AvniBhardwaj1/weather-mcp-server",
+      "skills": ["Node.js", "REST", "Redis", "Jest"]
+    },
+    {
+      "name": "Fake News Detection",
+      "description": "Uses TF-IDF and cosine similarity, with 89% accuracy and a Streamlit app.",
+      "url": "https://github.com/AvniBhardwaj1/MLPROJECT",
+      "skills": ["TF-IDF", "Cosine Similarity", "scikit-learn", "Streamlit"]
+    },
+    {
+      "name": "Deep Learning Research",
+      "description": "Confidential image-classification/diagnostics research under review for publication, using an ensemble of DenseNet201, SE-ResNet50, MobileNetV3-Large-100, and Xception."
+    },
+    {
+      "name": "IoT Actuator Control",
+      "description": "Arduino Uno and ESP8266 actuator-control project."
+    },
+    {
+      "name": "Speed Typing Game",
+      "description": "Vanilla JavaScript words-per-minute typing trainer.",
+      "url": "https://github.com/AvniBhardwaj1/speed-typing-game",
+      "skills": ["JavaScript", "HTML", "CSS"]
+    }
+  ],
+  "skills": {
+    "Data Engineering and Cloud": [
+      "AWS (S3, EC2, ECS, Aurora)",
+      "Google Cloud",
+      "Docker",
+      "Kubernetes",
+      "CI/CD",
+      "ETL pipeline design",
+      "Data modeling",
+      "Data warehousing",
+      "Kafka/Redpanda",
+      "Apache Flink",
+      "ClickHouse",
+      "Redis",
+      "MinIO",
+      "Grafana",
+      "MySQL",
+      "Qdrant"
+    ],
+    "AI and Machine Learning": [
+      "Generative AI",
+      "LLMs",
+      "Agentic AI",
+      "RAG",
+      "LangChain",
+      "LlamaIndex",
+      "Prompt engineering",
+      "NLP",
+      "Text classification",
+      "PyTorch",
+      "scikit-learn",
+      "NumPy",
+      "Pandas",
+      "Streamlit"
+    ],
+    "Backend": [
+      "Python",
+      "C++",
+      "SQL",
+      "FastAPI",
+      "REST",
+      "Microservices",
+      "Git",
+      "Unix",
+      "Multithreading"
+    ],
+    "Embedded and IoT": [
+      "ESP32",
+      "Embedded C",
+      "Sensor interfacing",
+      "GPIO",
+      "I2C",
+      "Blynk Cloud"
+    ]
+  },
+  "achievements": [
+    "AWS Academy Graduate - Cloud Architecting (2025).",
+    "Tableau Foundation Course - Intellipaat (2025).",
+    "National Finalist, Chaitanya leadership event, Atharv Ranbhoomi'24 at IIM Indore (top 10 of 1000+).",
+    "Google Developer Student Clubs (GDSC) Lead, 2023-24.",
+    "Techinnovation 6th Rank Winner at IIT Kanpur twice: CCTV analytics frontend (top 5 of 25,000) and environmental monitoring prototype.",
+    "Finalist, Kavach Hackathon (Government of India cybersecurity), 2023.",
+    "Organizing Committee, WittyHacks 4.0 at NMIMS Indore.",
+    "Top 10, Execute Hackathon (AI fashion try-on using TensorFlow and OpenCV).",
+    "Winner, GDSC Oracle Challenge 2023."
+  ],
+  "certifications": [
+    "Accenture Forage virtual experience.",
+    "Machine Learning Workshop, Techkriti, IIT Kanpur.",
+    "Robotics Workshop, Techkriti, IIT Kanpur.",
+    "Chaitanya Certificate of Merit (IIM Indore national finalist).",
+    "Community Service with MP Police.",
+    "Techkriti Innovation Challenge Certificate of Merit, IIT Kanpur.",
+    "Accenture iAspire 'Go for Gold' Gold level (January 2025).",
+    "Google DSC Lead Certificate of Completion (2023-24).",
+    "HitNext Challenge Certificate of Organisation, GDSC NMIMS Indore.",
+    "AWS Academy Cloud Architecting 60-hour training badge (November 2025, Credly verified).",
+    "Tableau Foundation Course - Intellipaat (2025).",
+    "Conference Paper Presenter, International Conference on Recent Paradigm in Computer Science and Engineering, STME NMIMS (2022).",
+    "ISC2 Certified in Cybersecurity CC course, Udemy (17.5 hours, 2025).",
+    "Oracle Challenge Winner (team TECH-TITANS).",
+    "Kavach 2023 Grand Finale (team NM_VISIONARYTITANS)."
+  ],
+  "contact": {
+    "email": "avnibhardwaj01.ab@gmail.com",
+    "phone": "+91 96913 85721",
+    "location": "Indore, Madhya Pradesh",
+    "github": "https://github.com/AvniBhardwaj1",
+    "linkedin": "https://www.linkedin.com/in/avni-bhardwaj10/",
+    "leetcode": "https://leetcode.com/u/AvniBhardwaj10/"
+  },
+  "gaps": [
+    "TODO(owner): Provide the specific GitHub repository URLs for Deep Learning Research and IoT Actuator Control if they are public.",
+    "TODO(owner): Confirm whether the Deep Learning Research project is still under review for publication and which details may be shared publicly."
+  ]
+}

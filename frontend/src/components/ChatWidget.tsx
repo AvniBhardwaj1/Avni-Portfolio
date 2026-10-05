@@ -36,7 +36,7 @@ const ChatPanel = ({
   sessionId: string;
   initialMessages: Message[];
 }) => {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, append, error } = useChat({
     api: API,
     streamProtocol: "text",
     body: { sessionId },
@@ -58,7 +58,9 @@ const ChatPanel = ({
       exit={{ opacity: 0, y: 24, scale: 0.96 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
       data-testid="chat-panel"
-      className="flex h-[460px] w-[min(92vw,370px)] flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-background/85 shadow-2xl backdrop-blur-xl"
+      role="region"
+      aria-label="Avni's portfolio assistant"
+      className="flex h-[min(460px,70dvh)] w-[min(calc(100vw-2rem),370px)] flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-background/85 shadow-2xl backdrop-blur-xl"
     >
       <div className="flex items-center justify-between border-b border-foreground/10 px-5 py-4">
         <div className="flex items-center gap-3">
@@ -67,15 +69,23 @@ const ChatPanel = ({
           </div>
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.2em]">Avni's Digital Clone</p>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
-              Live — remembers this conversation
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground" data-testid="chat-status" aria-live="polite">
+              {isLoading ? "Thinking" : "Portfolio assistant"}
             </p>
           </div>
         </div>
         <span className="h-2 w-2 rounded-full bg-accent" data-testid="chat-status-dot" />
       </div>
 
-      <div ref={scrollRef} className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 py-4" data-testid="chat-messages">
+      <div
+        ref={scrollRef}
+        className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 py-4"
+        data-testid="chat-messages"
+        role="log"
+        aria-label="Chat conversation"
+        aria-live="polite"
+        aria-relevant="additions text"
+      >
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -92,6 +102,8 @@ const ChatPanel = ({
         {showTyping && (
           <div
             data-testid="chat-typing-indicator"
+            role="status"
+            aria-label="Assistant is typing"
             className="flex items-center gap-1.5 self-start rounded-2xl rounded-bl-sm border border-foreground/10 bg-foreground/5 px-4 py-3"
           >
             {[0, 1, 2].map((d) => (
@@ -104,6 +116,16 @@ const ChatPanel = ({
           </div>
         )}
       </div>
+
+      {error && (
+        <p
+          data-testid="chat-error"
+          role="alert"
+          className="px-5 pb-2 text-xs text-destructive"
+        >
+          The assistant could not respond. Please try again, or contact Avni directly.
+        </p>
+      )}
 
       {messages.length === 1 && (
         <div className="flex flex-wrap gap-2 px-5 pb-2" data-testid="chat-suggestions">
@@ -129,16 +151,21 @@ const ChatPanel = ({
           handleSubmit(e);
         }}
         className="flex items-center gap-2 border-t border-foreground/10 p-3"
-      >        <input
+      >
+        <input
           data-testid="chat-input"
+          aria-label="Ask Avni's portfolio assistant a question"
           value={input}
           onChange={handleInputChange}
           placeholder="Ask the clone anything"
+          maxLength={1200}
+          required
           className="flex-1 bg-transparent px-2 py-2 text-sm outline-none placeholder:text-muted-foreground"
         />
         <button
           type="submit"
           data-testid="chat-send-button"
+          aria-label="Send message"
           data-magnetic
           disabled={isLoading || !input.trim()}
           className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-accent-foreground transition-transform hover:scale-105 active:scale-95 disabled:opacity-40"
@@ -146,6 +173,12 @@ const ChatPanel = ({
           <Send className="h-4 w-4" />
         </button>
       </form>
+      <p
+        data-testid="chat-privacy-notice"
+        className="px-4 pb-3 text-center font-mono text-[9px] leading-relaxed text-muted-foreground"
+      >
+        Messages are stored in MongoDB to restore this conversation. Please don’t share sensitive information.
+      </p>
     </motion.div>
   );
 };
@@ -169,7 +202,7 @@ export const ChatWidget = () => {
   }, [sessionId]);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4">
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-4 md:bottom-6 md:right-6">
       <AnimatePresence>
         {open && history && <ChatPanel sessionId={sessionId} initialMessages={history} />}
       </AnimatePresence>
@@ -178,7 +211,8 @@ export const ChatWidget = () => {
         data-testid="chat-toggle-button"
         data-magnetic
         onClick={() => setOpen((o) => !o)}
-        aria-label="Toggle chat assistant"
+        aria-label={open ? "Close chat assistant" : "Open chat assistant"}
+        aria-expanded={open}
         className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg transition-transform hover:scale-105 active:scale-95"
       >
         {open ? <X className="h-6 w-6" /> : <MessageSquareText className="h-6 w-6" />}

@@ -4,7 +4,8 @@
   "outputDirectory": "frontend/build",
   "functions": {
     "api/index.py": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "includeFiles": ["backend/profile.json"]
     }
   },
   "rewrites": [

@@ -35,6 +35,7 @@ and account requirements can change, so check the provider's current terms.
 | `LLM_API_KEY` | For a real LLM | Key for the selected provider; never prefix it with `REACT_APP_` |
 | `LLM_MODEL` | No | Optional provider model override |
 | `LLM_MAX_TOKENS` | No | Maximum generated tokens (default 512; max 2048) |
+| `LLM_FALLBACK` | No | Keep `mock` (default) to return a clear static response if provider calls fail |
 | `EMAIL_PROVIDER` | For weekly email | `resend` or `smtp` |
 | `EMAIL_FROM` | For weekly email | Sender accepted by the selected email provider |
 | `DIGEST_EMAIL` | For weekly email | Recipient address |
@@ -52,6 +53,12 @@ your Resend account. For SMTP, set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`,
 Vercel injects the cron authorization header from `CRON_SECRET`; the endpoint
 rejects requests without the matching bearer token. The configured schedule
 checks daily at 09:00 India time and sends only on Mondays.
+
+Chat accepts at most 1,200 characters per message and 20 messages per request.
+The API uses the newest conversation context (up to 6,000 characters) and
+enforces a MongoDB-backed limit of 20 requests per IP per minute. Chat messages
+are stored in MongoDB to restore the visitor's conversation; do not solicit or
+share sensitive information in chat.
 
 ## 3. Deploy and verify
 
