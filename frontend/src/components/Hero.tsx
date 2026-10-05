@@ -1,10 +1,14 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { ArrowDown, CameraOff, Hand, Loader2, ScanFace } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { animate, motion, useInView, useMotionValue, useTransform } from "framer-motion";
+import { ArrowDown, ArrowUpRight, CameraOff, Download, Hand, Loader2, ScanFace } from "lucide-react";
 import type { useGestureScroll } from "@/hooks/useGestureScroll";
 import { Portrait } from "@/components/Portrait";
 import { SocialLinks } from "@/components/SocialLinks";
 import { GestureGuideModal } from "@/components/GestureGuideModal";
+import { PROJECT_COUNT } from "@/components/Experience";
+import { CERTIFICATION_COUNT } from "@/components/Certificates";
+import { SKILL_PILLAR_COUNT } from "@/components/Skills";
+import { useMotion } from "@/theme/MotionContext";
 
 const NAME_LINES = ["AVNI", "BHARDWAJ"];
 
@@ -24,8 +28,35 @@ const STATUS_TEXT: Record<string, string> = {
   error: "Camera unavailable here — classic scroll works fine",
 };
 
+const STATISTICS = [
+  { id: "projects", value: PROJECT_COUNT, label: "Projects documented" },
+  { id: "skills", value: SKILL_PILLAR_COUNT, label: "Skill pillars" },
+  { id: "certificates", value: CERTIFICATION_COUNT, label: "Certificates" },
+];
+
+const CountUp = ({ value }: { value: number }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest) => Math.round(latest));
+  const inView = useInView(ref, { once: true, margin: "-30px" });
+  const { reduced } = useMotion();
+
+  useEffect(() => {
+    if (!inView) return;
+    if (reduced) {
+      count.set(value);
+      return;
+    }
+    const controls = animate(count, value, { duration: 1, ease: "easeOut" });
+    return () => controls.stop();
+  }, [count, inView, reduced, value]);
+
+  return <motion.span ref={ref}>{rounded}</motion.span>;
+};
+
 export const Hero = ({ gesture }: { gesture: ReturnType<typeof useGestureScroll> }) => {
   const { status, enable } = gesture;
+  const { reduced } = useMotion();
   const [guideOpen, setGuideOpen] = useState(false);
   return (
     <section
@@ -76,6 +107,13 @@ export const Hero = ({ gesture }: { gesture: ReturnType<typeof useGestureScroll>
             >
               Computer Engineering | Data, Cloud &amp; AI
             </p>
+            <div
+              data-testid="availability-pill"
+              className="mt-5 inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-foreground/80"
+            >
+              <span className={`h-2 w-2 rounded-full bg-accent ${reduced ? "" : "animate-pulse"}`} />
+              Open to internships &amp; collaborations
+            </div>
             <p
               data-testid="hero-tagline"
               className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg"
@@ -83,8 +121,33 @@ export const Hero = ({ gesture }: { gesture: ReturnType<typeof useGestureScroll>
               Architecting intelligent data pipelines and scalable AI solutions — turning
               raw events into production-grade intelligence.
             </p>
+            <a
+              href={`${process.env.PUBLIC_URL ?? ""}/Avni_Bhardwaj_Resume.pdf`}
+              download
+              data-testid="hero-resume-link"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-3 font-mono text-xs uppercase tracking-[0.15em] text-accent-foreground transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            >
+              <Download className="h-4 w-4" />
+              Download résumé
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </a>
             <div className="mt-8">
               <SocialLinks />
+            </div>
+            <div
+              data-testid="hero-statistics"
+              className="mt-10 grid max-w-xl grid-cols-3 gap-3 border-t border-foreground/10 pt-5"
+            >
+              {STATISTICS.map((stat) => (
+                <div key={stat.id} data-testid={`hero-stat-${stat.id}`}>
+                  <p className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                    <CountUp value={stat.value} />
+                  </p>
+                  <p className="mt-1 font-mono text-[9px] uppercase leading-relaxed tracking-[0.15em] text-muted-foreground sm:text-[10px]">
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
             </div>
           </motion.div>
 

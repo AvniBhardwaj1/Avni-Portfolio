@@ -18,7 +18,7 @@ type ProjectDetails = {
   impact: string[];
 };
 
-type Project = {
+export type Project = {
   id: string;
   index: string;
   period: string;
@@ -263,7 +263,13 @@ const PROJECTS: Project[] = [
   },
 ];
 
+export const CASE_STUDIES = [AIRBUS, ...PROJECTS];
+export const PROJECT_COUNT = CASE_STUDIES.length;
+
 const INDEX_COLORS = ["text-accent", "text-accent2", "text-accent3"];
+
+const hasSpecificRepository = (project: Project) =>
+  Boolean(project.href && project.href !== "https://github.com/AvniBhardwaj1");
 
 const AircraftAssembly = lazy(() =>
   import("@/components/AircraftAssembly").then((module) => ({
@@ -315,6 +321,7 @@ const DeferredAircraft = ({ dark }: { dark: boolean }) => {
           className="min-h-[70vh]"
           data-testid="aircraft-loading"
           aria-busy="true"
+          role="status"
           aria-label="Airbus visualization loads when this section is near"
         />
       )}
@@ -339,21 +346,7 @@ const Card = ({
     transition={{ duration: 0.85, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
     style={{ transformPerspective: 1000 }}
     data-testid={`project-card-${project.id}`}
-    role="button"
-    tabIndex={0}
-    aria-label={`Open ${project.title} project details`}
-    onClick={() => {
-      track("card_click", { id: project.id, title: project.title });
-      onOpen(project);
-    }}
-    onKeyDown={(event) => {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      event.preventDefault();
-      track("card_click", { id: project.id, title: project.title });
-      onOpen(project);
-    }}
-    data-magnetic
-    className="group flex h-full cursor-pointer flex-col gap-6 rounded-2xl border border-foreground/10 bg-background/70 p-8 backdrop-blur-sm transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-accent/60"
+    className="group flex h-full flex-col gap-6 rounded-2xl border border-foreground/10 bg-background/70 p-8 backdrop-blur-sm transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-accent/60"
   >
     <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
       <span className={INDEX_COLORS[i % 3]}>{project.index}</span>
@@ -374,6 +367,12 @@ const Card = ({
         </li>
       ))}
     </ul>
+    <p
+      data-testid={`project-impact-${project.id}`}
+      className="border-l-2 border-accent/50 pl-4 text-sm font-medium leading-relaxed text-foreground/85"
+    >
+      {project.details.impact[0]}
+    </p>
     <div className="mt-auto flex flex-wrap gap-2 pt-2">
       {project.stack.map((tech) => (
         <span
@@ -384,9 +383,38 @@ const Card = ({
         </span>
       ))}
     </div>
-    <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground/70 transition-colors group-hover:text-accent">
-      Tap to unfold the build
-    </p>
+    <div className="flex flex-wrap items-center gap-2 border-t border-foreground/10 pt-4">
+      <button
+        type="button"
+        data-testid={`project-quick-view-${project.id}`}
+        onClick={() => {
+          track("card_click", { id: project.id, title: project.title });
+          onOpen(project);
+        }}
+        className="rounded-full border border-foreground/15 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-accent hover:text-accent"
+      >
+        Quick view
+      </button>
+      <a
+        href={`/projects/${project.id}`}
+        data-testid={`project-case-study-${project.id}`}
+        className="rounded-full bg-accent px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-accent-foreground transition-transform hover:scale-[1.03]"
+      >
+        Case study
+      </a>
+      {hasSpecificRepository(project) && (
+        <a
+          href={project.href}
+          target="_blank"
+          rel="noreferrer"
+          data-testid={`project-repository-${project.id}`}
+          aria-label={`View ${project.title} on GitHub`}
+          className="inline-flex items-center gap-1 rounded-full border border-foreground/15 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-accent hover:text-accent"
+        >
+          Code <ArrowUpRight className="h-3 w-3" />
+        </a>
+      )}
+    </div>
   </motion.article>
 );
 
@@ -490,20 +518,30 @@ const ProjectOverlay = ({
           ))}
         </div>
 
-        {project.href && (
+        <div className="mt-2 flex flex-wrap gap-3">
+          <a
+            href={`/projects/${project.id}`}
+            data-testid="project-overlay-case-study"
+            className="inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 font-mono text-xs uppercase tracking-[0.2em] text-accent-foreground transition-transform hover:scale-[1.03] active:scale-95"
+          >
+            Full case study
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </a>
+          {hasSpecificRepository(project) && (
           <a
             href={project.href}
             target="_blank"
             rel="noreferrer"
             data-testid="project-overlay-github"
             data-magnetic
-            className="mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 font-mono text-xs uppercase tracking-[0.2em] text-accent-foreground transition-transform hover:scale-[1.03] active:scale-95"
+            className="inline-flex w-fit items-center gap-2 rounded-full border border-foreground/15 px-6 py-3 font-mono text-xs uppercase tracking-[0.2em] text-foreground transition-colors hover:border-accent hover:text-accent"
           >
             <Github className="h-4 w-4" />
-            View on GitHub
+            View code
             <ArrowUpRight className="h-3.5 w-3.5" />
           </a>
-        )}
+          )}
+        </div>
       </motion.div>
     </motion.div>
   );
@@ -545,9 +583,8 @@ export const Experience = () => {
     requestAnimationFrame(() => ScrollTrigger.refresh());
   };
 
-  const allProjects = [AIRBUS, ...PROJECTS];
   const selectedIndex = selected
-    ? allProjects.findIndex((p) => p.id === selected.id)
+    ? CASE_STUDIES.findIndex((p) => p.id === selected.id)
     : 0;
 
   return (

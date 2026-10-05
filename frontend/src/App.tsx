@@ -16,6 +16,7 @@ import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
 import { Marquee } from "@/components/Marquee";
 import { Experience } from "@/components/Experience";
+import { Highlights } from "@/components/Highlights";
 import { Timeline } from "@/components/Timeline";
 import { Skills } from "@/components/Skills";
 import { Certificates } from "@/components/Certificates";
@@ -26,6 +27,7 @@ import { Dock } from "@/components/Dock";
 import { GestureCursor } from "@/components/GestureCursor";
 import { FlightPath } from "@/components/FlightPath";
 import StatsPage from "@/pages/StatsPage";
+import { ProjectCaseStudyPage } from "@/pages/ProjectCaseStudyPage";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -101,6 +103,7 @@ function Site() {
         <Marquee />
         <Experience />
         <Timeline />
+        <Highlights />
         <Skills />
         <Certificates />
         <Contact />
@@ -159,10 +162,17 @@ export default function App() {
   const isStats =
     window.location.pathname.endsWith("/stats") ||
     window.location.hash.replace("#", "").replace(/^\//, "") === "stats";
+  const projectSlug = window.location.pathname.match(/^\/projects\/([a-z0-9-]+)\/?$/)?.[1];
   return (
     <ThemeProvider>
       <MotionProvider>
-        {isStats ? <StatsPage /> : <Site />}
+        {isStats ? (
+          <StatsPage />
+        ) : projectSlug ? (
+          <ProjectCaseStudyPage slug={projectSlug} />
+        ) : (
+          <Site />
+        )}
       </MotionProvider>
     </ThemeProvider>
   );

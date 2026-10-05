@@ -183,7 +183,7 @@ export const Contact = () => (
     data-testid="contact-section"
     className="relative z-10 px-6 pb-10 pt-32 md:px-16 lg:px-24"
   >
-    <Chapter no="05" title="Contact" id="contact" />
+    <Chapter no="06" title="Contact" id="contact" />
 
     <p
       className="mb-6 font-mono text-xs uppercase tracking-[0.35em] text-accent"
@@ -350,10 +350,19 @@ export const Contact = () => (
       </div>
     </div>
 
-    <footer className="mt-10 flex flex-col gap-3 pt-2 md:flex-row md:items-center md:justify-between">
+    <footer
+      data-testid="portfolio-footer"
+      className="mt-10 flex flex-col gap-4 border-t border-foreground/10 pt-6 md:flex-row md:items-center md:justify-between"
+    >
       <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground" data-testid="footer-copyright">
         © 2026 Avni Bhardwaj
       </p>
+      <nav aria-label="Footer navigation" className="flex flex-wrap gap-x-5 gap-y-2 font-mono text-[10px] uppercase tracking-[0.2em]">
+        <a data-testid="footer-work-link" href="#work" className="text-muted-foreground transition-colors hover:text-accent">Work</a>
+        <a data-testid="footer-skills-link" href="#skills" className="text-muted-foreground transition-colors hover:text-accent">Skills</a>
+        <a data-testid="footer-contact-link" href="#contact" className="text-muted-foreground transition-colors hover:text-accent">Contact</a>
+        <a data-testid="footer-github-link" href="https://github.com/AvniBhardwaj1" target="_blank" rel="noreferrer" className="text-muted-foreground transition-colors hover:text-accent">GitHub ↗</a>
+      </nav>
       <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
         React · Three.js · GSAP · MediaPipe
       </p>

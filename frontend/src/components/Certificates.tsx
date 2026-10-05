@@ -27,6 +27,8 @@ const CERTS: Cert[] = [
   { id: "cert-14", label: "Kavach 2023 — Grand Finale", sub: "Govt. of India · Cybersecurity Hackathon", desc: "Grand Finale participant at Kavach 2023, the national cybersecurity hackathon, with team NM_VISIONARYTITANS.", img: "/certificates/cert-14.jpg", pdf: "/certificates/cert-14.pdf" },
 ];
 
+export const CERTIFICATION_COUNT = CERTS.length;
+
 const DiscFace = ({ cert }: { cert: Cert }) => (
   <>
     <img
@@ -65,7 +67,7 @@ export const Certificates = () => {
       data-testid="certificates-section"
       className="relative z-10 px-6 py-32 md:px-16 lg:px-24"
     >
-      <Chapter no="04" title="Certificates" id="certificates" />
+      <Chapter no="05" title="Certificates" id="certificates" />
 
       <div className="relative">
         <div

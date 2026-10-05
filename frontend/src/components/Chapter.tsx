@@ -15,9 +15,15 @@ export const Chapter = ({ no, title, id }: { no: string; title: string; id?: str
     <motion.div
       ref={ref}
       style={{ y }}
-      className="mb-16 flex items-baseline gap-6"
+      className="mb-16 flex flex-wrap items-baseline gap-x-6 gap-y-2"
       data-testid={id ? `${id}-chapter` : undefined}
     >
+      <p
+        data-testid={id ? `${id}-section-eyebrow` : undefined}
+        className="w-full font-mono text-[10px] uppercase tracking-[0.3em] text-accent"
+      >
+        {"// "}{title}
+      </p>
       <motion.span
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
