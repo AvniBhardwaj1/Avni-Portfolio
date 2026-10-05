@@ -79,5 +79,7 @@ the production build performs the CRA/TypeScript checks.
 The chat’s source of facts is [backend/profile.json](./backend/profile.json).
 It includes `TODO(owner)` entries for the public repositories for Deep Learning
 Research and IoT Actuator Control, and confirmation of what may be shared about
-the publication-review status of the research project. Update those facts when
-confirmed; the chat intentionally does not expose the editorial TODOs.
+the publication-review status of the research project. The profile and
+timeline also disagree on the Chaitanya finalist ranking (top 10 of 1,000+
+versus top 20 from 977 registrations). Confirm these facts before treating them
+as definitive; the chat intentionally does not expose the editorial TODOs.
