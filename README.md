@@ -1,60 +1,83 @@
 # Avni Bhardwaj — Portfolio
 
-React portfolio with a FastAPI API, MongoDB-backed analytics/chat history, an
-optional provider-backed chat assistant, and a scheduled weekly digest.
+An Emergent-free personal portfolio built with React and FastAPI. The frontend
+and API deploy together to Vercel; MongoDB Atlas stores contact submissions,
+chat history, and analytics.
 
-## Stack
+## What’s included
 
-- Frontend: React 19, TypeScript, Tailwind CSS, Craco
-- API: FastAPI, Motor, exposed to Vercel by `api/index.py`
-- Database: MongoDB Atlas
-- Hosting and scheduled digest: Vercel
+- Interactive portfolio, responsive layouts, accessible keyboard dialogs, and
+  reduced-motion support
+- Individual case-study routes at `/projects/<project-id>`
+- Optional, profile-grounded AI chat (`mock` mode works without a provider key)
+- Opt-in hand-gesture controls; camera processing stays in the browser
+- MongoDB-backed contact form, chat history, and token-protected `/stats`
+- Optional Vercel Cron weekly digest using Resend or SMTP
+
+Contact messages are saved to the `contact_submissions` MongoDB collection.
+They are **not emailed automatically**. Chat history is stored in MongoDB to
+restore conversations; the chat UI discloses this to visitors.
+
+## Deploy
+
+Use [DEPLOY.md](./DEPLOY.md) for a Vercel Hobby + Atlas M0 setup. The core site
+does not require a paid service, LLM key, or email provider. Deploy the
+`revamp/emergent-free` branch or another branch you select; no push to `main`
+is required.
 
 ## Local development
 
-1. Install Node.js 20+ and Python 3.11+.
-2. Configure the backend:
+Requirements: Node.js 20+, Python 3.11+, and a MongoDB URI.
 
-   ```sh
-   cp backend/.env.example backend/.env
-   ```
+```sh
+cp backend/.env.example backend/.env
+# Set MONGO_URL and DB_NAME in backend/.env.
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+.venv/bin/uvicorn --app-dir backend server:app --reload --port 8000
+```
 
-   Set `MONGO_URL` and `DB_NAME` in `backend/.env`. `LLM_PROVIDER=mock` is safe
-   for local development; select a provider and set its key to enable live chat.
-3. Install and start the API:
+In another terminal, point the frontend at the local API and start it:
 
-   ```sh
-   python -m venv .venv
-   . .venv/bin/activate
-   pip install -r backend/requirements.txt
-   cd backend
-   uvicorn server:app --reload
-   ```
-4. In another terminal, install and start the frontend:
+```sh
+cp frontend/.env.example frontend/.env
+# Set REACT_APP_BACKEND_URL=http://127.0.0.1:8000 in frontend/.env.
+cd frontend
+npm ci
+npm start
+```
 
-   ```sh
-   cd frontend
-   npm ci
-   npm start
-   ```
-
-The frontend defaults to same-origin `/api` requests. For local frontend/API
-development on different origins, set `REACT_APP_BACKEND_URL=http://127.0.0.1:8000`
-in `frontend/.env`.
-
-## Deployment
-
-Follow [DEPLOY.md](./DEPLOY.md) for a Vercel + MongoDB Atlas deployment and
-provider configuration. For Vercel, select `updated_2026` or the branch you
-choose to deploy; no push to `main` is required.
+Open `http://localhost:3000`. The frontend uses same-origin `/api` by default;
+`REACT_APP_BACKEND_URL` is needed for this two-port local setup. Never put
+server credentials in a `REACT_APP_*` variable.
 
 ## Checks
 
 ```sh
-cd frontend && npm test -- --watchAll=false
 cd frontend && npm run build
-python -m pytest backend/tests
+cd ..
+.venv/bin/python -m pytest -q backend/tests
 ```
 
-The GitHub contributions test calls the configured local API by default. Start
-the API before running it, or set `REACT_APP_BACKEND_URL` to another API URL.
+The backend suite includes three live GitHub-contributions integration tests.
+Run the API locally and allow network access for those tests. Focused tests that
+do not need the API or external network:
+
+```sh
+.venv/bin/python -m pytest -q \
+  backend/tests/test_providers.py \
+  backend/tests/test_security_config.py \
+  backend/tests/test_profile_chat.py
+```
+
+There is no standalone frontend lint script or frontend unit-test suite yet;
+the production build performs the CRA/TypeScript checks.
+
+## Profile facts to confirm
+
+The chat’s source of facts is [backend/profile.json](./backend/profile.json).
+It includes `TODO(owner)` entries for the public repositories for Deep Learning
+Research and IoT Actuator Control, and confirmation of what may be shared about
+the publication-review status of the research project. Update those facts when
+confirmed; the chat intentionally does not expose the editorial TODOs.

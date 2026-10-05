@@ -1,85 +1,111 @@
-# Deploy from scratch — Vercel + MongoDB Atlas
+# Deploy from scratch — Vercel Hobby + MongoDB Atlas M0
 
-The site and API can run on Vercel Hobby with an Atlas M0 database. The chat
-provider and email sender are optional integrations; the site starts with chat
-in mock mode and does not need either provider to deploy. Provider free tiers
-and account requirements can change, so check the provider's current terms.
+The portfolio and API can run on the free Vercel Hobby plan with an Atlas M0
+cluster. Allow about 10–15 minutes if you already have GitHub, MongoDB Atlas,
+and Vercel accounts. A custom domain, LLM provider, and email sender are
+optional. Provider free tiers and account requirements can change; confirm
+current terms before choosing one.
 
-## 1. Create the database
+## 1. Create the free database
 
-1. Create a MongoDB Atlas account and an M0 free cluster.
-2. Create a database user and allow Vercel to reach the cluster. Atlas network
-   access rules apply to the Vercel serverless API; restrict access further if
-   you use a stable egress option.
-3. Copy the Python-driver connection URI. Replace the username/password
-   placeholders, and use database name `avni_portfolio`.
+1. Create an Atlas M0 free cluster.
+2. Create a database user limited to read/write access on `avni_portfolio`, with
+   a unique, strong password. URL-encode special characters in the connection
+   URI password.
+3. Atlas M0 plus Vercel Hobby does not provide a stable Vercel egress IP for an
+   Atlas IP allowlist. To connect from the serverless function, add `0.0.0.0/0`
+   to the Atlas network access list. This permits connection attempts from any
+   IP, so rely on TLS, the database user's least-privilege role, and a strong
+   unique password; do not reuse that password anywhere.
+4. Copy the Python-driver connection URI. Keep it private.
 
-## 2. Connect the repository to Vercel
+## 2. Import the GitHub repository into Vercel
 
 1. Import `AvniBhardwaj1/Avni-Portfolio` into Vercel.
-2. Keep the project root directory at the repository root.
-3. Select `updated_2026` or another branch you choose. For the current cleanup,
-   deploy `revamp/emergent-free` after its changes are ready; there is no need
-   to push to `main`.
-4. Add the server environment variables below before deploying.
+2. Keep the project root at the repository root. The checked-in `vercel.json`
+   supplies the build command, output directory, Python function routing, SPA
+   fallback (including case-study URLs), and daily cron schedule.
+3. Select `revamp/emergent-free` or the branch you want to deploy. The branch
+   must first be pushed to GitHub with a normal, non-forced push. There is no
+   requirement to deploy from `main`.
+4. Add the required server environment variables below, then deploy.
+
+## 3. Add Vercel environment variables
+
+Generate two different random secrets, for example with
+`openssl rand -hex 32`. Add them only in Vercel Project → Settings →
+Environment Variables; never commit them or use a `REACT_APP_` prefix.
 
 | Variable | Required | Value |
 |---|---:|---|
-| `MONGO_URL` | Yes | MongoDB Atlas connection URI |
+| `MONGO_URL` | Yes | Atlas connection URI |
 | `DB_NAME` | Yes | `avni_portfolio` |
-| `STATS_TOKEN` | Yes | Long random secret used by `/stats` and manual digest trigger |
-| `CRON_SECRET` | Yes | Separate long random secret used by the Vercel scheduled digest |
-| `SITE_URL` | Yes | Your canonical HTTPS Vercel URL |
-| `REACT_APP_SITE_URL` | Recommended | The same production URL, used at build time for canonical, Open Graph, sitemap, and robots metadata |
-| `CORS_ORIGINS` | For cross-origin local/API use | Comma-separated allowed origins; set to your site origin |
-| `LLM_PROVIDER` | No | `mock` (default), `groq`, `gemini`, `openrouter`, `anthropic`, or `openai` |
-| `LLM_API_KEY` | For a real LLM | Key for the selected provider; never prefix it with `REACT_APP_` |
-| `LLM_MODEL` | No | Optional provider model override |
-| `LLM_MAX_TOKENS` | No | Maximum generated tokens (default 512; max 2048) |
-| `LLM_FALLBACK` | No | Keep `mock` (default) to return a clear static response if provider calls fail |
-| `EMAIL_PROVIDER` | For weekly email | `resend` or `smtp` |
-| `EMAIL_FROM` | For weekly email | Sender accepted by the selected email provider |
-| `DIGEST_EMAIL` | For weekly email | Recipient address |
-| `EMAIL_REPLY_TO` | No | Optional reply-to address |
-| `EMAIL_FROM_NAME` | No | Sender name in the digest |
+| `STATS_TOKEN` | Yes | First random secret; protects `/stats` and the manual digest trigger |
+| `CRON_SECRET` | Yes | Separate random secret; protects the Vercel Cron endpoint |
+| `SITE_URL` | Yes | Canonical HTTPS production URL, such as `https://<project>.vercel.app` |
+| `REACT_APP_SITE_URL` | Recommended | Same public URL; used at build time for canonical, Open Graph, `robots.txt`, and `sitemap.xml` URLs |
+| `LLM_PROVIDER` | No | Use `mock` first; choose `groq`, `gemini`, `openrouter`, `anthropic`, or `openai` to enable a hosted model |
+| `LLM_API_KEY` | For hosted chat | Key for the provider selected above; keep server-side |
+| `LLM_MODEL` | No | Optional model override |
+| `LLM_MAX_TOKENS` | No | Output limit from 1 to 2048; defaults to 512 |
+| `LLM_FALLBACK` | No | Defaults to `mock` if the selected provider fails |
+| `CORS_ORIGINS` | Only for cross-origin use | Comma-separated trusted site origins; same-origin Vercel requests do not need CORS |
 
-Generate independent random values for the two access secrets (for example,
-`openssl rand -hex 32`). Do not reuse a provider API key as either token.
+Vercel sets `VERCEL_PROJECT_PRODUCTION_URL` / `VERCEL_URL` for builds. Set
+`REACT_APP_SITE_URL` explicitly if using a custom domain or if the generated
+preview URLs are not the canonical URL you want.
 
-For Resend, set `RESEND_API_KEY` and use an `EMAIL_FROM` sender authorized by
-your Resend account. For SMTP, set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`,
-`SMTP_PASSWORD`, and `SMTP_USE_SSL` (`true` for implicit TLS, otherwise STARTTLS).
-`EMAIL_FROM` must be accepted by that SMTP service.
+The site starts with `LLM_PROVIDER=mock` and no LLM key. To enable dynamic chat,
+choose a provider whose current free tier and key requirements work for you,
+then set `LLM_PROVIDER` and `LLM_API_KEY`. No LLM provider is required to deploy
+the site.
 
-Vercel injects the cron authorization header from `CRON_SECRET`; the endpoint
-rejects requests without the matching bearer token. The configured schedule
-checks daily at 09:00 India time and sends only on Mondays.
+## 4. Optional: enable the weekly email digest
 
-The build uses `VERCEL_PROJECT_PRODUCTION_URL` or `VERCEL_URL` for public SEO
-metadata unless `REACT_APP_SITE_URL` is set. Set that public (non-secret)
-variable explicitly if using a custom domain.
+The daily Vercel Cron runs at 09:00 India time and sends only on Mondays. The
+digest is separate from the contact form: contact messages are stored in
+MongoDB and do not send owner notifications. Until `DIGEST_EMAIL` is set, the
+authorized Cron returns an explicit `skipped` status and sends nothing.
 
-Chat accepts at most 1,200 characters per message and 20 messages per request.
-The API uses the newest conversation context (up to 6,000 characters) and
-enforces a MongoDB-backed limit of 20 requests per IP per minute. Chat messages
-are stored in MongoDB to restore the visitor's conversation; do not solicit or
-share sensitive information in chat.
+To enable the digest, configure all of:
 
-## 3. Deploy and verify
+| Variable | Value |
+|---|---|
+| `EMAIL_PROVIDER` | `resend` or `smtp` |
+| `EMAIL_FROM` | Sender address authorized by the selected provider |
+| `DIGEST_EMAIL` | Recipient address |
+| `EMAIL_REPLY_TO` | Optional reply-to address |
+| `EMAIL_FROM_NAME` | Optional sender display name |
 
-Deploy the selected branch. The repository config builds the frontend with
-`npm ci` and routes `/api/*` to the FastAPI function. Verify:
+For Resend, also set `RESEND_API_KEY` and use an authorized sender. For SMTP,
+set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, and
+`SMTP_USE_SSL` (`true` for implicit TLS; otherwise STARTTLS). Email delivery is
+optional; do not configure the cron email path until the provider accepts the
+sender and recipient settings.
 
-- `/` loads the portfolio.
-- `/api/` returns the API health response.
-- `/stats` loads and rejects an incorrect token; unlock it with `STATS_TOKEN`.
-- Chat works in `mock` mode, or with the provider selected in `LLM_PROVIDER`.
-- Configure email and then use the protected manual digest endpoint only when
-  you are ready to send a real email.
+## 5. Deploy and verify
+
+After deployment:
+
+- Open `/` and a case-study route such as `/projects/agent`.
+- Open `/api/` and confirm the JSON health response.
+- Open `/stats`; verify that an incorrect token is rejected and use
+  `STATS_TOKEN` to unlock it.
+- Try chat in `mock` mode, or after configuring a hosted provider.
+- Submit a contact message and verify it appears in the Atlas
+  `contact_submissions` collection. The app does not provide an inbox/admin
+  screen or send a notification email.
+- Only after email setup, wait for Monday’s cron or use the protected manual
+  digest endpoint with `STATS_TOKEN`.
+
+The custom domain is optional: the Vercel-provided HTTPS URL is sufficient.
+When adding a domain, configure it in Vercel, update `SITE_URL` and
+`REACT_APP_SITE_URL`, and redeploy so canonical and social metadata match.
 
 ## Local environment files
 
-Copy `backend/.env.example` to `backend/.env` for local API development. Root
-`.env.example` documents the server-side deployment variables, and
-`frontend/.env.example` contains only optional public frontend settings.
-Never commit `.env` files or put server secrets in `REACT_APP_*` variables.
+Use `backend/.env.example` for local server settings, the root `.env.example`
+for server-side deployment variables, and `frontend/.env.example` for public
+frontend settings. Copy the relevant template to `.env`; real `.env` files are
+ignored by Git. Never put MongoDB, LLM, email, cron, or stats secrets in
+`REACT_APP_*` variables.

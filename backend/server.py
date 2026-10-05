@@ -584,6 +584,9 @@ async def cron_weekly_digest(request: Request, x_stats_token: str = Header(defau
     cron_ok = bool(cron_secret) and hmac.compare_digest(auth, f"Bearer {cron_secret}")
     if not cron_ok:
         raise HTTPException(status_code=401, detail="unauthorized")
+    if not DIGEST_EMAIL:
+        logger.info("Skipping weekly digest because DIGEST_EMAIL is not configured")
+        return {"status": "skipped", "reason": "digest email is not configured"}
     now = datetime.now(ZoneInfo("Asia/Kolkata"))
     if now.weekday() != 0:
         return {"status": "skipped", "reason": "not Monday"}

@@ -48,3 +48,26 @@ def test_cron_rejects_stats_token_and_requires_cron_secret(monkeypatch):
     response = asyncio.run(request())
 
     assert response.status_code == 401
+
+
+def test_cron_reports_skip_when_digest_email_is_not_configured(monkeypatch):
+    monkeypatch.setenv("CRON_SECRET", "configured-cron-secret")
+    monkeypatch.setenv("DIGEST_EMAIL", "")
+    server = _load_server(monkeypatch)
+
+    async def request():
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=server.app), base_url="http://test"
+        ) as client:
+            return await client.get(
+                "/api/cron/weekly-digest",
+                headers={"authorization": "Bearer configured-cron-secret"},
+            )
+
+    response = asyncio.run(request())
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "skipped",
+        "reason": "digest email is not configured",
+    }
