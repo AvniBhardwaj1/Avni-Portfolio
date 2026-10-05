@@ -1,8 +1,8 @@
 # Avni Bhardwaj — Portfolio
 
 An Emergent-free personal portfolio built with React and FastAPI. The frontend
-and API deploy together to Vercel; MongoDB Atlas stores contact submissions,
-chat history, and analytics.
+and API deploy together to Vercel; MongoDB Atlas stores contact submissions and
+analytics, with optional chat transcript logging.
 
 ## What’s included
 
@@ -11,12 +11,14 @@ chat history, and analytics.
 - Individual case-study routes at `/projects/<project-id>`
 - Optional, profile-grounded AI chat (`mock` mode works without a provider key)
 - Opt-in hand-gesture controls; camera processing stays in the browser
-- MongoDB-backed contact form, chat history, and token-protected `/stats`
+- MongoDB-backed contact form, optional chat transcript logging, and token-protected `/stats`
 - Optional Vercel Cron weekly digest using Resend or SMTP
 
 Contact messages are saved to the `contact_submissions` MongoDB collection.
-They are **not emailed automatically**. Chat history is stored in MongoDB to
-restore conversations; the chat UI discloses this to visitors.
+If an email provider is configured, new contacts also trigger an escaped
+notification to the profile email; message storage succeeds even if delivery
+fails. Chat transcripts are not stored by default. Set `CHAT_LOGGING=on` to
+persist history in MongoDB; the widget discloses the configured behavior.
 
 ## Deploy
 
@@ -76,7 +78,7 @@ the production build performs the CRA/TypeScript checks.
 
 ## Profile facts to confirm
 
-The chat’s source of facts is [backend/profile.json](./backend/profile.json).
+The chat’s source of facts is [backend/data/profile.json](./backend/data/profile.json).
 It includes `TODO(owner)` entries for the public repositories for Deep Learning
 Research and IoT Actuator Control, and confirmation of what may be shared about
 the publication-review status of the research project. The profile and

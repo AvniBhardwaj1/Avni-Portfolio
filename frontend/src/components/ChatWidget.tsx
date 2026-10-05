@@ -32,9 +32,11 @@ const SUGGESTIONS = [
 const ChatPanel = ({
   sessionId,
   initialMessages,
+  loggingEnabled,
 }: {
   sessionId: string;
   initialMessages: Message[];
+  loggingEnabled: boolean;
 }) => {
   const { messages, input, handleInputChange, handleSubmit, isLoading, append, error } = useChat({
     api: API,
@@ -177,7 +179,9 @@ const ChatPanel = ({
         data-testid="chat-privacy-notice"
         className="px-4 pb-3 text-center font-mono text-[9px] leading-relaxed text-muted-foreground"
       >
-        Messages are stored in MongoDB to restore this conversation. Please don’t share sensitive information.
+        {loggingEnabled
+          ? "Chats are stored in MongoDB to restore this conversation. Please don’t share sensitive information."
+          : "Chats are not stored. Please don’t share sensitive information."}
       </p>
     </motion.div>
   );
@@ -186,27 +190,43 @@ const ChatPanel = ({
 export const ChatWidget = () => {
   const [open, setOpen] = useState(false);
   const [history, setHistory] = useState<Message[] | null>(null);
+  const [loggingEnabled, setLoggingEnabled] = useState(false);
   const sessionId = useRef(getSessionId()).current;
 
   useEffect(() => {
     fetch(`${API}/history?sessionId=${sessionId}`)
       .then((r) => r.json())
-      .then((d) =>
+      .then((d) => {
+        setLoggingEnabled(d.loggingEnabled === true);
         setHistory(
           d.messages?.length
             ? d.messages
             : [{ id: "intro", role: "assistant", content: INTRO }],
-        ),
-      )
+        );
+      })
       .catch(() => setHistory([{ id: "intro", role: "assistant", content: INTRO }]));
   }, [sessionId]);
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-4 md:bottom-6 md:right-6">
       <AnimatePresence>
-        {open && history && <ChatPanel sessionId={sessionId} initialMessages={history} />}
+        {open && history && (
+          <ChatPanel
+            sessionId={sessionId}
+            initialMessages={history}
+            loggingEnabled={loggingEnabled}
+          />
+        )}
       </AnimatePresence>
 
+      {!open && (
+        <p
+          data-testid="chat-entry-prompt"
+          className="max-w-56 rounded-xl border border-foreground/10 bg-background/90 px-3 py-2 text-right font-mono text-[9px] leading-relaxed text-foreground/80 shadow-sm backdrop-blur-xl"
+        >
+          Ask the assistant — it’s read Avni’s résumé.
+        </p>
+      )}
       <button
         data-testid="chat-toggle-button"
         data-magnetic

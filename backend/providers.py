@@ -18,6 +18,13 @@ _OPENAI_COMPATIBLE = {
     "groq": "https://api.groq.com/openai/v1/chat/completions",
     "openrouter": "https://openrouter.ai/api/v1/chat/completions",
 }
+_DEFAULT_BASE_URLS = {
+    "openai": "https://api.openai.com/v1",
+    "groq": "https://api.groq.com/openai/v1",
+    "openrouter": "https://openrouter.ai/api/v1",
+    "anthropic": "https://api.anthropic.com",
+    "gemini": "https://generativelanguage.googleapis.com",
+}
 
 
 def _max_tokens() -> int:
@@ -75,12 +82,18 @@ async def complete_chat(messages: list[dict[str, str]], system_prompt: str) -> s
         raise HTTPException(status_code=503, detail="LLM_MODEL cannot be empty")
 
     max_tokens = _max_tokens()
+    base_url = (
+        os.environ.get("LLM_BASE_URL", "").strip()
+        or _DEFAULT_BASE_URLS[provider]
+    ).rstrip("/")
+    if not base_url.startswith("https://"):
+        raise HTTPException(status_code=503, detail="LLM_BASE_URL must use HTTPS")
     timeout = httpx.Timeout(20.0, connect=5.0)
     try:
         async with httpx.AsyncClient(timeout=timeout) as client:
             if provider in _OPENAI_COMPATIBLE:
                 response = await client.post(
-                    _OPENAI_COMPATIBLE[provider],
+                    f"{base_url}/chat/completions",
                     headers={"Authorization": f"Bearer {api_key}"},
                     json={
                         "model": model,
@@ -90,7 +103,7 @@ async def complete_chat(messages: list[dict[str, str]], system_prompt: str) -> s
                 )
             elif provider == "anthropic":
                 response = await client.post(
-                    "https://api.anthropic.com/v1/messages",
+                    f"{base_url}/v1/messages",
                     headers={
                         "x-api-key": api_key,
                         "anthropic-version": "2023-06-01",
@@ -104,7 +117,7 @@ async def complete_chat(messages: list[dict[str, str]], system_prompt: str) -> s
                 )
             else:
                 response = await client.post(
-                    f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+                    f"{base_url}/v1beta/models/{model}:generateContent",
                     params={"key": api_key},
                     json={
                         "systemInstruction": {"parts": [{"text": system_prompt}]},

@@ -1,5 +1,4 @@
-import { Download, Moon, PersonStanding, Sun, TerminalSquare } from "lucide-react";
-import { useTheme } from "@/theme/ThemeContext";
+import { Download, PersonStanding, TerminalSquare } from "lucide-react";
 import { useMotion } from "@/theme/MotionContext";
 import { scrollToSection } from "@/lib/scroll";
 import { track } from "@/lib/analytics";
@@ -12,7 +11,6 @@ const LINKS = [
 ];
 
 export const Nav = ({ onOpenTerminal }: { onOpenTerminal: () => void }) => {
-  const { theme, toggle } = useTheme();
   const { reduced, toggle: toggleMotion } = useMotion();
   return (
     <header
@@ -73,14 +71,6 @@ export const Nav = ({ onOpenTerminal }: { onOpenTerminal: () => void }) => {
             }`}
           >
             <PersonStanding className="h-4 w-4" />
-          </button>
-          <button
-            data-testid="theme-toggle"
-            onClick={toggle}
-            aria-label="Toggle light and dark mode"
-            className="ml-1 flex h-8 w-8 items-center justify-center rounded-full border border-foreground/10 transition-colors hover:border-accent hover:text-accent sm:ml-2 sm:h-9 sm:w-9"
-          >
-            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
         </nav>
       </div>

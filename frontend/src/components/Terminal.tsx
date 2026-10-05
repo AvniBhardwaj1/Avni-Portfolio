@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { TerminalSquare, X } from "lucide-react";
 import { track } from "@/lib/analytics";
-import { useTheme } from "@/theme/ThemeContext";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 
 type Line = { kind: "cmd" | "out" | "sys"; text: string };
@@ -114,7 +113,6 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
   const scrollRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<{ target: number; tries: number } | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
-  const { toggle } = useTheme();
   useDialogFocus(open, dialogRef, onClose);
 
   useEffect(() => {
@@ -235,8 +233,7 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
         { kind: "sys", text: "14 vinyls on the shelf below — drop one on the turntable and listen for the crackle." },
       );
     if (name === "theme") {
-      toggle();
-      return push({ kind: "sys", text: "theme flipped. the terminal stays dark — terminals don't do beige." });
+      return push({ kind: "sys", text: "dark mode is always on. terminals don't do beige." });
     }
     if (name === "resume") {
       window.open(`${process.env.PUBLIC_URL ?? ""}/Avni_Bhardwaj_Resume.pdf`, "_blank", "noreferrer");

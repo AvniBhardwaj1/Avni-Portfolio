@@ -16,12 +16,17 @@ const GROUPS = [
   {
     id: "backend",
     title: "Backend",
-    items: ["Python", "C++", "FastAPI"],
-  },
-  {
-    id: "embedded-iot",
-    title: "Embedded & IoT",
-    items: ["ESP32", "Embedded C", "Sensor interfacing", "GPIO", "I2C", "Blynk Cloud"],
+    items: [
+      "Python",
+      "C++",
+      "FastAPI",
+      "ESP32",
+      "Embedded C",
+      "Sensor interfacing",
+      "GPIO",
+      "I2C",
+      "Blynk Cloud",
+    ],
   },
 ];
 

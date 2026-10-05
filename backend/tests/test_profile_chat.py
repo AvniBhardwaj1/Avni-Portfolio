@@ -9,9 +9,10 @@ from pydantic import ValidationError
 from starlette.requests import Request
 
 
-def load_server(monkeypatch):
+def load_server(monkeypatch, chat_logging="off"):
     monkeypatch.setenv("MONGO_URL", "mongodb://127.0.0.1:27017")
     monkeypatch.setenv("DB_NAME", "test_portfolio")
+    monkeypatch.setenv("CHAT_LOGGING", chat_logging)
     backend_path = str(Path(__file__).resolve().parents[1])
     if backend_path not in sys.path:
         sys.path.insert(0, backend_path)
@@ -102,11 +103,11 @@ def test_chat_rate_limit_is_per_ip_and_limits_requests(monkeypatch):
 
 
 def test_failed_provider_returns_explicit_mock_fallback(monkeypatch):
-    server = load_server(monkeypatch)
+    server = load_server(monkeypatch, chat_logging="on")
     fake_db = FakeDatabase()
     monkeypatch.setattr(server, "db", fake_db)
     monkeypatch.setattr(server, "_RATE_LIMIT_INDEX_READY", False)
-    monkeypatch.setenv("LLM_FALLBACK", "mock")
+    monkeypatch.setenv("LLM_FALLBACK_PROVIDER", "mock")
 
     async def fail_provider(*_args, **_kwargs):
         raise HTTPException(status_code=502, detail="provider failure")
@@ -134,6 +135,33 @@ def test_failed_provider_returns_explicit_mock_fallback(monkeypatch):
     ]
 
 
+def test_chat_transcripts_are_not_stored_by_default(monkeypatch):
+    server = load_server(monkeypatch)
+    fake_db = FakeDatabase()
+    monkeypatch.setattr(server, "db", fake_db)
+    monkeypatch.setattr(server, "_RATE_LIMIT_INDEX_READY", False)
+    monkeypatch.setenv("LLM_PROVIDER", "mock")
+
+    async def call_chat():
+        response = await server.chat_clone(
+            server.ChatRequest(
+                messages=[server.ChatMessage(role="user", content="Tell me about Avni")]
+            ),
+            make_request(),
+        )
+        parts = [
+            part if isinstance(part, bytes) else part.encode()
+            async for part in response.body_iterator
+        ]
+        return b"".join(parts)
+
+    asyncio.run(call_chat())
+    history = asyncio.run(server.chat_history("test-session"))
+
+    assert fake_db.chat_messages.documents == []
+    assert history == {"messages": [], "loggingEnabled": False}
+
+
 def test_contact_submission_is_validated_and_stored(monkeypatch):
     server = load_server(monkeypatch)
     fake_db = FakeDatabase()
@@ -145,6 +173,7 @@ def test_contact_submission_is_validated_and_stored(monkeypatch):
             server.ContactSubmission(
                 name="Recruiter",
                 email="recruiter@example.com",
+                project_type="Internship",
                 message="I would like to discuss a project.",
             ),
             make_request(),
@@ -152,9 +181,94 @@ def test_contact_submission_is_validated_and_stored(monkeypatch):
 
     response = asyncio.run(submit())
 
-    assert response == {"status": "received"}
+    assert response == {"status": "received", "notificationStatus": "skipped"}
     assert len(fake_db.contact_submissions.documents) == 1
     assert fake_db.contact_submissions.documents[0]["email"] == "recruiter@example.com"
+    assert fake_db.contact_submissions.documents[0]["projectType"] == "Internship"
+
+
+def test_contact_is_saved_when_notification_fails(monkeypatch):
+    server = load_server(monkeypatch)
+    fake_db = FakeDatabase()
+    monkeypatch.setattr(server, "db", fake_db)
+    monkeypatch.setattr(server, "_RATE_LIMIT_INDEX_READY", False)
+    monkeypatch.setattr(server, "_contact_email_configured", lambda: True)
+
+    async def fail_email(**_kwargs):
+        raise HTTPException(status_code=502, detail="email provider unavailable")
+
+    monkeypatch.setattr(server, "send_email", fail_email)
+
+    async def submit():
+        return await server.submit_contact(
+            server.ContactSubmission(
+                name="Recruiter",
+                email="recruiter@example.com",
+                project_type="Internship",
+                message="I would like to discuss a project.",
+            ),
+            make_request(),
+        )
+
+    response = asyncio.run(submit())
+    assert response == {"status": "received", "notificationStatus": "failed"}
+    assert len(fake_db.contact_submissions.documents) == 1
+
+
+def test_contact_notification_is_sent_after_saving(monkeypatch):
+    server = load_server(monkeypatch)
+    fake_db = FakeDatabase()
+    sent = []
+    monkeypatch.setattr(server, "db", fake_db)
+    monkeypatch.setattr(server, "_RATE_LIMIT_INDEX_READY", False)
+    monkeypatch.setattr(server, "_contact_email_configured", lambda: True)
+
+    async def send_email(**kwargs):
+        sent.append(kwargs)
+        return "email-id"
+
+    monkeypatch.setattr(server, "send_email", send_email)
+
+    async def submit():
+        return await server.submit_contact(
+            server.ContactSubmission(
+                name="Recruiter",
+                email="recruiter@example.com",
+                project_type="Internship",
+                message="I would like to discuss a project.",
+            ),
+            make_request(),
+        )
+
+    response = asyncio.run(submit())
+
+    assert response == {"status": "received", "notificationStatus": "sent"}
+    assert len(fake_db.contact_submissions.documents) == 1
+    assert sent[0]["to"] == server.PROFILE_DATA["contact"]["email"]
+    assert sent[0]["reply_to"] == "recruiter@example.com"
+
+
+def test_contact_honeypot_acknowledges_without_storing(monkeypatch):
+    server = load_server(monkeypatch)
+    fake_db = FakeDatabase()
+    monkeypatch.setattr(server, "db", fake_db)
+
+    async def submit():
+        return await server.submit_contact(
+            server.ContactSubmission(
+                name="Bot",
+                email="bot@example.com",
+                project_type="Other",
+                message="I would like to discuss a project.",
+                website="https://spam.example",
+            ),
+            make_request(),
+        )
+
+    response = asyncio.run(submit())
+
+    assert response == {"status": "received", "notificationStatus": "skipped"}
+    assert fake_db.contact_submissions.documents == []
 
 
 def test_contact_submission_rejects_invalid_email(monkeypatch):
@@ -165,6 +279,7 @@ def test_contact_submission_rejects_invalid_email(monkeypatch):
             server.ContactSubmission(
                 name="Recruiter",
                 email="not-an-email",
+                project_type="Other",
                 message="I would like to discuss a project.",
             ),
             make_request(),

@@ -11,7 +11,6 @@ import { initAudioOnGesture } from "@/lib/sounds";
 import { initAnalytics } from "@/lib/analytics";
 import { useGestureScroll } from "@/hooks/useGestureScroll";
 import { Cursor } from "@/components/Cursor";
-import { MeshGradient } from "@/components/MeshGradient";
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
 import { Marquee } from "@/components/Marquee";
@@ -41,15 +40,26 @@ function Site() {
   const { reduced } = useMotion();
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
+  const [smallScreen, setSmallScreen] = useState(() =>
+    window.matchMedia("(max-width: 767px)").matches,
+  );
 
   useEffect(() => {
-    if (reduced) {
+    const media = window.matchMedia("(max-width: 767px)");
+    const updateScreenSize = () => setSmallScreen(media.matches);
+    updateScreenSize();
+    media.addEventListener("change", updateScreenSize);
+    if (reduced || media.matches) {
       setSceneReady(false);
-      return;
+    } else {
+      const timer = window.setTimeout(() => setSceneReady(true), 1200);
+      return () => {
+        media.removeEventListener("change", updateScreenSize);
+        window.clearTimeout(timer);
+      };
     }
-    const timer = window.setTimeout(() => setSceneReady(true), 1200);
-    return () => window.clearTimeout(timer);
-  }, [reduced]);
+    return () => media.removeEventListener("change", updateScreenSize);
+  }, [reduced, smallScreen]);
 
   useEffect(() => {
     initAudioOnGesture();
@@ -91,8 +101,7 @@ function Site() {
       >
         Skip to main content
       </a>
-      <MeshGradient />
-      {!reduced && sceneReady && (
+      {!reduced && !smallScreen && sceneReady && (
         <Suspense fallback={null}>
           <Scene3D />
         </Suspense>

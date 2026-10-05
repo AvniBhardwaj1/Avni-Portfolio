@@ -54,7 +54,9 @@ const ContactForm = () => {
         body: JSON.stringify({
           name: data.get("name"),
           email: data.get("email"),
+          project_type: data.get("project_type"),
           message: data.get("message"),
+          website: data.get("website"),
         }),
       });
       if (!response.ok) {
@@ -65,8 +67,15 @@ const ContactForm = () => {
             : "The message could not be sent. Please try again.",
         );
       }
+      const body = await response.json();
       form.reset();
-      setStatus("Thanks — your message has been sent to Avni.");
+      setStatus(
+        body.notificationStatus === "sent"
+          ? "Thanks — your message was saved and Avni was notified."
+          : body.notificationStatus === "failed"
+            ? "Your message was saved, but the email notification failed. You can also email Avni directly."
+            : "Your message was saved. Email notifications are not configured yet.",
+      );
     } catch (err) {
       setError(
         err instanceof Error
@@ -118,6 +127,35 @@ const ContactForm = () => {
         />
       </div>
       <div className="flex flex-col gap-2 md:col-span-2">
+        <label htmlFor="contact-project-type" className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          Project type
+        </label>
+        <select
+          id="contact-project-type"
+          name="project_type"
+          data-testid="contact-project-type-select"
+          required
+          defaultValue=""
+          className="min-h-12 rounded-xl border border-foreground/15 bg-background/75 px-4 text-sm outline-none transition-colors focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent/40"
+        >
+          <option value="" disabled>Select a topic</option>
+          <option value="Internship">Internship</option>
+          <option value="Project collaboration">Project collaboration</option>
+          <option value="Speaking or community">Speaking or community</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div className="sr-only" aria-hidden="true">
+        <label htmlFor="contact-website">Leave this field empty</label>
+        <input
+          id="contact-website"
+          name="website"
+          data-testid="contact-honeypot"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+      <div className="flex flex-col gap-2 md:col-span-2">
         <label htmlFor="contact-message" className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
           Message
         </label>
@@ -137,7 +175,7 @@ const ContactForm = () => {
         data-testid="contact-form-privacy"
         className="text-xs leading-relaxed text-muted-foreground md:col-span-2"
       >
-        Your message and reply email are stored in MongoDB so Avni can follow up. Please don’t include sensitive information.
+        Your message and reply email are saved to MongoDB. If email is configured, Avni also receives a notification. Please don’t include sensitive information.
       </p>
       <div className="flex flex-wrap items-center gap-4 md:col-span-2">
         <button

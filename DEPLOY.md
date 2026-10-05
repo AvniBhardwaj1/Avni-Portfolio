@@ -47,9 +47,13 @@ Environment Variables; never commit them or use a `REACT_APP_` prefix.
 | `LLM_PROVIDER` | No | Use `mock` first; choose `groq`, `gemini`, `openrouter`, `anthropic`, or `openai` to enable a hosted model |
 | `LLM_API_KEY` | For hosted chat | Key for the provider selected above; keep server-side |
 | `LLM_MODEL` | No | Optional model override |
+| `LLM_BASE_URL` | No | Optional HTTPS API base URL override for the selected provider |
 | `LLM_MAX_TOKENS` | No | Output limit from 1 to 2048; defaults to 512 |
-| `LLM_FALLBACK` | No | Defaults to `mock` if the selected provider fails |
+| `LLM_FALLBACK_PROVIDER` | No | Defaults to `mock` if the selected provider fails |
 | `CORS_ORIGINS` | Only for cross-origin use | Comma-separated trusted site origins; same-origin Vercel requests do not need CORS |
+| `CHAT_LOGGING` | No | `off` by default; set `on` to persist chat transcripts in MongoDB |
+| `GITHUB_USERNAME` | No | Defaults to `AvniBhardwaj1` for the contributions heatmap |
+| `GITHUB_TOKEN` | No | Optional server-side token for GitHub's HTML fallback |
 
 Vercel sets `VERCEL_PROJECT_PRODUCTION_URL` / `VERCEL_URL` for builds. Set
 `REACT_APP_SITE_URL` explicitly if using a custom domain or if the generated
@@ -63,25 +67,31 @@ the site.
 ## 4. Optional: enable the weekly email digest
 
 The daily Vercel Cron runs at 09:00 India time and sends only on Mondays. The
-digest is separate from the contact form: contact messages are stored in
-MongoDB and do not send owner notifications. Until `DIGEST_EMAIL` is set, the
-authorized Cron returns an explicit `skipped` status and sends nothing.
+digest is separate from contact notifications: contact messages are always
+stored in MongoDB, and a notification is attempted when the email provider is
+configured. Until `DIGEST_EMAIL` is set, the authorized Cron returns an
+explicit `skipped` status and sends no digest.
 
 To enable the digest, configure all of:
 
 | Variable | Value |
 |---|---|
 | `EMAIL_PROVIDER` | `resend` or `smtp` |
-| `EMAIL_FROM` | Sender address authorized by the selected provider |
+| `EMAIL_FROM_ADDRESS` | Sender address authorized by the selected provider |
+| `EMAIL_API_KEY` | Resend API key (SMTP uses its SMTP credentials instead) |
 | `DIGEST_EMAIL` | Recipient address |
 | `EMAIL_REPLY_TO` | Optional reply-to address |
 | `EMAIL_FROM_NAME` | Optional sender display name |
 
-For Resend, also set `RESEND_API_KEY` and use an authorized sender. For SMTP,
+For Resend, set `EMAIL_API_KEY` and use an authorized sender. For SMTP,
 set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, and
 `SMTP_USE_SSL` (`true` for implicit TLS; otherwise STARTTLS). Email delivery is
 optional; do not configure the cron email path until the provider accepts the
 sender and recipient settings.
+
+Contact notifications use the email provider settings above and are sent to
+the contact address in `backend/data/profile.json`. A delivery failure does
+not discard the MongoDB submission.
 
 ## 5. Deploy and verify
 
@@ -93,8 +103,10 @@ After deployment:
   `STATS_TOKEN` to unlock it.
 - Try chat in `mock` mode, or after configuring a hosted provider.
 - Submit a contact message and verify it appears in the Atlas
-  `contact_submissions` collection. The app does not provide an inbox/admin
-  screen or send a notification email.
+  `contact_submissions` collection. If email delivery is configured, verify
+  the notification arrives at the profile contact address. The app does not
+  provide an inbox/admin screen; failed notification delivery does not discard
+  the saved message.
 - Only after email setup, wait for Monday’s cron or use the protected manual
   digest endpoint with `STATS_TOKEN`.
 
