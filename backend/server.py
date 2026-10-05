@@ -1,10 +1,15 @@
 import asyncio
+import hmac
 import ipaddress
 import logging
 import os
 import re
+import smtplib
+import ssl
 import uuid
 from datetime import datetime, timezone
+from email.message import EmailMessage
+from email.utils import make_msgid
 from html import escape
 from html.parser import HTMLParser
 from pathlib import Path
@@ -13,20 +18,26 @@ from zoneinfo import ZoneInfo
 
 import httpx
 from dotenv import load_dotenv
-from emergentintegrations.llm.chat import LlmChat, StreamDone, TextDelta, UserMessage
 from fastapi import APIRouter, FastAPI, Header, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, ConfigDict, Field
 from starlette.middleware.cors import CORSMiddleware
 
+from providers import complete_chat
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
-mongo_url = os.environ['MONGO_URL']
+mongo_url = os.environ.get('MONGO_URL')
+if not mongo_url:
+    raise RuntimeError("MONGO_URL must be configured")
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db_name = os.environ.get('DB_NAME')
+if not db_name:
+    raise RuntimeError("DB_NAME must be configured")
+db = client[db_name]
 
 # Create the main app without a prefix
 app = FastAPI()
@@ -103,41 +114,32 @@ FACTS ABOUT AVNI BHARDWAJ:
 
 @api_router.post("/chat")
 async def chat_clone(req: ChatRequest):
-    user_text = next((m.content for m in reversed(req.messages) if m.role == "user"), "")
-    chat = LlmChat(
-        api_key=os.environ["EMERGENT_LLM_KEY"],
-        session_id=f"avni-clone-{req.sessionId}",
-        system_message=AVNI_SYSTEM_PROMPT,
-    ).with_model("openai", "gpt-5.4-mini")
+    messages = [
+        {"role": message.role, "content": message.content}
+        for message in req.messages
+        if message.role in {"user", "assistant"}
+    ]
+    user_text = next((m["content"] for m in reversed(messages) if m["role"] == "user"), "")
+    if not user_text.strip():
+        raise HTTPException(status_code=422, detail="A user message is required")
 
-    async def generate():
-        full: list[str] = []
-        try:
-            await db.chat_messages.insert_one({
-                "sessionId": req.sessionId,
-                "role": "user",
-                "content": user_text,
-                "ts": datetime.now(timezone.utc).isoformat(),
-            })
-            async for event in chat.stream_message(UserMessage(text=user_text)):
-                if isinstance(event, TextDelta):
-                    full.append(event.content)
-                    yield event.content
-                elif isinstance(event, StreamDone):
-                    break
-            if full:
-                await db.chat_messages.insert_one({
-                    "sessionId": req.sessionId,
-                    "role": "assistant",
-                    "content": "".join(full),
-                    "ts": datetime.now(timezone.utc).isoformat(),
-                })
-        except Exception:
-            logger.exception("chat stream failed")
-            yield "My clone brain glitched - email the human original at avnibhardwaj01.ab@gmail.com."
+    timestamp = datetime.now(timezone.utc).isoformat()
+    await db.chat_messages.insert_one({
+        "sessionId": req.sessionId,
+        "role": "user",
+        "content": user_text,
+        "ts": timestamp,
+    })
+    answer = await complete_chat(messages, AVNI_SYSTEM_PROMPT)
+    await db.chat_messages.insert_one({
+        "sessionId": req.sessionId,
+        "role": "assistant",
+        "content": answer,
+        "ts": datetime.now(timezone.utc).isoformat(),
+    })
 
     return StreamingResponse(
-        generate(),
+        iter([answer]),
         media_type="text/plain",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
@@ -172,18 +174,19 @@ async def track_event(ev: AnalyticsEvent):
 
 @api_router.get("/analytics/stats")
 async def analytics_stats(x_stats_token: str = Header(default="")):
-    if x_stats_token != os.environ.get("STATS_TOKEN"):
+    stats_token = os.environ.get("STATS_TOKEN", "")
+    if not stats_token or not hmac.compare_digest(x_stats_token, stats_token):
         raise HTTPException(status_code=401, detail="unauthorized")
     events = await db.analytics_events.find({}, {"_id": 0}).to_list(20000)
     return _aggregate(events)
 
-# --- Email (Emergent managed Resend proxy) ---
-EMAIL_BASE_URL = "https://integrations.emergentagent.com"
-EMAIL_KEY = os.environ["EMERGENT_EMAIL_KEY"]
-EMAIL_FROM_NAME = os.environ["EMAIL_FROM_NAME"]
+# --- Email delivery ---
+EMAIL_PROVIDER = os.environ.get("EMAIL_PROVIDER", "resend").strip().lower()
+EMAIL_FROM = os.environ.get("EMAIL_FROM", "").strip()
+EMAIL_FROM_NAME = os.environ.get("EMAIL_FROM_NAME", "Avni Bhardwaj Portfolio")
 EMAIL_REPLY_TO = os.environ.get("EMAIL_REPLY_TO")
-DIGEST_EMAIL = os.environ["DIGEST_EMAIL"]
-SITE_URL = os.environ.get("SITE_URL", "")
+DIGEST_EMAIL = os.environ.get("DIGEST_EMAIL", "").strip()
+SITE_URL = os.environ.get("SITE_URL", "").rstrip("/")
 
 _SHORTENERS = ("bit.ly", "tinyurl.com", "t.co", "is.gd", "cutt.ly", "goo.gl", "rebrand.ly")
 _CRED_ASK = ("reply with your password", "reply with the code", "send your password", "cvv",
@@ -251,24 +254,107 @@ def _assert_safe_email(subject: str, html: str) -> None:
 
 async def send_email(*, to: str, subject: str, html: str, reply_to: str | None = None) -> str | None:
     _assert_safe_email(subject, html)
-    payload = {"to": [to], "subject": subject, "html": html, "from_name": EMAIL_FROM_NAME}
-    if reply_to or EMAIL_REPLY_TO:
-        payload["contact_email"] = reply_to or EMAIL_REPLY_TO
+    if not EMAIL_FROM:
+        raise HTTPException(status_code=503, detail="EMAIL_FROM must be configured")
+    actual_reply_to = reply_to or EMAIL_REPLY_TO
+
+    if EMAIL_PROVIDER == "resend":
+        api_key = os.environ.get("RESEND_API_KEY", "").strip()
+        if not api_key:
+            raise HTTPException(status_code=503, detail="RESEND_API_KEY is required for Resend")
+        payload = {"from": EMAIL_FROM, "to": [to], "subject": subject, "html": html}
+        if actual_reply_to:
+            payload["reply_to"] = actual_reply_to
+        try:
+            async with httpx.AsyncClient(timeout=15) as client:
+                resp = await client.post(
+                    "https://api.resend.com/emails",
+                    headers={"Authorization": f"Bearer {api_key}"},
+                    json=payload,
+                )
+            resp.raise_for_status()
+            email_id = resp.json().get("id")
+            if not email_id:
+                raise HTTPException(status_code=502, detail="Email provider returned no message ID")
+            return email_id
+        except httpx.HTTPStatusError as e:
+            logger.error("Resend request failed with HTTP %s", e.response.status_code)
+            raise HTTPException(status_code=502, detail="Failed to send email") from e
+        except httpx.TimeoutException as e:
+            raise HTTPException(status_code=504, detail="Email provider timed out") from e
+        except httpx.RequestError as e:
+            logger.error("Resend request failed: %s", type(e).__name__)
+            raise HTTPException(status_code=502, detail="Email provider is unavailable") from e
+        except ValueError as e:
+            raise HTTPException(status_code=502, detail="Invalid response from email provider") from e
+
+    if EMAIL_PROVIDER != "smtp":
+        raise HTTPException(status_code=503, detail="EMAIL_PROVIDER must be resend or smtp")
+
+    smtp_host = os.environ.get("SMTP_HOST", "").strip()
+    if not smtp_host:
+        raise HTTPException(status_code=503, detail="SMTP_HOST must be configured for SMTP")
     try:
-        async with httpx.AsyncClient(timeout=30) as client:
-            resp = await client.post(
-                f"{EMAIL_BASE_URL}/api/v1/email/send",
-                headers={"X-Email-Key": EMAIL_KEY},
-                json=payload,
-            )
-        resp.raise_for_status()
-        return resp.json().get("id")
-    except httpx.HTTPStatusError as e:
-        logger.error(f"Email send failed: {e.response.status_code} {e.response.text}")
-        raise HTTPException(status_code=502, detail="Failed to send email")
-    except httpx.HTTPError as e:
-        logger.error(f"Email send error: {e!s}")
-        raise HTTPException(status_code=500, detail="Failed to send email") from e
+        smtp_port = int(os.environ.get("SMTP_PORT", "587"))
+    except ValueError as e:
+        raise HTTPException(status_code=503, detail="SMTP_PORT must be an integer") from e
+    smtp_username = os.environ.get("SMTP_USERNAME", "")
+    smtp_password = os.environ.get("SMTP_PASSWORD", "")
+    use_ssl = os.environ.get("SMTP_USE_SSL", "false").lower() == "true"
+    message = EmailMessage()
+    message["From"] = EMAIL_FROM
+    message["To"] = to
+    message["Subject"] = subject
+    message["Message-ID"] = make_msgid()
+    if actual_reply_to:
+        message["Reply-To"] = actual_reply_to
+    message.set_content("This email contains an HTML digest. Please use an HTML-enabled email client.")
+    message.add_alternative(html, subtype="html")
+
+    try:
+        await asyncio.to_thread(
+            _smtp_send,
+            smtp_host,
+            smtp_port,
+            smtp_username,
+            smtp_password,
+            use_ssl,
+            message,
+        )
+    except (smtplib.SMTPException, OSError) as e:
+        logger.error("SMTP delivery failed: %s", type(e).__name__)
+        raise HTTPException(status_code=502, detail="Failed to send email") from e
+    return message["Message-ID"]
+
+
+def _smtp_deliver(
+    smtp: smtplib.SMTP,
+    message: EmailMessage,
+    username: str,
+    password: str,
+) -> None:
+    if username:
+        smtp.login(username, password)
+    smtp.send_message(message)
+
+
+def _smtp_send(
+    host: str,
+    port: int,
+    username: str,
+    password: str,
+    use_ssl: bool,
+    message: EmailMessage,
+) -> None:
+    if use_ssl:
+        with smtplib.SMTP_SSL(
+            host, port, timeout=20, context=ssl.create_default_context()
+        ) as smtp:
+            _smtp_deliver(smtp, message, username, password)
+    else:
+        with smtplib.SMTP(host, port, timeout=20) as smtp:
+            smtp.starttls(context=ssl.create_default_context())
+            _smtp_deliver(smtp, message, username, password)
 
 # --- Analytics aggregation ---
 def _aggregate(events: list) -> dict:
@@ -293,6 +379,10 @@ def _aggregate(events: list) -> dict:
     }
 
 async def send_weekly_digest() -> str | None:
+    if not DIGEST_EMAIL:
+        raise HTTPException(status_code=503, detail="DIGEST_EMAIL must be configured")
+    if not SITE_URL.startswith("https://"):
+        raise HTTPException(status_code=503, detail="SITE_URL must be configured as an HTTPS URL")
     week_start = datetime.now(timezone.utc).timestamp() - 7 * 86400
     since = datetime.fromtimestamp(week_start, tz=timezone.utc).isoformat()
     events = await db.analytics_events.find({"ts": {"$gte": since}}, {"_id": 0}).to_list(20000)
@@ -357,21 +447,21 @@ async def _weekly_digest_loop():
 
 @api_router.post("/analytics/weekly-email")
 async def trigger_weekly_email(x_stats_token: str = Header(default="")):
-    if x_stats_token != os.environ.get("STATS_TOKEN"):
+    stats_token = os.environ.get("STATS_TOKEN", "")
+    if not stats_token or not hmac.compare_digest(x_stats_token, stats_token):
         raise HTTPException(status_code=401, detail="unauthorized")
     email_id = await send_weekly_digest()
     return {"status": "sent", "email_id": email_id}
 
 
 # Vercel Cron hits this daily at 09:00 IST (03:30 UTC) — sends only on Mondays,
-# once per week (marker in db.settings). On Emergent the asyncio loop handles it.
+# once per week (marker in db.settings). Local deployments use the asyncio loop.
 @api_router.get("/cron/weekly-digest")
 async def cron_weekly_digest(request: Request, x_stats_token: str = Header(default="")):
     auth = request.headers.get("authorization", "")
     cron_secret = os.environ.get("CRON_SECRET", "")
-    cron_ok = bool(cron_secret) and auth == f"Bearer {cron_secret}"
-    token_ok = bool(x_stats_token) and x_stats_token == os.environ.get("STATS_TOKEN")
-    if not (cron_ok or token_ok):
+    cron_ok = bool(cron_secret) and hmac.compare_digest(auth, f"Bearer {cron_secret}")
+    if not cron_ok:
         raise HTTPException(status_code=401, detail="unauthorized")
     now = datetime.now(ZoneInfo("Asia/Kolkata"))
     if now.weekday() != 0:
@@ -460,8 +550,15 @@ app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_credentials=False,
+    allow_origins=[
+        origin.strip()
+        for origin in os.environ.get(
+            "CORS_ORIGINS",
+            "http://localhost:3000,http://127.0.0.1:3000",
+        ).split(",")
+        if origin.strip()
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )

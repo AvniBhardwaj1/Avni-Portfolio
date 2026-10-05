@@ -1,70 +1,73 @@
-# Free Deployment Guide — Vercel + MongoDB Atlas
+# Deploy from scratch — Vercel + MongoDB Atlas
 
-Everything below is $0. **No credit card needed for anything.**
+The site and API can run on Vercel Hobby with an Atlas M0 database. The chat
+provider and email sender are optional integrations; the site starts with chat
+in mock mode and does not need either provider to deploy. Provider free tiers
+and account requirements can change, so check the provider's current terms.
 
-## Architecture
+## 1. Create the database
 
-- **Frontend + Backend (FastAPI) + Cron** → Vercel free Hobby plan, one project, one URL like `https://avni-portfolio.vercel.app`
-- **Database** → MongoDB Atlas M0 (free forever, 512 MB)
+1. Create a MongoDB Atlas account and an M0 free cluster.
+2. Create a database user and allow Vercel to reach the cluster. Atlas network
+   access rules apply to the Vercel serverless API; restrict access further if
+   you use a stable egress option.
+3. Copy the Python-driver connection URI. Replace the username/password
+   placeholders, and use database name `avni_portfolio`.
 
-The backend runs as a Vercel Python serverless function (`/api/index.py` reuses `backend/server.py`). The weekly digest email runs via Vercel Cron (daily 09:00 IST check, sends Mondays only).
+## 2. Connect the repository to Vercel
 
----
+1. Import `AvniBhardwaj1/Avni-Portfolio` into Vercel.
+2. Keep the project root directory at the repository root.
+3. Select `updated_2026` or another branch you choose. For the current cleanup,
+   deploy `revamp/emergent-free` after its changes are ready; there is no need
+   to push to `main`.
+4. Add the server environment variables below before deploying.
 
-## Step 1 — MongoDB Atlas (free database)
+| Variable | Required | Value |
+|---|---:|---|
+| `MONGO_URL` | Yes | MongoDB Atlas connection URI |
+| `DB_NAME` | Yes | `avni_portfolio` |
+| `STATS_TOKEN` | Yes | Long random secret used by `/stats` and manual digest trigger |
+| `CRON_SECRET` | Yes | Separate long random secret used by the Vercel scheduled digest |
+| `SITE_URL` | Yes | Your canonical HTTPS Vercel URL |
+| `CORS_ORIGINS` | For cross-origin local/API use | Comma-separated allowed origins; set to your site origin |
+| `LLM_PROVIDER` | No | `mock` (default), `groq`, `gemini`, `openrouter`, `anthropic`, or `openai` |
+| `LLM_API_KEY` | For a real LLM | Key for the selected provider; never prefix it with `REACT_APP_` |
+| `LLM_MODEL` | No | Optional provider model override |
+| `LLM_MAX_TOKENS` | No | Maximum generated tokens (default 512; max 2048) |
+| `EMAIL_PROVIDER` | For weekly email | `resend` or `smtp` |
+| `EMAIL_FROM` | For weekly email | Sender accepted by the selected email provider |
+| `DIGEST_EMAIL` | For weekly email | Recipient address |
+| `EMAIL_REPLY_TO` | No | Optional reply-to address |
+| `EMAIL_FROM_NAME` | No | Sender name in the digest |
 
-1. https://cloud.mongodb.com → sign up free
-2. Create an **M0 FREE** cluster (AWS, Mumbai region is fine)
-3. Database Access → Add Database User → save the username + password
-4. Network Access → **Allow Access from Anywhere** (`0.0.0.0/0`) — required so Vercel can reach it
-5. Connect → **Drivers** → Python → copy the connection string:
-   `mongodb+srv://<user>:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority`
-   (replace `<password>` with the database user's password)
+Generate independent random values for the two access secrets (for example,
+`openssl rand -hex 32`). Do not reuse a provider API key as either token.
 
-## Step 2 — Push this code to GitHub
+For Resend, set `RESEND_API_KEY` and use an `EMAIL_FROM` sender authorized by
+your Resend account. For SMTP, set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`,
+`SMTP_PASSWORD`, and `SMTP_USE_SSL` (`true` for implicit TLS, otherwise STARTTLS).
+`EMAIL_FROM` must be accepted by that SMTP service.
 
-Use **"Save to GitHub"** in the Emergent chat input → select repo `avnibhardwaj1/Avni-Portfolio` → branch `main` → PUSH.
+Vercel injects the cron authorization header from `CRON_SECRET`; the endpoint
+rejects requests without the matching bearer token. The configured schedule
+checks daily at 09:00 India time and sends only on Mondays.
 
-(`.env` files are gitignored — secrets never leave this workspace.)
+## 3. Deploy and verify
 
-## Step 3 — Vercel (free hosting for everything)
+Deploy the selected branch. The repository config builds the frontend with
+`npm ci` and routes `/api/*` to the FastAPI function. Verify:
 
-1. https://vercel.com → sign up **with GitHub** (free, no card)
-2. **Add New → Project** → import `Avni-Portfolio`
-3. Leave **Root Directory** as the repo root (the included `vercel.json` handles the frontend build + API)
-4. Before deploying, open **Environment Variables** and add:
+- `/` loads the portfolio.
+- `/api/` returns the API health response.
+- `/stats` loads and rejects an incorrect token; unlock it with `STATS_TOKEN`.
+- Chat works in `mock` mode, or with the provider selected in `LLM_PROVIDER`.
+- Configure email and then use the protected manual digest endpoint only when
+  you are ready to send a real email.
 
-   | Name | Value |
-   |---|---|
-   | `MONGO_URL` | your Atlas connection string from Step 1 |
-   | `DB_NAME` | `avni_portfolio` |
-   | `EMERGENT_LLM_KEY` | from `backend/.env` in your Emergent workspace |
-   | `EMERGENT_EMAIL_KEY` | from `backend/.env` |
-   | `STATS_TOKEN` | from `backend/.env` |
-   | `DIGEST_EMAIL` | from `backend/.env` (where the weekly digest goes) |
-   | `EMAIL_FROM_NAME` | from `backend/.env` |
-   | `EMAIL_REPLY_TO` | from `backend/.env` |
-   | `SITE_URL` | `https://<your-project>.vercel.app` |
-   | `CORS_ORIGINS` | `https://<your-project>.vercel.app` |
-   | `CRON_SECRET` | make up a long random string (protects the cron endpoint) |
+## Local environment files
 
-   You do NOT need `REACT_APP_BACKEND_URL` — frontend and API share the same origin on Vercel.
-
-5. **Deploy**. ~2-3 minutes later your site is live.
-
-## Step 4 — Verify the live site
-
-- `https://<your-project>.vercel.app` — hero, A380, vinyls, everything
-- `https://<your-project>.vercel.app/api/` — should return a JSON "Hello World"
-- Chat widget answers (needs `EMERGENT_LLM_KEY`)
-- Skills section shows the live GitHub heatmap
-- Stats dashboard: `https://<your-project>.vercel.app/stats`
-
-## Notes
-
-- Your Emergent preview keeps working exactly as before — nothing here affects it.
-- Every push to `main` auto-redeploys on Vercel. No GitHub Actions needed.
-- Serverless means the first API call after idle can take a few seconds (cold start) — normal on the free plan.
-- The weekly digest email still goes out Mondays 09:00 IST via Vercel Cron.
-- If the Vercel build log shows a Python dependency error, check the function logs under your project → Deployments → Functions.
-- Optional later: add a custom domain in Vercel → Settings → Domains (free).
+Copy `backend/.env.example` to `backend/.env` for local API development. Root
+`.env.example` documents the server-side deployment variables, and
+`frontend/.env.example` contains only optional public frontend settings.
+Never commit `.env` files or put server secrets in `REACT_APP_*` variables.
