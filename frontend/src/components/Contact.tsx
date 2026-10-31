@@ -11,7 +11,6 @@ import {
   Linkedin,
   Mail,
   MapPin,
-  Phone,
 } from "lucide-react";
 import { Chapter } from "@/components/Chapter";
 import { NowCard } from "@/components/NowCard";
@@ -23,7 +22,6 @@ const DETAILS = [
   { id: "location", Icon: MapPin, label: "Location", value: "Indore, Madhya Pradesh" },
   { id: "email", Icon: Mail, label: "Email", value: "avnibhardwaj01.ab@gmail.com", href: "mailto:avnibhardwaj01.ab@gmail.com" },
   { id: "education", Icon: GraduationCap, label: "Education", value: "NMIMS Indore" },
-  { id: "mobile", Icon: Phone, label: "Mobile", value: "+91 96913 85721", href: "tel:+919691385721" },
   { id: "languages", Icon: Languages, label: "Languages", value: "English · Hindi · Korean (I)" },
 ];
 

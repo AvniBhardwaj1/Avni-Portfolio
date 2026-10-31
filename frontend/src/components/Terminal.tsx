@@ -73,7 +73,6 @@ const OUTPUTS: Record<string, string[]> = {
   ],
   contact: [
     "email    →  avnibhardwaj01.ab@gmail.com",
-    "mobile   →  +91 96913 85721",
     "location →  indore, madhya pradesh",
     "type `resume` to download the PDF.",
   ],

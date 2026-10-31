@@ -13,6 +13,7 @@ analytics, with optional chat transcript logging.
 - Opt-in hand-gesture controls; camera processing stays in the browser
 - MongoDB-backed contact form, optional chat transcript logging, and token-protected `/stats`
 - Optional Vercel Cron weekly digest using Resend or SMTP
+- Updated, phone-redacted résumé and the supplied DeepLearning.AI certificate
 
 Contact messages are saved to the `contact_submissions` MongoDB collection.
 If an email provider is configured, new contacts also trigger an escaped

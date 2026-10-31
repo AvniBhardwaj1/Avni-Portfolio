@@ -23,7 +23,18 @@
       "work": [
         "Architected FP-BOT, a Dockerized retrieval-augmented generation pipeline using LlamaIndex, vLLM, and Qdrant to index documentation from 30+ tools, deployed through Jenkins CI/CD and queried through FastAPI.",
         "Built AirSimuPy, a Python and PySide6 simulation platform using NetworkX and NumPy to execute block-diagram data pipelines with a Hybrid Compiled Architecture, reducing team reliance on MATLAB Simulink.",
-        "Validated a Python-based Sorting Tool against legacy Fortran solvers."
+        "Validated a Python load-sorting engine against a legacy Fortran solver across millions of data points, testing race conditions, data shapes, and multiprocessing serialization.",
+        "Built a multithreaded Tkinter test-automation tool with SSH batch dispatch and regex-based path rewriting, reducing a 10-file test cycle from about 20 minutes to under 60 seconds."
+      ]
+    },
+    {
+      "role": "Software Developer Intern",
+      "organization": "Hiteshi Infotech",
+      "location": "Indore",
+      "period": "June-July 2024",
+      "work": [
+        "Contributed reusable React, HTML, CSS, and JavaScript components to the company's production website.",
+        "Applied component-based frontend architecture and state management patterns and worked with Node.js backend-connected features."
       ]
     }
   ],
@@ -53,6 +64,11 @@
       "skills": ["Python", "LLMs", "ATS APIs", "pytest"]
     },
     {
+      "name": "Driving License Application Portal",
+      "description": "A full-stack citizen-service portal with age-gated applications, role-based applicant and admin flows, a resumable multi-step wizard, Razorpay webhook verification, and normalized PostgreSQL records.",
+      "skills": ["React", "FastAPI", "PostgreSQL", "Razorpay"]
+    },
+    {
       "name": "Weather MCP Server",
       "description": "Normalizes OpenWeatherMap responses, uses TTL/Redis caching, and includes Jest tests and a demo UI.",
       "url": "https://github.com/AvniBhardwaj1/weather-mcp-server",
@@ -66,7 +82,17 @@
     },
     {
       "name": "Deep Learning Research",
-      "description": "Confidential image-classification/diagnostics research under review for publication, using an ensemble of DenseNet201, SE-ResNet50, MobileNetV3-Large-100, and Xception."
+      "description": "Four-author research on pediatric bone-age assessment using an ensemble of DenseNet201, SE-ResNet50, MobileNetV3-Large-100, and Xception; the résumé lists the work as under review at a Springer journal."
+    },
+    {
+      "name": "Hybrid Face-Iris Biometric Authentication Research",
+      "description": "Four-author research proposing and evaluating three cross-attention architectures for multimodal face-iris verification, with up to 99.83% accuracy reported in the résumé; publication details remain withheld.",
+      "skills": ["PyTorch", "Cross-Attention", "ResNet", "VGG16"]
+    },
+    {
+      "name": "IoT Smart Home Automation",
+      "description": "An ESP32-based home automation system using environmental, gas, light, and motion sensors, relay control, an LCD, and buzzer/LED alerts.",
+      "skills": ["ESP32", "C++", "DHT11", "MQ-2", "PIR", "Blynk"]
     },
     {
       "name": "IoT Actuator Control",
@@ -139,6 +165,8 @@
     "Tableau Foundation Course - Intellipaat (2025).",
     "National Finalist, Chaitanya leadership event, Atharv Ranbhoomi'24 at IIM Indore (top 10 of 1000+).",
     "Google Developer Student Clubs (GDSC) Lead, 2023-24.",
+    "Led a GDSC community of 300+ students, organized 10+ technical workshops, and supported Google Cloud and GenAI certification initiatives for 200+ students.",
+    "Main-head organizer for Witty Hacks 2024 at NMIMS Indore, coordinating a three-day event for 3,000+ participants across 100 teams.",
     "Techinnovation 6th Rank Winner at IIT Kanpur twice: CCTV analytics frontend (top 5 of 25,000) and environmental monitoring prototype.",
     "Finalist, Kavach Hackathon (Government of India cybersecurity), 2023.",
     "Organizing Committee, WittyHacks 4.0 at NMIMS Indore.",
@@ -157,6 +185,11 @@
     "HitNext Challenge Certificate of Organisation, GDSC NMIMS Indore.",
     "AWS Academy Cloud Architecting 60-hour training badge (November 2025, Credly verified).",
     "Tableau Foundation Course - Intellipaat (2025).",
+    "Fast Prototyping of GenAI Apps with Streamlit - DeepLearning.AI.",
+    "Generative AI with Large Language Models: Transformers in Practice - DeepLearning.AI; issued September 23, 2026; credential 20338f23-2026-436d-8ef7-10402366191b; https://www.deeplearning.ai/certificates/20338f23-2026-436d-8ef7-10402366191b.",
+    "Google Cloud Fundamentals - Google Cloud Study Jams.",
+    "Amazon ML Summer School 2024 - Selected Participant.",
+    "NVIDIA Certified Associate - Generative AI LLMs (NCA-GENL) certification preparation - LinkedIn Learning.",
     "Conference Paper Presenter, International Conference on Recent Paradigm in Computer Science and Engineering, STME NMIMS (2022).",
     "ISC2 Certified in Cybersecurity CC course, Udemy (17.5 hours, 2025).",
     "Oracle Challenge Winner (team TECH-TITANS).",
@@ -164,7 +197,6 @@
   ],
   "contact": {
     "email": "avnibhardwaj01.ab@gmail.com",
-    "phone": "+91 96913 85721",
     "location": "Indore, Madhya Pradesh",
     "github": "https://github.com/AvniBhardwaj1",
     "linkedin": "https://www.linkedin.com/in/avni-bhardwaj10/",
@@ -172,7 +204,6 @@
   },
   "gaps": [
     "TODO(owner): Provide the specific GitHub repository URLs for Deep Learning Research and IoT Actuator Control if they are public.",
-    "TODO(owner): Confirm whether the Deep Learning Research project is still under review for publication and which details may be shared publicly.",
     "TODO(owner): Resolve the Chaitanya finalist ranking conflict: the profile says top 10 of 1,000+, while the timeline says top 20 from 977 registrations."
   ]
 }

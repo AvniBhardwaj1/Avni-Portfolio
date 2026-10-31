@@ -6,7 +6,16 @@ import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { track } from "@/lib/analytics";
 import { startCrackle, stopCrackle } from "@/lib/sounds";
 
-type Cert = { id: string; label: string; sub: string; desc: string; img: string; pdf: string };
+type Cert = {
+  id: string;
+  label: string;
+  sub: string;
+  desc: string;
+  img?: string;
+  imageFit?: "cover" | "contain";
+  pdf?: string;
+  linkText?: string;
+};
 
 const PUB = process.env.PUBLIC_URL ?? "";
 
@@ -25,20 +34,27 @@ const CERTS: Cert[] = [
   { id: "cert-12", label: "ISC2 Certified in Cybersecurity (CC)", sub: "Udemy · 17.5 hours, Apr 2025", desc: "Completed the full ISC2 Certified in Cybersecurity (CC) course on Udemy.", img: "/certificates/cert-12.jpg", pdf: "/certificates/cert-12.pdf" },
   { id: "cert-13", label: "Oracle Challenge — Winner", sub: "GDSC STME · Team TECH-TITANS", desc: "Certificate of Achievement for outstanding performance in the Oracle Challenge, team TECH-TITANS.", img: "/certificates/cert-13.jpg", pdf: "/certificates/cert-13.pdf" },
   { id: "cert-14", label: "Kavach 2023 — Grand Finale", sub: "Govt. of India · Cybersecurity Hackathon", desc: "Grand Finale participant at Kavach 2023, the national cybersecurity hackathon, with team NM_VISIONARYTITANS.", img: "/certificates/cert-14.jpg", pdf: "/certificates/cert-14.pdf" },
+  { id: "cert-15", label: "Fast Prototyping of GenAI Apps with Streamlit", sub: "DeepLearning.AI", desc: "Course completion listed on Avni's supplied résumé." },
+  { id: "cert-16", label: "Transformers in Practice", sub: "DeepLearning.AI · Issued Sep 23, 2026", desc: "Generative AI with Large Language Models course certificate. Credential ID: 20338f23-2026-436d-8ef7-10402366191b.", img: "/certificates/deeplearningai-transformers.png", imageFit: "contain", pdf: "https://www.deeplearning.ai/certificates/20338f23-2026-436d-8ef7-10402366191b", linkText: "Verify certificate" },
+  { id: "cert-17", label: "Google Cloud Fundamentals", sub: "Google Cloud Study Jams", desc: "Course completion listed on Avni's supplied résumé." },
+  { id: "cert-18", label: "Amazon ML Summer School 2024", sub: "Selected Participant", desc: "Selection listed on Avni's supplied résumé." },
+  { id: "cert-19", label: "Generative AI LLMs Certification Preparation", sub: "LinkedIn Learning · NVIDIA NCA-GENL", desc: "NVIDIA Certified Associate Generative AI LLMs certification preparation course listed on Avni's supplied résumé." },
 ];
 
 export const CERTIFICATION_COUNT = CERTS.length;
 
 const DiscFace = ({ cert }: { cert: Cert }) => (
   <>
-    <img
-      src={`${PUB}${cert.img}`}
-      alt={cert.label}
-      className="h-full w-full rounded-full object-cover"
-      onError={(e) => {
-        e.currentTarget.style.display = "none";
-      }}
-    />
+    {cert.img && (
+      <img
+        src={cert.img.startsWith("http") ? cert.img : `${PUB}${cert.img}`}
+        alt={cert.label}
+        className={`h-full w-full rounded-full ${cert.imageFit === "contain" ? "bg-white object-contain" : "object-cover"}`}
+        onError={(e) => {
+          e.currentTarget.style.display = "none";
+        }}
+      />
+    )}
     <div className="vinyl-grooves pointer-events-none absolute inset-0 rounded-full" />
     <div className="absolute inset-[40%] flex items-center justify-center rounded-full border border-foreground/20 bg-background">
       <Award className="h-4 w-4 text-accent" />
@@ -189,23 +205,34 @@ export const Certificates = () => {
                 </h3>
                 <p className="mt-1 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{active.sub}</p>
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{active.desc}</p>
-                <img
-                  src={`${PUB}${active.img}`}
-                  alt={active.label}
-                  className="mt-6 max-h-56 w-full rounded-xl border border-foreground/10 object-contain"
-                  data-testid="cert-player-image"
-                />
-                <a
-                  href={`${PUB}${active.pdf}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  data-testid="cert-player-pdf-link"
-                  data-magnetic
-                  className="mt-5 inline-flex items-center gap-2 rounded-full border border-foreground/15 px-5 py-2.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors hover:border-accent hover:text-accent"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  Open original PDF
-                </a>
+                {active.img ? (
+                  <img
+                    src={active.img.startsWith("http") ? active.img : `${PUB}${active.img}`}
+                    alt={active.label}
+                    className="mt-6 max-h-56 w-full rounded-xl border border-foreground/10 object-contain"
+                    data-testid="cert-player-image"
+                  />
+                ) : (
+                  <p
+                    data-testid="cert-player-image-unavailable"
+                    className="mt-6 rounded-xl border border-foreground/10 px-4 py-3 text-xs leading-relaxed text-muted-foreground"
+                  >
+                    Listed on the supplied résumé. A certificate scan was not provided.
+                  </p>
+                )}
+                {active.pdf && (
+                  <a
+                    href={active.pdf.startsWith("http") ? active.pdf : `${PUB}${active.pdf}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    data-testid="cert-player-pdf-link"
+                    data-magnetic
+                    className="mt-5 inline-flex items-center gap-2 rounded-full border border-foreground/15 px-5 py-2.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors hover:border-accent hover:text-accent"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    {active.linkText ?? "Open original PDF"}
+                  </a>
+                )}
               </motion.div>
             </motion.div>
           </motion.div>

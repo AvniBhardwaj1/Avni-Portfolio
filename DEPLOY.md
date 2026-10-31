@@ -64,7 +64,28 @@ choose a provider whose current free tier and key requirements work for you,
 then set `LLM_PROVIDER` and `LLM_API_KEY`. No LLM provider is required to deploy
 the site.
 
-## 4. Optional: enable the weekly email digest
+## 4. Enable contact email notifications
+
+The contact form always stores messages in MongoDB. To also send notifications
+to the email address in `backend/data/profile.json`, set these Vercel
+Environment Variables:
+
+| Variable | Value |
+|---|---|
+| `EMAIL_PROVIDER` | `resend` |
+| `EMAIL_API_KEY` | Resend API key, kept server-side |
+| `EMAIL_FROM_ADDRESS` | A sender address verified with Resend |
+| `EMAIL_FROM_NAME` | Optional display name |
+
+No recipient variable is required for contact messages. Resend sends them to
+the profile email; `DIGEST_EMAIL` is only for the separate weekly digest. Never
+put an email API key in frontend code or a `REACT_APP_*` variable. The contact
+endpoint validates message fields, limits requests per IP, ignores honeypot
+submissions, and escapes user text before putting it in the notification.
+Email delivery is best-effort: a provider failure does not discard the saved
+message and is reported to the sender.
+
+## 5. Optional: enable the weekly email digest
 
 The daily Vercel Cron runs at 09:00 India time and sends only on Mondays. The
 digest is separate from contact notifications: contact messages are always
@@ -93,7 +114,7 @@ Contact notifications use the email provider settings above and are sent to
 the contact address in `backend/data/profile.json`. A delivery failure does
 not discard the MongoDB submission.
 
-## 5. Deploy and verify
+## 6. Deploy and verify
 
 After deployment:
 

@@ -69,9 +69,12 @@ def test_profile_is_externalized_and_prompt_uses_it(monkeypatch):
     server = load_server(monkeypatch)
 
     assert "Autonomous AI Research Agent (Briefing-Bot)" in server.AVNI_SYSTEM_PROMPT
+    assert "Software Developer Intern" in server.AVNI_SYSTEM_PROMPT
+    assert "Transformers in Practice" in server.AVNI_SYSTEM_PROMPT
     assert "TODO(owner)" not in server.AVNI_SYSTEM_PROMPT
     assert any(gap.startswith("TODO(owner)") for gap in server.PROFILE_DATA["gaps"])
     assert server.PROFILE_DATA["contact"]["email"] == "avnibhardwaj01.ab@gmail.com"
+    assert "phone" not in server.PROFILE_DATA["contact"]
 
 
 def test_chat_rejects_invalid_roles_and_oversized_input(monkeypatch):
@@ -248,6 +251,39 @@ def test_contact_notification_is_sent_after_saving(monkeypatch):
     assert sent[0]["reply_to"] == "recruiter@example.com"
 
 
+def test_contact_notification_escapes_untrusted_html(monkeypatch):
+    server = load_server(monkeypatch)
+    fake_db = FakeDatabase()
+    sent = []
+    monkeypatch.setattr(server, "db", fake_db)
+    monkeypatch.setattr(server, "_RATE_LIMIT_INDEX_READY", False)
+    monkeypatch.setattr(server, "_contact_email_configured", lambda: True)
+
+    async def send_email(**kwargs):
+        sent.append(kwargs)
+        return "email-id"
+
+    monkeypatch.setattr(server, "send_email", send_email)
+
+    async def submit():
+        return await server.submit_contact(
+            server.ContactSubmission(
+                name="<img src=x>",
+                email="recruiter@example.com",
+                project_type="Other",
+                message="Please review this <script>alert(1)</script> message.",
+            ),
+            make_request(),
+        )
+
+    response = asyncio.run(submit())
+
+    assert response["notificationStatus"] == "sent"
+    assert "<img" not in sent[0]["html"]
+    assert "<script>" not in sent[0]["html"]
+    assert "&lt;script&gt;" in sent[0]["html"]
+
+
 def test_contact_honeypot_acknowledges_without_storing(monkeypatch):
     server = load_server(monkeypatch)
     fake_db = FakeDatabase()
@@ -269,6 +305,35 @@ def test_contact_honeypot_acknowledges_without_storing(monkeypatch):
 
     assert response == {"status": "received", "notificationStatus": "skipped"}
     assert fake_db.contact_submissions.documents == []
+
+
+def test_contact_rate_limit_rejects_the_sixth_request(monkeypatch):
+    server = load_server(monkeypatch)
+    fake_db = FakeDatabase()
+    monkeypatch.setattr(server, "db", fake_db)
+    monkeypatch.setattr(server, "_RATE_LIMIT_INDEX_READY", False)
+    request = make_request()
+    submission = server.ContactSubmission(
+        name="Recruiter",
+        email="recruiter@example.com",
+        project_type="Internship",
+        message="I would like to discuss a project.",
+    )
+
+    async def submit():
+        return await server.submit_contact(submission, request)
+
+    async def submit_five():
+        for _ in range(5):
+            await submit()
+        with pytest.raises(HTTPException) as exc:
+            await submit()
+        assert exc.value.status_code == 429
+        assert exc.value.headers["Retry-After"]
+
+    asyncio.run(submit_five())
+
+    assert len(fake_db.contact_submissions.documents) == 5
 
 
 def test_contact_submission_rejects_invalid_email(monkeypatch):
