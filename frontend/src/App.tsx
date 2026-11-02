@@ -4,6 +4,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Hand, Pointer, X } from "lucide-react";
 import { MotionConfig } from "framer-motion";
+import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/theme/ThemeContext";
 import { MotionProvider, useMotion } from "@/theme/MotionContext";
 import { setLenis } from "@/lib/scroll";
@@ -180,6 +181,7 @@ export default function App() {
         ) : (
           <Site />
         )}
+        <Analytics />
       </MotionProvider>
     </ThemeProvider>
   );
