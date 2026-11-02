@@ -28,6 +28,30 @@
         --ring: 187 100% 50%;
         --radius: 0.5rem;
     }
+    :root[data-theme="light"] {
+        color-scheme: light;
+        --background: 210 33% 98%;
+        --foreground: 222 47% 11%;
+        --card: 0 0% 100%;
+        --card-foreground: 222 47% 11%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222 47% 11%;
+        --primary: 222 47% 11%;
+        --primary-foreground: 210 33% 98%;
+        --secondary: 214 32% 93%;
+        --secondary-foreground: 222 47% 11%;
+        --muted: 214 32% 93%;
+        --muted-foreground: 215 16% 40%;
+        --accent: 188 100% 30%;
+        --accent-foreground: 0 0% 100%;
+        --accent-2: 262 70% 52%;
+        --accent-3: 28 90% 46%;
+        --destructive: 0 72% 45%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 214 26% 84%;
+        --input: 214 26% 84%;
+        --ring: 188 100% 30%;
+    }
     .dark {
         --background: 225 30% 4%;
         --foreground: 210 30% 96%;
@@ -127,18 +151,6 @@
     animation: blink-dot 1.2s infinite ease-in-out;
 }
 
-@media (pointer: fine) {
-    html,
-    body,
-    a,
-    button,
-    input,
-    textarea,
-    [role="button"] {
-        cursor: none;
-    }
-}
-
 .dot-lit {
     background: hsl(var(--accent));
     box-shadow: 0 0 16px hsl(var(--accent) / 0.9);
@@ -199,16 +211,6 @@
 .reduced-motion .typing-dot {
     animation: none;
     opacity: 1;
-}
-
-@media (pointer: fine) {
-    .reduced-motion html,
-    .reduced-motion body,
-    .reduced-motion a,
-    .reduced-motion button,
-    .reduced-motion input {
-        cursor: auto;
-    }
 }
 
 @layer base {

@@ -1,7 +1,7 @@
-import { Download, PersonStanding, TerminalSquare } from "lucide-react";
-import { useMotion } from "@/theme/MotionContext";
+import { Download, TerminalSquare } from "lucide-react";
 import { scrollToSection } from "@/lib/scroll";
 import { track } from "@/lib/analytics";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const LINKS = [
   { label: "Work", target: "#work" },
@@ -11,7 +11,6 @@ const LINKS = [
 ];
 
 export const Nav = ({ onOpenTerminal }: { onOpenTerminal: () => void }) => {
-  const { reduced, toggle: toggleMotion } = useMotion();
   return (
     <header
       data-testid="main-nav"
@@ -60,18 +59,7 @@ export const Nav = ({ onOpenTerminal }: { onOpenTerminal: () => void }) => {
             <Download className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Résumé</span>
           </a>
-          <button
-            data-testid="motion-toggle"
-            data-magnetic
-            onClick={toggleMotion}
-            aria-label="Toggle reduced motion"
-            title={reduced ? "Reduced motion on — click to enable animations" : "Animations on — click for reduced motion"}
-            className={`ml-1 flex h-8 w-8 items-center justify-center rounded-full border transition-colors hover:border-accent hover:text-accent sm:ml-2 sm:h-9 sm:w-9 ${
-              reduced ? "border-accent text-accent" : "border-foreground/10"
-            }`}
-          >
-            <PersonStanding className="h-4 w-4" />
-          </button>
+          <ThemeToggle />
         </nav>
       </div>
     </header>

@@ -293,7 +293,7 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[90] flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-sm"
           data-testid="terminal-overlay"
           role="presentation"
           onClick={(e) => e.target === e.currentTarget && onClose()}
@@ -304,19 +304,19 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.97 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="flex h-[min(80vh,560px)] w-[min(94vw,760px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0a0f14] shadow-2xl"
+            className="flex h-[min(80vh,560px)] w-[min(94vw,760px)] flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-card shadow-2xl"
             onClick={() => inputRef.current?.focus()}
             role="dialog"
             aria-modal="true"
             aria-label="Interactive portfolio terminal"
             tabIndex={-1}
           >
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+            <div className="flex items-center justify-between border-b border-foreground/10 px-4 py-3">
               <div className="flex items-center gap-2">
                 <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
                 <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
                 <span className="h-3 w-3 rounded-full bg-[#28c840]" />
-                <span className="ml-3 flex items-center gap-2 font-mono text-xs text-white/50">
+                <span className="ml-3 flex items-center gap-2 font-mono text-xs text-muted-foreground">
                   <TerminalSquare className="h-3.5 w-3.5" /> visitor@avni: ~
                 </span>
               </div>
@@ -324,7 +324,7 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
                 onClick={onClose}
                 data-testid="terminal-close-button"
                 aria-label="Close terminal"
-                className="text-white/50 transition-colors hover:text-white"
+                className="text-muted-foreground transition-colors hover:text-foreground"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -338,8 +338,8 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
                     line.kind === "cmd"
                       ? "text-cyan-300"
                       : line.kind === "sys"
-                        ? "text-white/40"
-                        : "text-white/85"
+                        ? "text-muted-foreground"
+                        : "text-foreground"
                   }`}
                 >
                   {line.text}
@@ -356,7 +356,7 @@ export const Terminal = ({ open, onClose }: { open: boolean; onClose: () => void
                   aria-label="Terminal command input"
                   spellCheck={false}
                   autoComplete="off"
-                  className="flex-1 bg-transparent font-mono text-[13px] text-white caret-cyan-300 outline-none"
+                  className="flex-1 bg-transparent font-mono text-[13px] text-foreground caret-accent outline-none"
                   style={{ cursor: "text" }}
                 />
               </div>

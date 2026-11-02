@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { ArrowLeft, ArrowUpRight, Github } from "lucide-react";
 import { CASE_STUDIES } from "@/components/Experience";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const hasSpecificRepository = (href?: string) =>
   Boolean(href && href !== "https://github.com/AvniBhardwaj1");
@@ -74,14 +75,17 @@ export const ProjectCaseStudyPage = ({ slug }: { slug: string }) => {
         >
           AB<span className="text-accent">://</span>
         </a>
-        <a
-          href="/#work"
-          data-testid="case-study-back-link"
-          className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-accent"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          All projects
-        </a>
+        <div className="flex items-center gap-4">
+          <a
+            href="/#work"
+            data-testid="case-study-back-link"
+            className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-accent"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            All projects
+          </a>
+          <ThemeToggle />
+        </div>
       </header>
 
       <article

@@ -112,7 +112,7 @@ export const Hero = ({ gesture }: { gesture: ReturnType<typeof useGestureScroll>
               className="mt-5 inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-foreground/80"
             >
               <span className={`h-2 w-2 rounded-full bg-accent ${reduced ? "" : "animate-pulse"}`} />
-              Open to internships &amp; collaborations
+              Open to work, collaborations &amp; research
             </div>
             <p
               data-testid="hero-tagline"

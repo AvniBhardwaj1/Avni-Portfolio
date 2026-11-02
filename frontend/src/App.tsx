@@ -10,7 +10,6 @@ import { setLenis } from "@/lib/scroll";
 import { initAudioOnGesture } from "@/lib/sounds";
 import { initAnalytics } from "@/lib/analytics";
 import { useGestureScroll } from "@/hooks/useGestureScroll";
-import { Cursor } from "@/components/Cursor";
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
 import { Marquee } from "@/components/Marquee";
@@ -120,7 +119,6 @@ function Site() {
       <ChatWidget />
       <Terminal open={terminalOpen} onClose={() => setTerminalOpen(false)} />
       <Dock onOpenTerminal={() => setTerminalOpen(true)} />
-      <Cursor />
       <FlightPath />
       {gesture.status === "active" && <GestureCursor cursorRef={gesture.cursorRef} />}
 
