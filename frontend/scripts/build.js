@@ -13,7 +13,7 @@ process.env.REACT_APP_SITE_URL = (
 
 const cracoBin = require.resolve("@craco/craco/dist/bin/craco.js");
 const build = spawnSync(process.execPath, [cracoBin, "build"], {
-  env: process.env,
+  env: { ...process.env, CI: "false" },
   stdio: "inherit",
 });
 
