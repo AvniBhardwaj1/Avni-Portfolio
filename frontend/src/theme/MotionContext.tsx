@@ -1,27 +1,28 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
-const MotionContext = createContext<{ reduced: boolean; toggle: () => void }>({
+const MotionContext = createContext<{ reduced: boolean }>({
   reduced: false,
-  toggle: () => {},
 });
 
 export function MotionProvider({ children }: { children: ReactNode }) {
-  const [reduced, setReduced] = useState<boolean>(() => {
-    if (localStorage.getItem("ab-reduced") === "1") return true;
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  });
+  const [systemReduced, setSystemReduced] = useState<boolean>(() =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const reduced = systemReduced;
 
   useEffect(() => {
-    localStorage.setItem("ab-reduced", reduced ? "1" : "0");
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => setSystemReduced(media.matches);
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
     document.documentElement.classList.toggle("reduced-motion", reduced);
   }, [reduced]);
 
-  return (
-    <MotionContext.Provider value={{ reduced, toggle: () => setReduced((r) => !r) }}>
-      {children}
-    </MotionContext.Provider>
-  );
+  return <MotionContext.Provider value={{ reduced }}>{children}</MotionContext.Provider>;
 }
 
 export const useMotion = () => useContext(MotionContext);

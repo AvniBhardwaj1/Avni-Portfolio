@@ -1,10 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Github, X } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Chapter } from "@/components/Chapter";
-import { AircraftAssembly } from "@/components/AircraftAssembly";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useTheme } from "@/theme/ThemeContext";
 import { track } from "@/lib/analytics";
 
@@ -18,7 +18,7 @@ type ProjectDetails = {
   impact: string[];
 };
 
-type Project = {
+export type Project = {
   id: string;
   index: string;
   period: string;
@@ -263,7 +263,71 @@ const PROJECTS: Project[] = [
   },
 ];
 
+export const CASE_STUDIES = [AIRBUS, ...PROJECTS];
+export const PROJECT_COUNT = CASE_STUDIES.length;
+
 const INDEX_COLORS = ["text-accent", "text-accent2", "text-accent3"];
+
+const hasSpecificRepository = (project: Project) =>
+  Boolean(project.href && project.href !== "https://github.com/AvniBhardwaj1");
+
+const AircraftAssembly = lazy(() =>
+  import("@/components/AircraftAssembly").then((module) => ({
+    default: module.AircraftAssembly,
+  })),
+);
+
+const DeferredAircraft = ({ dark }: { dark: boolean }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    if (!("IntersectionObserver" in window)) {
+      setShouldLoad(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setShouldLoad(true);
+        observer.disconnect();
+      },
+      { rootMargin: "500px 0px" },
+    );
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={containerRef} data-testid="aircraft-lazy-container">
+      {shouldLoad ? (
+        <Suspense
+          fallback={
+            <div
+              className="flex min-h-[70vh] items-center justify-center font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground"
+              data-testid="aircraft-loading"
+              aria-busy="true"
+            >
+              Loading Airbus visualization
+            </div>
+          }
+        >
+          <AircraftAssembly dark={dark} />
+        </Suspense>
+      ) : (
+        <div
+          className="min-h-[70vh]"
+          data-testid="aircraft-loading"
+          aria-busy="true"
+          role="status"
+          aria-label="Airbus visualization loads when this section is near"
+        />
+      )}
+    </div>
+  );
+};
 
 const Card = ({
   project,
@@ -282,12 +346,7 @@ const Card = ({
     transition={{ duration: 0.85, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
     style={{ transformPerspective: 1000 }}
     data-testid={`project-card-${project.id}`}
-    onClick={() => {
-      track("card_click", { id: project.id, title: project.title });
-      onOpen(project);
-    }}
-    data-magnetic
-    className="group flex h-full cursor-pointer flex-col gap-6 rounded-2xl border border-foreground/10 bg-background/70 p-8 backdrop-blur-sm transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-accent/60"
+    className="group flex h-full flex-col gap-6 rounded-2xl border border-foreground/10 bg-background/70 p-8 backdrop-blur-sm transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-accent/60"
   >
     <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
       <span className={INDEX_COLORS[i % 3]}>{project.index}</span>
@@ -308,6 +367,12 @@ const Card = ({
         </li>
       ))}
     </ul>
+    <p
+      data-testid={`project-impact-${project.id}`}
+      className="border-l-2 border-accent/50 pl-4 text-sm font-medium leading-relaxed text-foreground/85"
+    >
+      {project.details.impact[0]}
+    </p>
     <div className="mt-auto flex flex-wrap gap-2 pt-2">
       {project.stack.map((tech) => (
         <span
@@ -318,9 +383,38 @@ const Card = ({
         </span>
       ))}
     </div>
-    <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground/70 transition-colors group-hover:text-accent">
-      Tap to unfold the build
-    </p>
+    <div className="flex flex-wrap items-center gap-2 border-t border-foreground/10 pt-4">
+      <button
+        type="button"
+        data-testid={`project-quick-view-${project.id}`}
+        onClick={() => {
+          track("card_click", { id: project.id, title: project.title });
+          onOpen(project);
+        }}
+        className="rounded-full border border-foreground/15 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-accent hover:text-accent"
+      >
+        Quick view
+      </button>
+      <a
+        href={`/projects/${project.id}`}
+        data-testid={`project-case-study-${project.id}`}
+        className="rounded-full bg-accent px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-accent-foreground transition-transform hover:scale-[1.03]"
+      >
+        Case study
+      </a>
+      {hasSpecificRepository(project) && (
+        <a
+          href={project.href}
+          target="_blank"
+          rel="noreferrer"
+          data-testid={`project-repository-${project.id}`}
+          aria-label={`View ${project.title} on GitHub`}
+          className="inline-flex items-center gap-1 rounded-full border border-foreground/15 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-accent hover:text-accent"
+        >
+          Code <ArrowUpRight className="h-3 w-3" />
+        </a>
+      )}
+    </div>
   </motion.article>
 );
 
@@ -355,11 +449,8 @@ const ProjectOverlay = ({
   i: number;
   onClose: () => void;
 }) => {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(true, dialogRef, onClose);
 
   return (
     <motion.div
@@ -368,13 +459,19 @@ const ProjectOverlay = ({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
       data-testid="project-overlay"
+      role="presentation"
       className="fixed inset-0 z-[70] flex items-center justify-center bg-background/70 p-4 backdrop-blur-md md:p-8"
       onClick={onClose}
     >
       <motion.div
+        ref={dialogRef}
         layoutId={`project-card-${project.id}`}
         transition={{ type: "spring", stiffness: 220, damping: 26 }}
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="project-overlay-title"
+        tabIndex={-1}
         className="flex max-h-[85vh] w-full max-w-3xl flex-col gap-6 overflow-y-auto rounded-2xl border border-accent/30 bg-background/95 p-8 shadow-[0_50px_120px_-30px_hsl(var(--foreground)/0.4)] backdrop-blur-2xl md:p-10"
       >
         <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
@@ -390,7 +487,7 @@ const ProjectOverlay = ({
         </div>
 
         <div>
-          <h3 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
+          <h3 id="project-overlay-title" className="font-display text-3xl font-bold tracking-tight md:text-4xl">
             {project.title}
           </h3>
           <p className="mt-2 font-mono text-xs uppercase tracking-[0.2em] text-accent">
@@ -421,20 +518,30 @@ const ProjectOverlay = ({
           ))}
         </div>
 
-        {project.href && (
+        <div className="mt-2 flex flex-wrap gap-3">
+          <a
+            href={`/projects/${project.id}`}
+            data-testid="project-overlay-case-study"
+            className="inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 font-mono text-xs uppercase tracking-[0.2em] text-accent-foreground transition-transform hover:scale-[1.03] active:scale-95"
+          >
+            Full case study
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </a>
+          {hasSpecificRepository(project) && (
           <a
             href={project.href}
             target="_blank"
             rel="noreferrer"
             data-testid="project-overlay-github"
             data-magnetic
-            className="mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 font-mono text-xs uppercase tracking-[0.2em] text-accent-foreground transition-transform hover:scale-[1.03] active:scale-95"
+            className="inline-flex w-fit items-center gap-2 rounded-full border border-foreground/15 px-6 py-3 font-mono text-xs uppercase tracking-[0.2em] text-foreground transition-colors hover:border-accent hover:text-accent"
           >
             <Github className="h-4 w-4" />
-            View on GitHub
+            View code
             <ArrowUpRight className="h-3.5 w-3.5" />
           </a>
-        )}
+          )}
+        </div>
       </motion.div>
     </motion.div>
   );
@@ -476,9 +583,8 @@ export const Experience = () => {
     requestAnimationFrame(() => ScrollTrigger.refresh());
   };
 
-  const allProjects = [AIRBUS, ...PROJECTS];
   const selectedIndex = selected
-    ? allProjects.findIndex((p) => p.id === selected.id)
+    ? CASE_STUDIES.findIndex((p) => p.id === selected.id)
     : 0;
 
   return (
@@ -518,7 +624,7 @@ export const Experience = () => {
       {tab === "industry" ? (
         <div data-testid="industry-panel">
           <div className="-mx-6 md:-mx-16 lg:-mx-24">
-            <AircraftAssembly dark={dark} />
+            <DeferredAircraft dark={dark} />
           </div>
           <div className="mt-16 max-w-4xl">
             <Card project={AIRBUS} i={0} onOpen={openProject} />

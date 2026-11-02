@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#083344"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <radialGradient id="halo">
+      <stop offset="0" stop-color="#06b6d4" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#06b6d4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#050a10"/>
+  <circle cx="970" cy="320" r="330" fill="url(#halo)"/>
+  <rect x="52" y="52" width="1096" height="526" rx="28" fill="url(#glow)" stroke="#67e8f9" stroke-opacity=".24"/>
+  <path d="M88 142h86" stroke="#67e8f9" stroke-width="4"/>
+  <text x="88" y="190" fill="#67e8f9" font-family="monospace" font-size="20" letter-spacing="5">DATA · CLOUD · AI</text>
+  <text x="82" y="318" fill="#f8fafc" font-family="Arial, sans-serif" font-size="86" font-weight="700" letter-spacing="-3">AVNI</text>
+  <text x="82" y="410" fill="#f8fafc" font-family="Arial, sans-serif" font-size="86" font-weight="700" letter-spacing="-3">BHARDWAJ</text>
+  <text x="88" y="480" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="25">Computer Engineering · Data Systems · Applied AI</text>
+  <text x="88" y="534" fill="#67e8f9" font-family="monospace" font-size="16" letter-spacing="3">INDORE, INDIA</text>
+</svg>

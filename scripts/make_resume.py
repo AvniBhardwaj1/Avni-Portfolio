@@ -41,7 +41,7 @@ c.drawString(18 * mm, y, "Computer Engineering | Data, Cloud & AI")
 y -= 6 * mm
 c.setFillColor(GREY)
 c.setFont("Helvetica", 9)
-c.drawString(18 * mm, y, "Indore, Madhya Pradesh  ·  avnibhardwaj01.ab@gmail.com  ·  +91 96913 85721")
+c.drawString(18 * mm, y, "Indore, Madhya Pradesh  ·  avnibhardwaj01.ab@gmail.com")
 y -= 5 * mm
 c.drawString(18 * mm, y, "github.com/avnibhardwaj1  ·  linkedin.com/in/avni-bhardwaj10  ·  leetcode.com/u/AvniBhardwaj10")
 y -= 8 * mm

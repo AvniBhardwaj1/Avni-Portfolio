@@ -1,22 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Hand, Pointer, X } from "lucide-react";
 import { MotionConfig } from "framer-motion";
+import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/theme/ThemeContext";
 import { MotionProvider, useMotion } from "@/theme/MotionContext";
 import { setLenis } from "@/lib/scroll";
 import { initAudioOnGesture } from "@/lib/sounds";
 import { initAnalytics } from "@/lib/analytics";
 import { useGestureScroll } from "@/hooks/useGestureScroll";
-import { Scene3D } from "@/components/Scene3D";
-import { Cursor } from "@/components/Cursor";
-import { MeshGradient } from "@/components/MeshGradient";
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
 import { Marquee } from "@/components/Marquee";
 import { Experience } from "@/components/Experience";
+import { Highlights } from "@/components/Highlights";
 import { Timeline } from "@/components/Timeline";
 import { Skills } from "@/components/Skills";
 import { Certificates } from "@/components/Certificates";
@@ -27,14 +26,40 @@ import { Dock } from "@/components/Dock";
 import { GestureCursor } from "@/components/GestureCursor";
 import { FlightPath } from "@/components/FlightPath";
 import StatsPage from "@/pages/StatsPage";
+import { ProjectCaseStudyPage } from "@/pages/ProjectCaseStudyPage";
 
 gsap.registerPlugin(ScrollTrigger);
+
+const Scene3D = lazy(() =>
+  import("@/components/Scene3D").then((module) => ({ default: module.Scene3D })),
+);
 
 function Site() {
   const lenisRef = useRef<Lenis | null>(null);
   const gesture = useGestureScroll(lenisRef);
   const { reduced } = useMotion();
   const [terminalOpen, setTerminalOpen] = useState(false);
+  const [sceneReady, setSceneReady] = useState(false);
+  const [smallScreen, setSmallScreen] = useState(() =>
+    window.matchMedia("(max-width: 767px)").matches,
+  );
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 767px)");
+    const updateScreenSize = () => setSmallScreen(media.matches);
+    updateScreenSize();
+    media.addEventListener("change", updateScreenSize);
+    if (reduced || media.matches) {
+      setSceneReady(false);
+    } else {
+      const timer = window.setTimeout(() => setSceneReady(true), 1200);
+      return () => {
+        media.removeEventListener("change", updateScreenSize);
+        window.clearTimeout(timer);
+      };
+    }
+    return () => media.removeEventListener("change", updateScreenSize);
+  }, [reduced, smallScreen]);
 
   useEffect(() => {
     initAudioOnGesture();
@@ -69,14 +94,25 @@ function Site() {
   return (
     <MotionConfig reducedMotion={reduced ? "always" : "never"}>
     <div className="min-h-screen bg-background font-body text-foreground">
-      <MeshGradient />
-      <Scene3D />
+      <a
+        href="#main-content"
+        data-testid="skip-link"
+        className="sr-only fixed left-4 top-4 z-[110] rounded-lg bg-accent px-4 py-3 font-mono text-xs uppercase text-accent-foreground focus:not-sr-only"
+      >
+        Skip to main content
+      </a>
+      {!reduced && !smallScreen && sceneReady && (
+        <Suspense fallback={null}>
+          <Scene3D />
+        </Suspense>
+      )}
       <Nav onOpenTerminal={() => setTerminalOpen(true)} />
-      <main className="relative z-10">
+      <main id="main-content" className="relative z-10" data-testid="main-content">
         <Hero gesture={gesture} />
         <Marquee />
         <Experience />
         <Timeline />
+        <Highlights />
         <Skills />
         <Certificates />
         <Contact />
@@ -84,7 +120,6 @@ function Site() {
       <ChatWidget />
       <Terminal open={terminalOpen} onClose={() => setTerminalOpen(false)} />
       <Dock onOpenTerminal={() => setTerminalOpen(true)} />
-      <Cursor />
       <FlightPath />
       {gesture.status === "active" && <GestureCursor cursorRef={gesture.cursorRef} />}
 
@@ -135,10 +170,18 @@ export default function App() {
   const isStats =
     window.location.pathname.endsWith("/stats") ||
     window.location.hash.replace("#", "").replace(/^\//, "") === "stats";
+  const projectSlug = window.location.pathname.match(/^\/projects\/([a-z0-9-]+)\/?$/)?.[1];
   return (
     <ThemeProvider>
       <MotionProvider>
-        {isStats ? <StatsPage /> : <Site />}
+        {isStats ? (
+          <StatsPage />
+        ) : projectSlug ? (
+          <ProjectCaseStudyPage slug={projectSlug} />
+        ) : (
+          <Site />
+        )}
+        <Analytics />
       </MotionProvider>
     </ThemeProvider>
   );

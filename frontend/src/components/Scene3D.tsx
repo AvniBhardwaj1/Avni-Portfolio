@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { gsap } from "gsap";
@@ -26,11 +26,18 @@ function makeDotTexture() {
   return new THREE.CanvasTexture(canvas);
 }
 
-function ParticleField({ progress, dark }: { progress: Refs["progress"]; dark: boolean }) {
+function ParticleField({
+  progress,
+  dark,
+  count,
+}: {
+  progress: Refs["progress"];
+  dark: boolean;
+  count: number;
+}) {
   const points = useRef<THREE.Points>(null);
   const texture = useMemo(() => makeDotTexture(), []);
   const positions = useMemo(() => {
-    const count = 340;
     const arr = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       arr[i * 3] = (Math.random() - 0.5) * 24;
@@ -38,7 +45,7 @@ function ParticleField({ progress, dark }: { progress: Refs["progress"]; dark: b
       arr[i * 3 + 2] = (Math.random() - 0.5) * 14 - 2;
     }
     return arr;
-  }, []);
+  }, [count]);
 
   useFrame((state) => {
     const p = points.current;
@@ -69,11 +76,18 @@ function ParticleField({ progress, dark }: { progress: Refs["progress"]; dark: b
   );
 }
 
-function NodeCloud({ progress, dark }: { progress: Refs["progress"]; dark: boolean }) {
+function NodeCloud({
+  progress,
+  dark,
+  count,
+}: {
+  progress: Refs["progress"];
+  dark: boolean;
+  count: number;
+}) {
   const group = useRef<THREE.Group>(null);
   const nodes = useMemo(() => {
     const pts: THREE.Vector3[] = [];
-    const count = 26;
     for (let i = 0; i < count; i++) {
       const phi = Math.acos(1 - (2 * (i + 0.5)) / count);
       const theta = Math.PI * (1 + Math.sqrt(5)) * i;
@@ -86,7 +100,7 @@ function NodeCloud({ progress, dark }: { progress: Refs["progress"]; dark: boole
       );
     }
     return pts;
-  }, []);
+  }, [count]);
 
   useFrame((state) => {
     const g = group.current;
@@ -127,10 +141,16 @@ function CameraRig({ pointer }: { pointer: Refs["pointer"] }) {
 export const Scene3D = () => {
   const { theme } = useTheme();
   const dark = theme === "dark";
+  const [mobile, setMobile] = useState(() =>
+    window.matchMedia("(max-width: 767px)").matches,
+  );
   const progress = useRef(0);
   const pointer = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
+    const media = window.matchMedia("(max-width: 767px)");
+    const onChange = () => setMobile(media.matches);
+    media.addEventListener("change", onChange);
     const st = ScrollTrigger.create({
       trigger: document.documentElement,
       start: "top top",
@@ -143,9 +163,12 @@ export const Scene3D = () => {
       pointer.current.x = (e.clientX / window.innerWidth) * 2 - 1;
       pointer.current.y = (e.clientY / window.innerHeight) * 2 - 1;
     };
-    window.addEventListener("pointermove", onMove);
+    if (window.matchMedia("(pointer: fine)").matches) {
+      window.addEventListener("pointermove", onMove);
+    }
     return () => {
       st.kill();
+      media.removeEventListener("change", onChange);
       window.removeEventListener("pointermove", onMove);
     };
   }, []);
@@ -158,11 +181,11 @@ export const Scene3D = () => {
     >
       <Canvas
         camera={{ position: [0, 0, 9], fov: 45 }}
-        dpr={[1, 1.75]}
+        dpr={mobile ? [0.75, 1] : [1, 1.5]}
         gl={{ antialias: true, alpha: true }}
       >
-        <ParticleField progress={progress} dark={dark} />
-        <NodeCloud progress={progress} dark={dark} />
+        <ParticleField progress={progress} dark={dark} count={mobile ? 120 : 340} />
+        <NodeCloud progress={progress} dark={dark} count={mobile ? 10 : 26} />
         <CameraRig pointer={pointer} />
       </Canvas>
     </div>

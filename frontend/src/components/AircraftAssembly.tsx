@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
@@ -154,6 +154,16 @@ export const AircraftAssembly = ({ dark }: { dark: boolean }) => {
   const cardRRef = useRef<HTMLDivElement>(null);
   const [model, setModel] = useState<{ groups: Groups; fly: THREE.Group } | null>(null);
   const { reduced } = useMotion();
+  const [mobile, setMobile] = useState(() =>
+    window.matchMedia("(max-width: 767px)").matches,
+  );
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 767px)");
+    const onChange = () => setMobile(media.matches);
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
 
   useLayoutEffect(() => {
     if (!model) return;
@@ -210,7 +220,11 @@ export const AircraftAssembly = ({ dark }: { dark: boolean }) => {
   return (
     <div ref={sectionRef} className="relative h-screen overflow-hidden" data-testid="aircraft-assembly">
       <div className="pointer-events-none absolute inset-0">
-        <Canvas camera={{ position: [0, 1.4, 11], fov: 42 }} dpr={[1, 1.75]} gl={{ antialias: true, alpha: true }}>
+        <Canvas
+          camera={{ position: [0, 1.4, 11], fov: 42 }}
+          dpr={mobile ? [0.75, 1] : [1, 1.5]}
+          gl={{ antialias: !mobile, alpha: true }}
+        >
           <ambientLight intensity={dark ? 0.5 : 0.85} />
           <directionalLight position={[6, 8, 4]} intensity={dark ? 1.6 : 1.1} color={dark ? "#bfefff" : "#ffffff"} />
           <directionalLight position={[-6, 3, -4]} intensity={dark ? 0.5 : 0.4} color={dark ? "#155e75" : "#7dd3fc"} />
@@ -229,7 +243,7 @@ export const AircraftAssembly = ({ dark }: { dark: boolean }) => {
         ref={cardLRef}
         style={{ opacity: reduced ? 1 : 0 }}
         data-testid="airbus-card-fpbot"
-        className="pointer-events-none absolute left-6 top-[26%] max-w-sm rounded-2xl border border-foreground/10 bg-background/60 p-7 backdrop-blur-xl md:left-16 lg:left-24"
+        className="pointer-events-none absolute left-4 right-4 top-[26%] rounded-2xl border border-foreground/10 bg-background/60 p-5 backdrop-blur-xl md:left-16 md:right-auto md:max-w-sm md:p-7 lg:left-24"
       >
         <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent">Airbus India — Internship</p>
         <h4 className="mt-3 font-display text-2xl font-bold tracking-tight">FP-BOT</h4>
@@ -250,7 +264,7 @@ export const AircraftAssembly = ({ dark }: { dark: boolean }) => {
         ref={cardRRef}
         style={{ opacity: reduced ? 1 : 0 }}
         data-testid="airbus-card-airsimupy"
-        className="pointer-events-none absolute bottom-[18%] right-6 max-w-sm rounded-2xl border border-foreground/10 bg-background/60 p-7 backdrop-blur-xl md:right-16 lg:right-24"
+        className="pointer-events-none absolute bottom-[18%] left-4 right-4 rounded-2xl border border-foreground/10 bg-background/60 p-5 backdrop-blur-xl md:left-auto md:right-16 md:max-w-sm md:p-7 lg:right-24"
       >
         <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent">Simulation Engine & Validation</p>
         <h4 className="mt-3 font-display text-2xl font-bold tracking-tight">AirSimuPy</h4>

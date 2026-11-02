@@ -1,5 +1,7 @@
+import { useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Camera, Hand, Lock, Pointer, X } from "lucide-react";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 
 type Props = {
   open: boolean;
@@ -20,24 +22,34 @@ const GESTURES = [
   },
 ];
 
-export const GestureGuideModal = ({ open, onClose, onStart }: Props) => (
-  <AnimatePresence>
-    {open && (
+export const GestureGuideModal = ({ open, onClose, onStart }: Props) => {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(open, dialogRef, onClose);
+
+  return (
+    <AnimatePresence>
+      {open && (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.25 }}
         data-testid="gesture-guide-modal"
+        role="presentation"
         className="fixed inset-0 z-[90] flex items-center justify-center bg-background/70 p-4 backdrop-blur-md"
         onClick={onClose}
       >
         <motion.div
+          ref={dialogRef}
           initial={{ opacity: 0, scale: 0.92, y: 24 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 12 }}
           transition={{ type: "spring", stiffness: 260, damping: 24 }}
           onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="gesture-guide-title"
+          tabIndex={-1}
           className="w-full max-w-md rounded-3xl border border-foreground/10 bg-background/80 p-7 shadow-[0_40px_100px_-20px_hsl(var(--foreground)/0.35)] backdrop-blur-2xl"
         >
           <div className="flex items-start justify-between">
@@ -45,7 +57,7 @@ export const GestureGuideModal = ({ open, onClose, onStart }: Props) => (
               <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-accent">
                 {"// gesture control"}
               </p>
-              <h3 className="mt-2 font-display text-2xl font-bold tracking-tight">
+              <h3 id="gesture-guide-title" className="mt-2 font-display text-2xl font-bold tracking-tight">
                 Your hand is the mouse
               </h3>
             </div>
@@ -99,6 +111,7 @@ export const GestureGuideModal = ({ open, onClose, onStart }: Props) => (
           </button>
         </motion.div>
       </motion.div>
-    )}
-  </AnimatePresence>
-);
+      )}
+    </AnimatePresence>
+  );
+};
